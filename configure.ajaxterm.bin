@@ -1,0 +1,3 @@
+#!/bin/sh
+PYTHONPATH=/usr/share/ajaxterm
+exec $PYTHONPATH/ajaxterm.py "$@"
