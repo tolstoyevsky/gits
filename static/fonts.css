@@ -1,0 +1,9 @@
+@font-face {
+    font-family: 'Droid Sans Mono';
+    src: url('./fonts/DroidSansMono.ttf');
+}
+
+@font-face {
+    font-family: 'Ubuntu Mono';
+    src: url('./fonts/UbuntuMono-R.ttf');
+}

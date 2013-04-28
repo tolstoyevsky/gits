@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta charset="UTF-8"/>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" />
+        <link href="{{ static_url("basic.css") }}" rel="stylesheet" />
+        <link href="{{ static_url("control-panel.css") }}" rel="stylesheet" />
+        <script src="//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+        <script src="{{ static_url("ajaxterm.js") }}"></script>
+        <script src="{{ static_url("control-panel.js") }}"></script>
+    </head>
+    <body>
+        <div class="terminal" id="control-panel">
+            <!-- There will be terminal-screen here. -->
+            <div class="terminal-controls">
+                <div class="full-screen">
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-fullscreen"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

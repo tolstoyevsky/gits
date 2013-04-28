@@ -1,0 +1,67 @@
+/*
+ * TODO: Использовать CSS Variables (http://w3.org/TR/css-variables/), как
+ * только эта возможность станет доступна в Chrome.
+ *
+ * Дело в том, что для цвета текста (foreground color) и цвета фона (background
+ * color) терминалы используют одну и ту же группу цветов. Использование CSS
+ * Variables позволило бы скрыть шестнадцатеричные представления цветов за
+ * простыми именами. Сейчас везде необходимо использовать шестнадцатеричные
+ * представления, что существенно осложняет добавление новой цветовой схемы,
+ * т. к. нет возможности централизованного изменения того или иного цвета.
+ */
+
+/* Foreground colors (0-15) */
+.terminal-display span.f0  { color: #000000; }
+.terminal-display span.f1  { color: #b21818; }
+.terminal-display span.f2  { color: #18b218; }
+.terminal-display span.f3  { color: #b26818; }
+.terminal-display span.f4  { color: #1818b2; }
+.terminal-display span.f5  { color: #b218b2; }
+.terminal-display span.f6  { color: #18b2b2; }
+.terminal-display span.f7  { color: #b2b2b2; }
+.terminal-display span.f8  { color: #686868; }
+.terminal-display span.f9  { color: #ff5454; }
+.terminal-display span.f10 { color: #54ff54; }
+.terminal-display span.f11 { color: #ffff54; }
+.terminal-display span.f12 { color: #5454ff; }
+.terminal-display span.f13 { color: #ff54ff; }
+.terminal-display span.f14 { color: #54ffff; }
+.terminal-display span.f15 { color: #ffffff; }
+
+/* Background colors (0-7) */
+.terminal-display span.b0  { background-color: #000000; }
+.terminal-display span.b1  { background-color: #b21818; }
+.terminal-display span.b2  { background-color: #18b218; }
+.terminal-display span.b3  { background-color: #b26818; }
+.terminal-display span.b4  { background-color: #1818b2; }
+.terminal-display span.b5  { background-color: #b218b2; }
+.terminal-display span.b6  { background-color: #18b2b2; }
+.terminal-display span.b7  { background-color: #b2b2b2; }
+
+.terminal {
+    float: left;
+}
+
+.terminal-screen {
+    /*
+     * Внимание.
+     * Данный параметр не отвечает за цвет фона терминала, – цвет фона
+     * терминала задается на уровне самого терминала посредством команды setab.
+     * Блочный элемент, для которого предназначены эти стили, играет роль
+     * основы, на которой располагается текст терминала, поэтому параметр
+     * background-color отвечает за цвет фона отступов от внутренних краев
+     * терминала, размер которых, кстати, задается посредством параметра
+     * padding. При изменении цвета фона терминала командой setab нужно не
+     * забывать изменять и цвет фона отступов.
+     */
+    background-color: #000000;
+    overflow: hidden;
+    padding: 5px;
+}
+
+.terminal-display {
+    font-family: 'Droid Sans Mono';
+    font-size: 14px;
+    margin: 0px;
+    overflow: hidden;
+}

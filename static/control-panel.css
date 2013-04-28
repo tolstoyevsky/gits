@@ -1,0 +1,32 @@
+.terminal {
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+}
+
+.terminal-controls DIV {
+    float: right;
+    margin: 5px;
+}
+
+/*
+ * Некоторые стили, которые переопределил Bootstrap, необходимо вернуть на
+ * место.
+ */
+
+body {
+    margin: 8px;
+}
+
+.terminal-screen {
+    box-sizing: initial;
+}
+
+.terminal-display {
+    background-color: initial;
+    border: initial;
+    border-radius: initial;
+    line-height: initial;
+    padding: initial;
+    word-wrap: initial;
+}
+
