@@ -18,13 +18,13 @@ import fcntl
 import optparse
 import os
 import pty
-import select
 import signal
 import socket  # only for gethostname()
 import struct
 import sys
 import termios
 import threading
+import selectors
 
 import tornado.httpserver
 import tornado.ioloop
@@ -57,7 +57,7 @@ class TermSocketHandler(tornado.websocket.WebSocketHandler):
     # недалеком будущем стоит задуматься об использовании менее
     # универсальной структуры данных.
     clients = {}
-    epoll = select.epoll()
+    selector = selectors.DefaultSelector()
     fd = None
 
     def create(self, width = 80, height = 24):
@@ -102,7 +102,7 @@ class TermSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         self.fd = self.create()
-        self.epoll.register(self.fd, select.EPOLLIN)
+        self.selector.register(self.fd, selectors.EVENT_READ)
 
     def on_message(self, request):
         label, data = request.split(',')
@@ -120,7 +120,7 @@ class TermSocketHandler(tornado.websocket.WebSocketHandler):
             self.clients[self.fd]["terminal"].set_resolution(int(row), int(col))
 
     def on_close(self):
-        self.epoll.unregister(self.fd)
+        self.selector.unregister(self.fd)
         self.kill(self.fd)
 
     def kill(self, fd):
@@ -155,11 +155,11 @@ class Application(tornado.web.Application):
 
 def loop():
     while True:
-        events = TermSocketHandler.epoll.poll(1)
-        for fd, event in events:
-            if event & select.EPOLLIN:
-                dump = TermSocketHandler.dump(fd)
-                TermSocketHandler.clients[fd]["client"].write_message(dump)
+        events = TermSocketHandler.selector.select(1)
+        for file_obj, event in events:
+            if event & selectors.EVENT_READ:
+                dump = TermSocketHandler.dump(file_obj.fd)
+                TermSocketHandler.clients[file_obj.fd]["client"].write_message(dump)
 
 
 def main():
