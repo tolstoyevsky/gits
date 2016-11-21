@@ -155,7 +155,11 @@ class Application(tornado.web.Application):
 
 def loop():
     while True:
-        events = TermSocketHandler.selector.select(1)
+        try:
+            events = TermSocketHandler.selector.select(1)
+        except ValueError:
+            continue
+
         for file_obj, event in events:
             if event & selectors.EVENT_READ:
                 dump = TermSocketHandler.dump(file_obj.fd)
