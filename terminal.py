@@ -25,9 +25,17 @@ import re
 
 
 class Terminal:
-    def __init__(self, width=80, height=24):
-        self.width = width
-        self.height = height
+    def __init__(self, rows=24, cols=80):
+        self._cols = cols
+        self._rows = rows
+        self._cur_y = None
+        self._cur_x = None
+        # The following two fields are used only for implementation of
+        # storing (sc) and restoring (rc) the current cursor position.
+        self._cur_x_bak = 0
+        self._cur_y_bak = 0
+        self._screen = None
+
         self.control_characters = {
             "\x00": None,
             "\x05": self.esc_da,  # ENQ, Ctrl-E
@@ -49,8 +57,10 @@ class Terminal:
             '\x1b[@': 'ich1',
             '\x1b[4h': 'smir',
             '\x1b[4l': 'rmir',
-            '\x1b[0m': 'noname',  # такой управляющей последовательности нет,
-                                  # но это не мешает, к примеру, ls слать ее
+
+            # такой управляющей последовательности нет, но это не мешает,
+            # к примеру, ls слать ее
+            '\x1b[0m': 'noname',
             '\x1b[1m': 'bold',
             '\x1b[2m': 'dim',
             '\x1b[4m': 'smul',
@@ -132,17 +142,12 @@ class Terminal:
         }
         self.init()
         self.reset()
-        # self.scr = None
         # self.st = None
         # self.sb = None
-        # self.cx_bak = None
-        # self.cy_bak = None
         # self.cl = None
         # self.sgr = None
         self.buf = ''
         # self.outbuf = None
-        # self.cy = None
-        # self.cx = None
 
     def cap_civis(self):
         pass
@@ -176,77 +181,88 @@ class Terminal:
         # число 16 777 216 (0x1000000), которое, в свою очередь, представляет
         # собой количество уникальных цветов в цветовом пространстве модели
         # RGB.
-        self.scr = array.array('l', [0x07000000] * (self.width * self.height))
+        self._screen = array.array('L',
+                                   [0x07000000] * (self._cols * self._rows))
         self.st = 0
-        self.sb = self.height - 1
-        self.cx_bak = self.cx = 0
-        self.cy_bak = self.cy = 0
+        self.sb = self._rows - 1
+        self._cur_x_bak = self._cur_x = 0
+        self._cur_y_bak = self._cur_y = 0
         self.cl = 0
         self.sgr = 0x07000000
         self.buf = ""
         self.outbuf = ""
 
-    def peek(self, y1, x1, y2, x2):
-        # x1,y1 -- левая граница участка
-        # x2,y2 -- правая граница участка
-        begin = self.width * y1 + x1
-        end = self.width * y2 + x2
-        return self.scr[begin:end]
+    def peek(self, left_border, right_border):
+        """
 
-    def poke(self, y, x, s):
-        # x,y -- координаты того места, в котрое нужно вставить строку s
-        pos = self.width * y + x
-        self.scr[pos:pos + len(s)] = s
+        The name of the method was inherited from AjaxTerm, developers of
+        which, in turn, inherited it from BASIC. See poke.
+        """
+        x1, y1 = left_border
+        x2, y2 = right_border
+        begin = self._cols * y1 + x1
+        end = self._cols * y2 + x2
+        return self._screen[begin:end]
+
+    def poke(self, pos, s):
+        """
+
+        The name of the method was inherited from AjaxTerm, developers of
+        which, in turn, inherited it from BASIC. See peek.
+        """
+        x, y = pos
+        begin = self._cols * y + x
+        self._screen[begin:begin + len(s)] = s
 
     def zero(self, y1, x1, y2, x2):
-        w = self.width * (y2 - y1) + x2 - x1 + 1
-        z = array.array('l', [0x07000000] * w)
-        self.scr[self.width * y1 + x1:self.width * y2 + x2 + 1] = z
+        w = self._cols * (y2 - y1) + x2 - x1 + 1
+        z = array.array('L', [0x07000000] * w)
+        self._screen[self._cols * y1 + x1:self._cols * y2 + x2 + 1] = z
 
     def scroll_up(self, y1, y2):
         """Передвигает участок 0,y1 x 0,y2 на одну строку вверх,
         где 0 < y1 < y2.
         """
         # y1 + 1 потому, что копирование происходит со следующей строки
-        line = self.peek(y1 + 1, 0, y2, self.width)
-        self.poke(y1, 0, line)
-        self.zero(y2, 0, y2, self.width - 1)
+        line = self.peek((0, y1 + 1), (self._cols, y2))
+        self.poke((0, y1), line)
+        self.zero(y2, 0, y2, self._cols - 1)
 
     def scroll_down(self, y1, y2):
         """Передвигает участок 0,y1 x 0,y2 на одну строку вниз,
         где 0 < y1 < y2.
         """
-        line = self.peek(y1, 0, y2 - 1, self.width)
-        self.poke(y1 + 1, 0, line)
-        self.zero(y1, 0, y1, self.width - 1)
+        line = self.peek((0, y1), (self._cols, y2 - 1))
+        self.poke((0, y1 + 1), line)
+        self.zero(y1, 0, y1, self._cols - 1)
 
     def scroll_right(self, y, x):
-        self.poke(y, x + 1, self.peek(y, x, y, self.width))
+        self.poke((x + 1, y), self.peek((x, y), (self._cols, y)))
         self.zero(y, x, y, x)
 
     def cursor_down(self):
-        if self.st <= self.cy <= self.sb:
+        if self.st <= self._cur_y <= self.sb:
             self.cl = 0
-            q, r = divmod(self.cy + 1, self.sb + 1)
+            q, r = divmod(self._cur_y + 1, self.sb + 1)
             if q:
                 self.scroll_up(self.st, self.sb)
-                self.cy = self.sb
+                self._cur_y = self.sb
             else:
-                self.cy = r
+                self._cur_y = r
 
     def cursor_right(self):
-        q, r = divmod(self.cx + 1, self.width)
+        q, r = divmod(self._cur_x + 1, self._cols)
         if q:
             self.cl = 1
         else:
-            self.cx = r
+            self._cur_x = r
 
     def echo(self, c):
         if self.cl:
             self.cursor_down()
-            self.cx = 0
+            self._cur_x = 0
 
-        self.scr[(self.cy * self.width) + self.cx] = self.sgr | ord(c)
+        self._screen[(self._cur_y * self._cols) + self._cur_x] = self.sgr | ord(c)
         self.cursor_right()
 
     def csi_dispatch(self, seq, mo):
@@ -271,12 +287,12 @@ class Terminal:
 
     # def csi_E(self, l):
     #     self.csi_B(l)
-    #     self.cx = 0
+    #     self._cur_x = 0
     #     self.cl = 0
 
     # def csi_F(self, l):
     #     self.csi_A(l)
-    #     self.cx = 0
+    #     self._cur_x = 0
     #     self.cl = 0
 
     # def csi_a(self, l):
@@ -295,26 +311,26 @@ class Terminal:
     # новый стиль именования методов, реализующих возможности
 
     def esc_0x08(self, s):
-        self.cx = max(0, self.cx - 1)
+        self._cur_x = max(0, self._cur_x - 1)
 
     def esc_0x09(self, s):
-        x = self.cx + 8
+        x = self._cur_x + 8
         q, r = divmod(x, 8)
-        self.cx = (q * 8) % self.width
+        self._cur_x = (q * 8) % self._cols
 
     def esc_0x0a(self, s):
         self.cursor_down()
 
     def esc_0x0d(self, s):
         self.cl = 0
-        self.cx = 0
+        self._cur_x = 0
 
     def esc_da(self, s):
         self.outbuf = "\x1b[?6c"
 
     def esc_ri(self, s):
-        self.cy = max(self.st, self.cy - 1)
-        if self.cy == self.st:
+        self._cur_y = max(self.st, self._cur_y - 1)
+        if self._cur_y == self.st:
             self.scroll_down(self.st, self.sb)
 
     def esc_ignore(self, *s):
@@ -406,18 +422,18 @@ class Terminal:
 
     def cap_sc(self, s=''):
         """Save cursor position """
-        self.cx_bak = self.cx
-        self.cy_bak = self.cy
+        self._cur_x_bak = self._cur_x
+        self._cur_y_bak = self._cur_y
 
     def cap_rc(self, s=''):
         """Restore cursor to position of last sc """
-        self.cx = self.cx_bak
-        self.cy = self.cy_bak
+        self._cur_x = self._cur_x_bak
+        self._cur_y = self._cur_y_bak
         self.cl = 0
 
     def cap_ich1(self, l=[1]):
         """Insert character """
-        self.scroll_right(self.cy, self.cx)
+        self.scroll_right(self._cur_y, self._cur_x)
 
     def cap_smir(self, l=''):
         """Insert mode (enter) """
@@ -433,11 +449,11 @@ class Terminal:
 
     def cap_kcuu1(self, l=[1]):
         """sent by terminal up-arrow key """
-        self.cy = max(self.st, self.cy - l[0])
+        self._cur_y = max(self.st, self._cur_y - l[0])
 
     def cap_kcud1(self, l=[1]):
         """sent by terminal down-arrow key """
-        self.cy = min(self.sb, self.cy + l[0])
+        self._cur_y = min(self.sb, self._cur_y + l[0])
 
     def cap_kcuf1(self, l=[1]):
         """sent by terminal right-arrow key """
@@ -447,41 +463,41 @@ class Terminal:
         if mo:
             p1 = int(mo.group(1))
 
-        self.cx = min(self.width - 1, self.cx + p1)
+        self._cur_x = min(self._cols - 1, self._cur_x + p1)
         self.cl = 0
 
     def cap_kcub1(self, l=[1]):
         """sent by terminal left-arrow key """
-        self.cx = max(0, self.cx - l[0])
+        self._cur_x = max(0, self._cur_x - l[0])
         self.cl = 0
 
     def cap_kb2(self, l=[1]):
         """center of keypad """
-        self.cx = min(self.width, l[0]) - 1
+        self._cur_x = min(self._cols, l[0]) - 1
 
     def cap_home(self, l=[1, 1]):
         """Home cursor """
-        self.cx = min(self.width, l[1]) - 1
-        self.cy = min(self.height, l[0]) - 1
+        self._cur_x = min(self._cols, l[1]) - 1
+        self._cur_y = min(self._rows, l[0]) - 1
         self.cl = 0
 
     def cap_ed(self, l=[0]):
         """Clear to end of display """
         if l[0] == 0:
-            self.zero(self.cy, self.cx, self.height - 1, self.width - 1)
+            self.zero(self._cur_y, self._cur_x, self._rows - 1, self._cols - 1)
         elif l[0] == 1:
-            self.zero(0, 0, self.cy, self.cx)
+            self.zero(0, 0, self._cur_y, self._cur_x)
         elif l[0] == 2:
-            self.zero(0, 0, self.height - 1, self.width - 1)
+            self.zero(0, 0, self._rows - 1, self._cols - 1)
 
     def cap_el(self, l=[0]):
         """Clear to end of line """
         if l[0] == 0:
-            self.zero(self.cy, self.cx, self.cy, self.width - 1)
+            self.zero(self._cur_y, self._cur_x, self._cur_y, self._cols - 1)
         elif l[0] == 1:
-            self.zero(self.cy, 0, self.cy, self.cx)
+            self.zero(self._cur_y, 0, self._cur_y, self._cur_x)
         elif l[0] == 2:
-            self.zero(self.cy, 0, self.cy, self.width - 1)
+            self.zero(self._cur_y, 0, self._cur_y, self._cols - 1)
 
     def cap_el1(self, l=[0]):
         self.cap_el([1])
@@ -501,7 +517,7 @@ class Terminal:
     def cap_vpa(self, mo):
         """Set vertical position to absolute #1 """
         p = int(mo.group(1))
-        self.cy = min(self.height, p) - 1
+        self._cur_y = min(self._rows, p) - 1
 
     def cap_il(self, mo=None, p1=None):
         """Add #1 new blank lines """
@@ -510,47 +526,47 @@ class Terminal:
             p1 = int(mo.group(1))
 
         for i in range(p1):
-            if self.cy < self.sb:
-                self.scroll_down(self.cy, self.sb)
+            if self._cur_y < self.sb:
+                self.scroll_down(self._cur_y, self.sb)
 
     def cap_dl(self, mo=None, p1=None):
         """Delete #1 lines """
         if mo:
             p1 = int(mo.group(1))
 
-        if self.st <= self.cy <= self.sb:
+        if self.st <= self._cur_y <= self.sb:
             for i in range(p1):
-                self.scroll_up(self.cy, self.sb)
+                self.scroll_up(self._cur_y, self.sb)
 
     def cap_dch(self, mo=None, p1=None):
         """Delete #1 chars """
         if mo:
             p1 = int(mo.group(1))
 
-        w, cx, cy = self.width, self.cx, self.cy
-        end = self.peek(cy, cx, cy, w)
+        w, cx, cy = self._cols, self._cur_x, self._cur_y
+        end = self.peek((cx, cy), (w, cy))
         self.cap_el([0])
-        self.poke(cy, cx, end[p1:])
+        self.poke((cx, cy), end[p1:])
 
     def cap_csr(self, mo):
         """Change to lines #1 through #2 (VT100) """
         p1 = int(mo.group(1))
         p2 = int(mo.group(2))
-        self.st = min(self.height - 1, p1 - 1)
-        self.sb = min(self.height - 1, p2 - 1)
+        self.st = min(self._rows - 1, p1 - 1)
+        self.sb = min(self._rows - 1, p2 - 1)
         self.sb = max(self.st, self.sb)
 
     def cap_ech(self, mo):
         """Erase #1 characters """
         p = int(mo.group(1))
-        self.zero(self.cy, self.cx, self.cy, self.cx + p)
+        self.zero(self._cur_y, self._cur_x, self._cur_y, self._cur_x + p)
 
     def cap_cup(self, mo):
         """Move to row #1 col #2 """
         p1 = int(mo.group(1))
         p2 = int(mo.group(2))
-        self.cx = min(self.width, p2) - 1
-        self.cy = min(self.height, p1) - 1
+        self._cur_x = min(self._cols, p2) - 1
+        self._cur_y = min(self._rows, p1) - 1
         self.cl = 0
 
     def exec_escape_sequence(self):
@@ -601,15 +617,15 @@ class Terminal:
                 self.echo(i)
 
     def dumphtml(self):
-        h = self.height
-        w = self.width
+        h = self._rows
+        w = self._cols
         r = ''
 
         # Строка, содержащая готовый к выводу символ.
         span = ''
         span_bg, span_fg = -1, -1
         for i in range(h * w):
-            q, c = divmod(self.scr[i], 256 * 256 * 256)
+            q, c = divmod(self._screen[i], 256 * 256 * 256)
             bg, fg = divmod(q, 16)
 
             # AjaxTerm использует черный цвет в качестве фона для терминала,
@@ -622,7 +638,7 @@ class Terminal:
             # побитового И, можно получить его обычный аналог, т.е. номер 2.
             bg &= 0x7
 
-            if i == self.cy * w + self.cx:
+            if i == self._cur_y * w + self._cur_x:
                 bg, fg = 1, 7
 
             # Если характеристики текущей ячейки совпадают с характеристиками
@@ -654,6 +670,6 @@ class Terminal:
         return r
 
     def set_resolution(self, row, col):
-        self.height = row
-        self.width = col
+        self._rows = row
+        self._cols = col
         self.reset()

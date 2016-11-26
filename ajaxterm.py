@@ -60,7 +60,7 @@ class TermSocketHandler(tornado.websocket.WebSocketHandler):
     selector = selectors.DefaultSelector()
     fd = None
 
-    def create(self, width = 80, height = 24):
+    def create(self, rows=24, cols=80):
         pid, fd = pty.fork()
         if pid == 0:
             if os.getuid() == 0:
@@ -77,26 +77,30 @@ class TermSocketHandler(tornado.websocket.WebSocketHandler):
                 sys.stdout.write(socket.gethostname() + ' login: \n')
                 login = sys.stdin.readline().strip()
 
-                cmd = ['ssh']
-                cmd += ['-oPreferredAuthentications=keyboard-interactive,password']
-                cmd += ['-oNoHostAuthenticationForLocalhost=yes']
-                cmd += ['-oLogLevel=FATAL']
-                cmd += ['-F/dev/null']
-                cmd += ['-l', login, 'localhost']
+                cmd = [
+                    'ssh',
+                    '-oPreferredAuthentications=keyboard-interactive,password',
+                    '-oNoHostAuthenticationForLocalhost=yes',
+                    '-oLogLevel=FATAL',
+                    '-F/dev/null',
+                    '-l', login, 'localhost',
+                ]
 
-            env = {}
-            env["COLUMNS"] = str(width)
-            env["LINES"] = str(height)
-            env["TERM"] = "linux"
-            env["PATH"] = os.environ["PATH"]
+            env = {
+                'COLUMNS': str(cols),
+                'LINES': str(rows),
+                'PATH': os.environ['PATH'],
+                'TERM': 'linux',
+            }
             os.execvpe(cmd[0], cmd, env)
         else:
             fcntl.fcntl(fd, fcntl.F_SETFL, os.O_NONBLOCK)
-            fcntl.ioctl(fd, termios.TIOCSWINSZ, struct.pack("HHHH", height, width, 0, 0))
+            fcntl.ioctl(fd, termios.TIOCSWINSZ,
+                        struct.pack('HHHH', rows, cols, 0, 0))
             TermSocketHandler.clients[fd] = {
                 "client": self,
                 "pid": pid,
-                "terminal": terminal.Terminal(width, height)
+                "terminal": terminal.Terminal(rows, cols)
             }
             return fd
 
