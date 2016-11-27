@@ -214,10 +214,17 @@ class Terminal:
         begin = self._cols * y + x
         self._screen[begin:begin + len(s)] = s
 
-    def zero(self, y1, x1, y2, x2):
-        w = self._cols * (y2 - y1) + x2 - x1 + 1
-        z = array.array('L', [0x07000000] * w)
-        self._screen[self._cols * y1 + x1:self._cols * y2 + x2 + 1] = z
+    def zero(self, left_border, right_border):
+        """Clears the area from the left border ``(x1, y2)`` to the right
+        border ``(x2, y2)`` inclusive."""
+
+        x1, y1 = left_border
+        x2, y2 = right_border
+        begin = self._cols * y1 + x1
+        end = self._cols * y2 + x2 + 1
+        length = end - begin  # the length of the area which have to be cleared
+        self._screen[begin:end] = array.array('L', [0x07000000] * length)
+        return length
 
     def scroll_up(self, y1, y2):
         """Передвигает участок 0,y1 x 0,y2 на одну строку вверх,
@@ -226,7 +233,7 @@ class Terminal:
         # y1 + 1 потому, что копирование происходит со следующей строки
         line = self.peek((0, y1 + 1), (self._cols, y2))
         self.poke((0, y1), line)
-        self.zero(y2, 0, y2, self._cols - 1)
+        self.zero((0, y2), (self._cols - 1, y2))
 
     def scroll_down(self, y1, y2):
         """Передвигает участок 0,y1 x 0,y2 на одну строку вниз,
@@ -234,11 +241,11 @@ class Terminal:
         """
         line = self.peek((0, y1), (self._cols, y2 - 1))
         self.poke((0, y1 + 1), line)
-        self.zero(y1, 0, y1, self._cols - 1)
+        self.zero((0, y1), (self._cols - 1, y1))
 
     def scroll_right(self, y, x):
         self.poke((x + 1, y), self.peek((x, y), (self._cols, y)))
-        self.zero(y, x, y, x)
+        self.zero((x, y), (x, y))
 
     def cursor_down(self):
         if self.st <= self._cur_y <= self.sb:
@@ -484,20 +491,22 @@ class Terminal:
     def cap_ed(self, l=[0]):
         """Clear to end of display """
         if l[0] == 0:
-            self.zero(self._cur_y, self._cur_x, self._rows - 1, self._cols - 1)
+            self.zero((self._cur_x, self._cur_y),
+                      (self._cols - 1, self._rows - 1))
         elif l[0] == 1:
-            self.zero(0, 0, self._cur_y, self._cur_x)
+            self.zero((0, 0), (self._cur_x, self._cur_y))
         elif l[0] == 2:
-            self.zero(0, 0, self._rows - 1, self._cols - 1)
+            self.zero((0, 0), (self._cols - 1, self._rows - 1))
 
     def cap_el(self, l=[0]):
         """Clear to end of line """
         if l[0] == 0:
-            self.zero(self._cur_y, self._cur_x, self._cur_y, self._cols - 1)
+            self.zero((self._cur_x, self._cur_y),
+                      (self._cols - 1, self._cur_y))
         elif l[0] == 1:
-            self.zero(self._cur_y, 0, self._cur_y, self._cur_x)
+            self.zero((0, self._cur_y), (self._cur_x, self._cur_y))
         elif l[0] == 2:
-            self.zero(self._cur_y, 0, self._cur_y, self._cols - 1)
+            self.zero((0, self._cur_y), (self._cols - 1, self._cur_y))
 
     def cap_el1(self, l=[0]):
         self.cap_el([1])
@@ -559,7 +568,7 @@ class Terminal:
     def cap_ech(self, mo):
         """Erase #1 characters """
         p = int(mo.group(1))
-        self.zero(self._cur_y, self._cur_x, self._cur_y, self._cur_x + p)
+        self.zero((self._cur_x, self._cur_y), (self._cur_x + p, self._cur_y))
 
     def cap_cup(self, mo):
         """Move to row #1 col #2 """
