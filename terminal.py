@@ -193,7 +193,10 @@ class Terminal:
         self.outbuf = ""
 
     def peek(self, left_border, right_border):
-        """
+        """Captures and returns a rectangular region of the screen.
+
+        The ``left_border`` and ``right_border`` arguments must be tuples or
+        lists of coordinates ``(x1, y1)`` and ``(x2, y2)``, respectively.
 
         The name of the method was inherited from AjaxTerm, developers of
         which, in turn, inherited it from BASIC. See poke.
@@ -205,7 +208,10 @@ class Terminal:
         return self._screen[begin:end]
 
     def poke(self, pos, s):
-        """
+        """Puts the specified string ``s`` on the screen staring at the
+        specified position ``pos``.
+
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
 
         The name of the method was inherited from AjaxTerm, developers of
         which, in turn, inherited it from BASIC. See peek.
@@ -215,9 +221,11 @@ class Terminal:
         self._screen[begin:begin + len(s)] = s
 
     def zero(self, left_border, right_border):
-        """Clears the area from the left border ``(x1, y2)`` to the right
-        border ``(x2, y2)`` inclusive."""
+        """Clears the area from ``left_border`` to ``right_border``.
 
+        The ``left_border`` and ``right_border`` arguments must be tuples or
+        lists of coordinates ``(x1, y1)`` and ``(x2, y2)``, respectively.
+        """
         x1, y1 = left_border
         x2, y2 = right_border
         begin = self._cols * y1 + x1

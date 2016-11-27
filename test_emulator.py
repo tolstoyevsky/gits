@@ -24,6 +24,7 @@ class TestEmulator(unittest.TestCase):
         # Clear the whole second line
         self._terminal.poke((0, 1), stub)
         self._terminal.scroll_up(1, self._terminal._rows)
+        # Check that after scrolling up the line moved up one position
         line = self._terminal.peek((0, 0), (len(stub), 0))
         self.assertEqual(stub, line)
 
