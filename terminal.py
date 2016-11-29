@@ -33,10 +33,12 @@ class Terminal:
         self._rows = rows
         self._cur_y = None
         self._cur_x = None
+
         # The following two fields are used only for implementation of
         # storing (sc) and restoring (rc) the current cursor position.
         self._cur_x_bak = 0
         self._cur_y_bak = 0
+
         self._screen = None
 
         # eol stands for 'end of line' and is set to True when the cursor
