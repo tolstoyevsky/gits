@@ -36,6 +36,11 @@ class Terminal:
         self._cur_y_bak = 0
         self._screen = None
 
+        # eol stands for 'end of line' and is set to True when the cursor
+        # reaches the right side of the screen.
+        self._eol = False
+        self._sgr = None  # Select Graphic Rendition
+
         self.control_characters = {
             "\x00": None,
             "\x05": self.esc_da,  # ENQ, Ctrl-E
@@ -144,8 +149,6 @@ class Terminal:
         self.reset()
         # self.st = None
         # self.sb = None
-        # self.cl = None
-        # self.sgr = None
         self.buf = ''
         # self.outbuf = None
 
@@ -187,8 +190,8 @@ class Terminal:
         self.sb = self._rows - 1
         self._cur_x_bak = self._cur_x = 0
         self._cur_y_bak = self._cur_y = 0
-        self.cl = 0
-        self.sgr = 0x07000000
+        self._eol = False
+        self._sgr = 0x07000000
         self.buf = ""
         self.outbuf = ""
 
@@ -257,7 +260,7 @@ class Terminal:
 
     def cursor_down(self):
         if self.st <= self._cur_y <= self.sb:
-            self.cl = 0
+            self._eol = False
             q, r = divmod(self._cur_y + 1, self.sb + 1)
             if q:
                 self.scroll_up(self.st, self.sb)
@@ -268,16 +271,20 @@ class Terminal:
     def cursor_right(self):
         q, r = divmod(self._cur_x + 1, self._cols)
         if q:
-            self.cl = 1
+            self._eol = True
         else:
             self._cur_x = r
 
     def echo(self, c):
-        if self.cl:
+        """Puts the specified character ``c`` on the screen and moves the
+        cursor right by one position. If the cursor reaches the right side of
+        the screen, it is moved to the next line."""
+        if self._eol:
             self.cursor_down()
             self._cur_x = 0
 
-        self._screen[(self._cur_y * self._cols) + self._cur_x] = self.sgr | ord(c)
+        pos = self._cur_y * self._cols + self._cur_x
+        self._screen[pos] = self._sgr | ord(c)
         self.cursor_right()
 
     def csi_dispatch(self, seq, mo):
@@ -303,12 +310,12 @@ class Terminal:
     # def csi_E(self, l):
     #     self.csi_B(l)
     #     self._cur_x = 0
-    #     self.cl = 0
+    #     self._eol = False
 
     # def csi_F(self, l):
     #     self.csi_A(l)
     #     self._cur_x = 0
-    #     self.cl = 0
+    #     self._eol = False
 
     # def csi_a(self, l):
     #     self.csi_C(l)
@@ -337,7 +344,7 @@ class Terminal:
         self.cursor_down()
 
     def esc_0x0d(self, s):
-        self.cl = 0
+        self._eol = False
         self._cur_x = 0
 
     def esc_da(self, s):
@@ -357,9 +364,9 @@ class Terminal:
             p2 = int(mo.group(2))
 
         if p1 == 0 and p2 == 10:  # sgr0
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
         elif p1 == 39 and p2 == 49:  # op
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
         else:
             self.cap_set_colour(colour=p1)
             self.cap_set_colour(colour=p2)
@@ -369,9 +376,9 @@ class Terminal:
             colour = int(mo.group(1))
 
         if colour == 0:
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
         elif colour == 1:  # bold
-            self.sgr = (self.sgr | 0x08000000)
+            self._sgr = (self._sgr | 0x08000000)
         elif colour == 2:  # dim
             pass
         elif colour == 4:  # smul
@@ -379,7 +386,7 @@ class Terminal:
         elif colour == 5:  # blink
             pass
         elif colour == 7:  # smso or rev
-            self.sgr = 0x70000000
+            self._sgr = 0x70000000
         elif colour == 10:  # rmpch
             pass
         elif colour == 11:  # smpch
@@ -387,17 +394,17 @@ class Terminal:
         elif colour == 24:  # rmul
             pass
         elif colour == 27:  # rmso
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
         elif 30 <= colour <= 37:  # 7 или 8 цветов
             c = colour - 30
-            self.sgr = (self.sgr & 0xf8ffffff) | (c << 24)
+            self._sgr = (self._sgr & 0xf8ffffff) | (c << 24)
         elif colour == 39:
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
         elif 40 <= colour <= 47:
             c = colour - 40
-            self.sgr = (self.sgr & 0x0fffffff) | (c << 28)
+            self._sgr = (self._sgr & 0x0fffffff) | (c << 28)
         elif colour == 49:
-            self.sgr = 0x07000000
+            self._sgr = 0x07000000
 
     def cap_sgr0(self, mo=None, p1=''):
         self.cap_set_colour_pair(p1=0, p2=10)
@@ -444,7 +451,7 @@ class Terminal:
         """Restore cursor to position of last sc """
         self._cur_x = self._cur_x_bak
         self._cur_y = self._cur_y_bak
-        self.cl = 0
+        self._eol = False
 
     def cap_ich1(self, l=[1]):
         """Insert character """
@@ -460,7 +467,7 @@ class Terminal:
 
     def cap_smso(self, l=''):
         """Begin standout mode """
-        self.sgr = 0x70000000
+        self._sgr = 0x70000000
 
     def cap_kcuu1(self, l=[1]):
         """sent by terminal up-arrow key """
@@ -479,12 +486,12 @@ class Terminal:
             p1 = int(mo.group(1))
 
         self._cur_x = min(self._cols - 1, self._cur_x + p1)
-        self.cl = 0
+        self._eol = False
 
     def cap_kcub1(self, l=[1]):
         """sent by terminal left-arrow key """
         self._cur_x = max(0, self._cur_x - l[0])
-        self.cl = 0
+        self._eol = False
 
     def cap_kb2(self, l=[1]):
         """center of keypad """
@@ -494,7 +501,7 @@ class Terminal:
         """Home cursor """
         self._cur_x = min(self._cols, l[1]) - 1
         self._cur_y = min(self._rows, l[0]) - 1
-        self.cl = 0
+        self._eol = False
 
     def cap_ed(self, l=[0]):
         """Clear to end of display """
@@ -584,7 +591,7 @@ class Terminal:
         p2 = int(mo.group(2))
         self._cur_x = min(self._cols, p2) - 1
         self._cur_y = min(self._rows, p1) - 1
-        self.cl = 0
+        self._eol = False
 
     def exec_escape_sequence(self):
         e = self.buf
