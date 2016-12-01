@@ -24,6 +24,9 @@ import re
 # new books.
 
 
+MAGIC_NUMBER = 0x07000000
+
+
 class Terminal:
     def __init__(self, rows=24, cols=80):
         self._cols = cols
@@ -39,7 +42,13 @@ class Terminal:
         # eol stands for 'end of line' and is set to True when the cursor
         # reaches the right side of the screen.
         self._eol = False
+        self._top = None
+        self._bottom = None
+
         self._sgr = None  # Select Graphic Rendition
+
+        self._buf = ''
+        self._outbuf = ''
 
         self.control_characters = {
             "\x00": None,
@@ -147,10 +156,8 @@ class Terminal:
         }
         self.init()
         self.reset()
-        # self.st = None
-        # self.sb = None
-        self.buf = ''
-        # self.outbuf = None
+        # self._top = None
+        # self._bottom = None
 
     def cap_civis(self):
         pass
@@ -179,21 +186,18 @@ class Terminal:
             self.esc_re.append((re.compile('\x1b' + k), v))
 
     def reset(self, s=''):
-        # Попытка разгадать некоторые «магические числа».
-        # Число 0x7000000 (117 440 512) представляет собой умноженное на 7
-        # число 16 777 216 (0x1000000), которое, в свою очередь, представляет
-        # собой количество уникальных цветов в цветовом пространстве модели
-        # RGB.
-        self._screen = array.array('L',
-                                   [0x07000000] * (self._cols * self._rows))
-        self.st = 0
-        self.sb = self._rows - 1
+        """Initializes the terminal."""
+        cells_number = self._cols * self._rows
+        self._screen = array.array('L', [MAGIC_NUMBER] * cells_number)
+        self._sgr = MAGIC_NUMBER
         self._cur_x_bak = self._cur_x = 0
         self._cur_y_bak = self._cur_y = 0
         self._eol = False
-        self._sgr = 0x07000000
-        self.buf = ""
-        self.outbuf = ""
+        self._top = 0
+        self._bottom = self._rows - 1
+
+        self._buf = ''
+        self._outbuf = ''
 
     def peek(self, left_border, right_border):
         """Captures and returns a rectangular region of the screen.
@@ -234,7 +238,7 @@ class Terminal:
         begin = self._cols * y1 + x1
         end = self._cols * y2 + x2 + 1
         length = end - begin  # the length of the area which have to be cleared
-        self._screen[begin:end] = array.array('L', [0x07000000] * length)
+        self._screen[begin:end] = array.array('L', [MAGIC_NUMBER] * length)
         return length
 
     def scroll_up(self, y1, y2):
@@ -259,12 +263,12 @@ class Terminal:
         self.zero((x, y), (x, y))
 
     def cursor_down(self):
-        if self.st <= self._cur_y <= self.sb:
+        if self._top <= self._cur_y <= self._bottom:
             self._eol = False
-            q, r = divmod(self._cur_y + 1, self.sb + 1)
+            q, r = divmod(self._cur_y + 1, self._bottom + 1)
             if q:
-                self.scroll_up(self.st, self.sb)
-                self._cur_y = self.sb
+                self.scroll_up(self._top, self._bottom)
+                self._cur_y = self._bottom
             else:
                 self._cur_y = r
 
@@ -348,12 +352,12 @@ class Terminal:
         self._cur_x = 0
 
     def esc_da(self, s):
-        self.outbuf = "\x1b[?6c"
+        self._outbuf = "\x1b[?6c"
 
     def esc_ri(self, s):
-        self._cur_y = max(self.st, self._cur_y - 1)
-        if self._cur_y == self.st:
-            self.scroll_down(self.st, self.sb)
+        self._cur_y = max(self._top, self._cur_y - 1)
+        if self._cur_y == self._top:
+            self.scroll_down(self._top, self._bottom)
 
     def esc_ignore(self, *s):
         pass
@@ -364,9 +368,9 @@ class Terminal:
             p2 = int(mo.group(2))
 
         if p1 == 0 and p2 == 10:  # sgr0
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
         elif p1 == 39 and p2 == 49:  # op
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
         else:
             self.cap_set_colour(colour=p1)
             self.cap_set_colour(colour=p2)
@@ -376,7 +380,7 @@ class Terminal:
             colour = int(mo.group(1))
 
         if colour == 0:
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
         elif colour == 1:  # bold
             self._sgr = (self._sgr | 0x08000000)
         elif colour == 2:  # dim
@@ -394,17 +398,17 @@ class Terminal:
         elif colour == 24:  # rmul
             pass
         elif colour == 27:  # rmso
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
         elif 30 <= colour <= 37:  # 7 или 8 цветов
             c = colour - 30
             self._sgr = (self._sgr & 0xf8ffffff) | (c << 24)
         elif colour == 39:
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
         elif 40 <= colour <= 47:
             c = colour - 40
             self._sgr = (self._sgr & 0x0fffffff) | (c << 28)
         elif colour == 49:
-            self._sgr = 0x07000000
+            self._sgr = MAGIC_NUMBER
 
     def cap_sgr0(self, mo=None, p1=''):
         self.cap_set_colour_pair(p1=0, p2=10)
@@ -471,11 +475,11 @@ class Terminal:
 
     def cap_kcuu1(self, l=[1]):
         """sent by terminal up-arrow key """
-        self._cur_y = max(self.st, self._cur_y - l[0])
+        self._cur_y = max(self._top, self._cur_y - l[0])
 
     def cap_kcud1(self, l=[1]):
         """sent by terminal down-arrow key """
-        self._cur_y = min(self.sb, self._cur_y + l[0])
+        self._cur_y = min(self._bottom, self._cur_y + l[0])
 
     def cap_kcuf1(self, l=[1]):
         """sent by terminal right-arrow key """
@@ -550,17 +554,17 @@ class Terminal:
             p1 = int(mo.group(1))
 
         for i in range(p1):
-            if self._cur_y < self.sb:
-                self.scroll_down(self._cur_y, self.sb)
+            if self._cur_y < self._bottom:
+                self.scroll_down(self._cur_y, self._bottom)
 
     def cap_dl(self, mo=None, p1=None):
         """Delete #1 lines """
         if mo:
             p1 = int(mo.group(1))
 
-        if self.st <= self._cur_y <= self.sb:
+        if self._top <= self._cur_y <= self._bottom:
             for i in range(p1):
-                self.scroll_up(self._cur_y, self.sb)
+                self.scroll_up(self._cur_y, self._bottom)
 
     def cap_dch(self, mo=None, p1=None):
         """Delete #1 chars """
@@ -576,9 +580,9 @@ class Terminal:
         """Change to lines #1 through #2 (VT100) """
         p1 = int(mo.group(1))
         p2 = int(mo.group(2))
-        self.st = min(self._rows - 1, p1 - 1)
-        self.sb = min(self._rows - 1, p2 - 1)
-        self.sb = max(self.st, self.sb)
+        self._top = min(self._rows - 1, p1 - 1)
+        self._bottom = min(self._rows - 1, p2 - 1)
+        self._bottom = max(self._top, self._bottom)
 
     def cap_ech(self, mo):
         """Erase #1 characters """
@@ -594,19 +598,19 @@ class Terminal:
         self._eol = False
 
     def exec_escape_sequence(self):
-        e = self.buf
+        e = self._buf
 
         if e == '\x1b[?2004l':
             pass
 
-        method_name = self.new_sci_seq.get(self.buf, None)
+        method_name = self.new_sci_seq.get(self._buf, None)
 
         if len(e) > 32:
-            self.buf = ''
+            self._buf = ''
         elif method_name:  # т.н. статические последовательности
             method = getattr(self, 'cap_' + method_name)
             method()
-            self.buf = ''
+            self._buf = ''
         else:  # последовательности с параметрами
             for k, v in self.new_sci_seq_re_compiled:
                 mo = k.match(e)
@@ -614,28 +618,28 @@ class Terminal:
                     method = getattr(self, 'cap_' + v)
                     method(mo)
                     e = ''
-                    self.buf = ''
+                    self._buf = ''
 
             for r, f in self.esc_re:
                 mo = r.match(e)
                 if mo:
                     f(e, mo)
-                    self.buf = ''
+                    self._buf = ''
                     break
 
     def exec_single_character_command(self):
-        self.control_characters[self.buf](self.buf)
-        self.buf = ''
+        self.control_characters[self._buf](self._buf)
+        self._buf = ''
 
     def write(self, s):
         for i in self.decoder.decode(s):
             if i in self.control_characters:
-                self.buf += i
+                self._buf += i
                 self.exec_single_character_command()
             elif i == '\x1b':
-                self.buf += i
-            elif len(self.buf):
-                self.buf += i
+                self._buf += i
+            elif len(self._buf):
+                self._buf += i
                 self.exec_escape_sequence()
             else:
                 self.echo(i)

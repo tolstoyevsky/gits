@@ -2,7 +2,7 @@
 import array
 import unittest
 
-from terminal import Terminal
+from terminal import Terminal, MAGIC_NUMBER
 
 
 class TestEmulator(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(self._terminal._cur_x, self._cols)
 
     def test_scroll_up(self):
-        stub = array.array('L', [0x07000000] * self._terminal._cols)
+        stub = array.array('L', [MAGIC_NUMBER] * self._terminal._cols)
         # Clear the whole second line
         self._terminal.poke((0, 1), stub)
         self._terminal.scroll_up(1, self._terminal._rows)
