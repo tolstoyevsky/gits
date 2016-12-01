@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import array
 import unittest
-import sys
 
 from terminal import Terminal, MAGIC_NUMBER
 
@@ -11,6 +10,12 @@ class TestEmulator(unittest.TestCase):
         self._rows = 24
         self._cols = 80
         self._terminal = Terminal(self._rows, self._cols)
+
+    def check_screen_char(self, c, pos):
+        term = self._terminal
+        want = term._sgr | ord(c)
+        got = term._screen[pos]
+        self.assertEqual(want, got)
 
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
@@ -24,7 +29,7 @@ class TestEmulator(unittest.TestCase):
         self._terminal._cur_x = self._cols
         self._terminal.cursor_right()
 
-        # because cursor is on the most right position
+        # cursor is on the most right position
         # it position must no be changed.
         self.assertEqual(self._terminal._cur_x, self._cols)
 
@@ -40,17 +45,72 @@ class TestEmulator(unittest.TestCase):
         self._terminal._cur_y = self._rows
         self._terminal.cursor_down()
 
-        # because cursor is on the most down position
+        # cursor is on the most down position
         # it position must no be changed.
         self.assertEqual(self._terminal._cur_y, self._rows)
 
-    @unittest.skip("skip")
     def test_echo(self):
+        """Emulator should put the specified character ``c``
+        on the screen and move cursor right by one position.
         """
-        Emulator should write to standard output destination
-        any specified operands.
+
+        c = 'd'
+        term = self._terminal
+
+        term._cur_x = 1
+        term._cur_y = 1
+        term.echo(c)
+
+        # check the correctness or cursor right shift
+        self.assertEqual(2, term._cur_x)
+
+        # check if screen has the correct character
+        # on the corresponding position.
+        self.check_screen_char(
+            c, 
+            (term._cur_y * term._cols) + (term._cur_x - 1)
+        )
+
+    def test_echo_eol(self):
+        """Emulator should put specified character ``c``
+        on the screen and move cursor down by one position
+        if cursor reaches the end of line.
         """
-        pass
+        
+        term = self._terminal
+        term._eol = False
+
+        # put the cursor on the right most position - 1
+        term._cur_x = term._cols - 1
+        term._cur_y = 1
+        term.echo('d')
+
+        # the end of line was reached, eol must be True
+        # x position of cursor must not be changed.
+        self.assertTrue(term._eol)
+        self.assertEqual(term._cols - 1, term._cur_x)
+
+        # check if screen has the correct character
+        # on the corresponding position.
+        self.check_screen_char(
+            'd',
+            (term._cur_y * term._cols) + term._cur_x
+        )
+
+        # echo one more character.
+        # eol was reached, that's why cursor
+        # must be moved down by one position.
+        term.echo('a')
+        self.assertEqual(1, term._cur_x)
+        self.assertFalse(term._eol)
+        self.assertEqual(2, term._cur_y)
+
+        # check if screen has the correct character
+        # on the corresponding position.
+        self.check_screen_char(
+            'a', 
+            (term._cur_y * term._cols) + (term._cur_x - 1)
+        )
 
     def test_zero(self):
         """Emulator should clear the area from left to right."""
@@ -61,7 +121,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(length, len(area) + 1)
 
     def test_scroll_up(self):
-        """Emulator should move are one line up."""
+        """Emulator should move area one line up."""
 
         stub = array.array('L', [MAGIC_NUMBER] * self._terminal._cols)
         # Clear the whole second line
@@ -73,12 +133,12 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_scroll_down(self):
-        """Emulator should move area one line down."""
+        """Emulator should move area by one line down."""
         pass
 
     @unittest.skip("skip")
     def test_scroll_right(self):
-        """Emulator should move area to 1 position right."""
+        """Emulator should move area by one position right."""
         pass
 
 if __name__ == '__main__':
