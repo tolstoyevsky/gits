@@ -15,7 +15,6 @@
 # under the License.
 
 import fcntl
-import optparse
 import os
 import pty
 import signal
@@ -25,13 +24,17 @@ import sys
 import termios
 
 import tornado.httpserver
-import tornado.ioloop
+import tornado.options
 import tornado.web
+from tornado.ioloop import IOLoop
+from tornado.options import define, options
 from tornado.websocket import WebSocketHandler
 
 import terminal
 
 os.chdir(os.path.normpath(os.path.dirname(__file__)))
+
+define('port', help='listen on a specific port', default=8888)
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -46,7 +49,7 @@ class TermSocketHandler(WebSocketHandler):
         WebSocketHandler.__init__(self, application, request, **kwargs)
 
         self._fd = None
-        self._io_loop = tornado.ioloop.IOLoop.current()
+        self._io_loop = IOLoop.current()
 
     def _create(self, rows=24, cols=80):
         pid, fd = pty.fork()
@@ -140,16 +143,11 @@ class Application(tornado.web.Application):
 
 
 def main():
-    usage = "usage: %prog [options]"
-    parser = optparse.OptionParser(usage=usage)
-    parser.add_option("-p", "--port", default=8888,
-                      help="the port on which the web server is listening")
-
-    (options, args) = parser.parse_args()
+    tornado.options.parse_command_line()
 
     http_server = tornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.instance().start()
+    IOLoop.instance().start()
 
 if __name__ == "__main__":
     main()
