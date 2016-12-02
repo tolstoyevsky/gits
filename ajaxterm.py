@@ -55,10 +55,10 @@ class TermSocketHandler(WebSocketHandler):
     def __init__(self, application, request, **kwargs):
         WebSocketHandler.__init__(self, application, request, **kwargs)
 
-        self.fd = None
+        self._fd = None
         self._io_loop = tornado.ioloop.IOLoop.current()
 
-    def create(self, rows=24, cols=80):
+    def _create(self, rows=24, cols=80):
         pid, fd = pty.fork()
         if pid == 0:
             if os.getuid() == 0:
@@ -96,49 +96,54 @@ class TermSocketHandler(WebSocketHandler):
             fcntl.ioctl(fd, termios.TIOCSWINSZ,
                         struct.pack('HHHH', rows, cols, 0, 0))
             TermSocketHandler.clients[fd] = {
-                "client": self,
-                "pid": pid,
-                "terminal": terminal.Terminal(rows, cols)
+                'client': self,
+                'pid': pid,
+                'terminal': terminal.Terminal(rows, cols)
             }
 
             return fd
 
+    def _destroy(self, fd):
+        try:
+            os.kill(TermSocketHandler.clients[fd]['pid'], signal.SIGHUP)
+            os.close(fd)
+        except OSError:
+            pass
+
+        del TermSocketHandler.clients[fd]
+
+    # Implementing the methods inherited from
+    # tornado.websocket.WebSocketHandler
+
     def open(self):
         def callback(*args, **kwargs):
-            buf = os.read(self.fd, 65536)
-            TermSocketHandler.clients[self.fd]['terminal'].write(buf)
-            dump = TermSocketHandler.clients[self.fd]['terminal'].dumphtml()
-            TermSocketHandler.clients[self.fd]['client'].write_message(dump)
+            buf = os.read(self._fd, 65536)
+            TermSocketHandler.clients[self._fd]['terminal'].write(buf)
+            dump = TermSocketHandler.clients[self._fd]['terminal'].dumphtml()
+            TermSocketHandler.clients[self._fd]['client'].write_message(dump)
 
-        self.fd = self.create()
-        self._io_loop.add_handler(self.fd, callback, self._io_loop.READ)
+        self._fd = self._create()
+        self._io_loop.add_handler(self._fd, callback, self._io_loop.READ)
 
     def on_message(self, request):
         label, data = request.split(',')
 
         if label == 'key':
             try:
-                os.write(self.fd, data.encode("utf8"))
+                os.write(self._fd, data.encode('utf8'))
             except (IOError, OSError):
-                self.kill(self.fd)
+                self._destroy(self._fd)
         elif label == 'rsz':
             row, col = data.split('x')
-            fcntl.ioctl(self.fd,
+            fcntl.ioctl(self._fd,
                         termios.TIOCSWINSZ,
-                        struct.pack("HHHH", int(row), int(col), 0, 0))
-            self.clients[self.fd]["terminal"].set_resolution(int(row), int(col))
+                        struct.pack('HHHH', int(row), int(col), 0, 0))
+            self.clients[self._fd]['terminal'].set_resolution(int(row),
+                                                              int(col))
 
     def on_close(self):
-        self._io_loop.remove_handler(self.fd)
-        self.kill(self.fd)
-
-    def kill(self, fd):
-        try:
-            os.close(fd)
-            os.kill(self.clients[fd]["pid"], signal.SIGHUP)
-        except (IOError, OSError):
-            pass
-        del self.clients[fd]
+        self._io_loop.remove_handler(self._fd)
+        self._destroy(self._fd)
 
 
 class Application(tornado.web.Application):
