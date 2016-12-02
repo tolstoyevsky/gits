@@ -376,7 +376,7 @@ Po.namespace = function(ns_string) {
         });
 
         _input.bind('oninput', function(data) {
-            _ws.send('key,' + data);
+            _ws.send(data);
         });
 
         _ws.onmessage = (function(e) {

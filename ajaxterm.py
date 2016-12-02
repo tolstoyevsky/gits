@@ -36,17 +36,7 @@ os.chdir(os.path.normpath(os.path.dirname(__file__)))
 
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("index.htm")
-
-
-class BasicHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("basic.htm")
-
-
-class ControlPanelHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("control-panel.htm")
+        self.render('index.htm')
 
 
 class TermSocketHandler(WebSocketHandler):
@@ -125,21 +115,11 @@ class TermSocketHandler(WebSocketHandler):
         self._fd = self._create()
         self._io_loop.add_handler(self._fd, callback, self._io_loop.READ)
 
-    def on_message(self, request):
-        label, data = request.split(',')
-
-        if label == 'key':
-            try:
-                os.write(self._fd, data.encode('utf8'))
-            except (IOError, OSError):
-                self._destroy(self._fd)
-        elif label == 'rsz':
-            row, col = data.split('x')
-            fcntl.ioctl(self._fd,
-                        termios.TIOCSWINSZ,
-                        struct.pack('HHHH', int(row), int(col), 0, 0))
-            self.clients[self._fd]['terminal'].set_resolution(int(row),
-                                                              int(col))
+    def on_message(self, data):
+        try:
+            os.write(self._fd, data.encode('utf8'))
+        except (IOError, OSError):
+            self._destroy(self._fd)
 
     def on_close(self):
         self._io_loop.remove_handler(self._fd)
@@ -149,10 +129,8 @@ class TermSocketHandler(WebSocketHandler):
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r"/", IndexHandler),
-            (r"/basic", BasicHandler),
-            (r"/control-panel", ControlPanelHandler),
-            (r"/termsocket", TermSocketHandler),
+            (r'/', IndexHandler),
+            (r'/termsocket', TermSocketHandler),
         ]
         settings = dict(
             template_path=os.path.join(os.path.dirname(__file__), "templates"),

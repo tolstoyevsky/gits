@@ -2,12 +2,20 @@
 <html>
     <head>
         <title></title>
-        <meta charset="UTF-8" />
+        <meta charset="UTF-8"/>
+        <link href="{{ static_url("basic.css") }}" rel="stylesheet" />
+        <script src="//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+        <script src="{{ static_url("ajaxterm.js") }}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var $basis = document.getElementById('basic')
+                  , terminal = new Po.Terminal($basis);
+
+                terminal.screen.focus();
+            });
+        </script>
     </head>
     <body>
-        <ul>
-            <li><a href="/basic">Basic</a></li>
-            <li><a href="/control-panel">Control panel</a></li>
-        </ul>
+        <div class="terminal" id="basic"></div>
     </body>
 </html>
