@@ -29,7 +29,7 @@ class TestEmulator(unittest.TestCase):
         self._terminal.cursor_right()
 
         self.assertFalse(self._terminal._eol)
-        self.assertEqual(self._terminal._cur_x, 1)
+        self.assertEqual(1, self._terminal._cur_x)
 
         # Test the most right position - 1
         self._terminal._cur_x = self._cols - 1
@@ -37,7 +37,7 @@ class TestEmulator(unittest.TestCase):
         
         # Cursor is on the most right position - 1. It position must no be changed.
         self.assertTrue(self._terminal._eol)
-        self.assertEqual(self._terminal._cur_x, self._cols - 1)
+        self.assertEqual(self._cols - 1, self._terminal._cur_x)
 
         # Test the most right position.
         self._terminal._eol = False
@@ -54,21 +54,21 @@ class TestEmulator(unittest.TestCase):
         self._terminal._cur_y = 0
         self._terminal.cursor_down()
 
-        self.assertEqual(self._terminal._cur_y, 1)
+        self.assertEqual(1, self._terminal._cur_y)
 
         # Test most down position - 1
         self._terminal._cur_y = self._rows - 1
         self._terminal.cursor_down()
 
         # Cursor is on the most down position -1. It position must no be changed.
-        self.assertEqual(self._terminal._cur_y, self._rows - 1)
+        self.assertEqual(self._rows - 1, self._terminal._cur_y)
 
         # Test most down position
         self._terminal._cur_y = self._rows
         self._terminal.cursor_down()
 
         # Cursor is on the most down position. It position must no be changed.
-        self.assertEqual(self._terminal._cur_y, self._rows)
+        self.assertEqual(self._rows, self._terminal._cur_y)
 
     def test_echo(self):
         """Emulator should put the specified character ``c`` on the screen and 
