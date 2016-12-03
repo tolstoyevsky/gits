@@ -34,7 +34,7 @@ class TestEmulator(unittest.TestCase):
         # Test the most right position - 1
         self._terminal._cur_x = self._cols - 1
         self._terminal.cursor_right()
-        
+
         # Cursor is on the most right position - 1. It position must no be changed.
         self.assertTrue(self._terminal._eol)
         self.assertEqual(self._cols - 1, self._terminal._cur_x)
@@ -43,7 +43,7 @@ class TestEmulator(unittest.TestCase):
         self._terminal._eol = False
         self._terminal._cur_x = self._cols
         self._terminal.cursor_right()
-        
+
         # Cursor is on the most right position. It position must no be changed.
         self.assertTrue(self._terminal._eol)
         self.assertEqual(self._terminal._cols, self._terminal._cur_x)
@@ -71,7 +71,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(self._rows, self._terminal._cur_y)
 
     def test_echo(self):
-        """Emulator should put the specified character ``c`` on the screen and 
+        """Emulator should put the specified character ``c`` on the screen and
         move cursor right by one position.
         """
 
@@ -87,15 +87,15 @@ class TestEmulator(unittest.TestCase):
 
         # Check if screen has the correct character on the corresponding position.
         self.check_screen_char(
-            c, 
+            c,
             (term._cur_y * term._cols) + (term._cur_x - 1)
         )
 
     def test_echo_eol(self):
-        """Emulator should put specified character ``c`` on the screen and move 
+        """Emulator should put specified character ``c`` on the screen and move
         cursor down by one position if cursor reaches the end of line.
         """
-        
+
         term = self._terminal
         term._eol = False
 
@@ -115,7 +115,7 @@ class TestEmulator(unittest.TestCase):
             (term._cur_y * term._cols) + term._cur_x
         )
 
-        # Echo one more character. EOL was reached, that's why cursor must be 
+        # Echo one more character. EOL was reached, that's why cursor must be
         # moved down by one position.
         term.echo('a')
         self.assertEqual(1, term._cur_x)
@@ -124,7 +124,7 @@ class TestEmulator(unittest.TestCase):
 
         # Check if screen has the correct character on the corresponding position.
         self.check_screen_char(
-            'a', 
+            'a',
             (term._cur_y * term._cols) + (term._cur_x - 1)
         )
 
