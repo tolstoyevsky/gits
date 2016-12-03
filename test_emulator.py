@@ -31,6 +31,13 @@ class TestEmulator(unittest.TestCase):
         self.assertFalse(self._terminal._eol)
         self.assertEqual(1, self._terminal._cur_x)
 
+        # Existing tests cover the cases when cursor is on the most right position.
+        #
+        # These positions will never be achieved, because if cursor is on the
+        # most right position - 1 then the next position will be equal to
+        # the number of columns in the emulator and EOL(end of line) will be
+        # riched and the cursor position will not be changed.
+
         # Test the most right position - 1
         self._terminal._cur_x = self._cols - 1
         self._terminal.cursor_right()
@@ -55,6 +62,12 @@ class TestEmulator(unittest.TestCase):
         self._terminal.cursor_down()
 
         self.assertEqual(1, self._terminal._cur_y)
+
+        # Existing tests cover the cases when cursor is on the most down position.
+        #
+        # These positions will never be achieved, because if cursor is on the
+        # most down position - 1 then the next position will be equal to the number
+        # of rows in the emulator and the cursor position will not be changed.
 
         # Test most down position - 1
         self._terminal._cur_y = self._rows - 1
