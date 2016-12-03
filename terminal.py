@@ -53,12 +53,15 @@ class Terminal:
         self._outbuf = ''
 
         # esc sequences related to ITERM.
-        # for more deatails see: http://iterm2-tools.readthedocs.io/en/latest/shell_integration.html
+        # for more deatails see: 
+        #   - http://iterm2-tools.readthedocs.io/en/latest/shell_integration.html
+        #   - https://www.iterm2.com/documentation-shell-integration.html
         self.iterm_control_characters = {
             "\x1b]133;D;0\x07": self.esc_ignore,
             "\x1b]133;A\x07": self.esc_ignore,
             "\x1b]133;B\x07": self.esc_ignore,
             "\x1b]133;C;\x07": self.esc_ignore,
+            "\x1b]133;D;1\x07": self.esc_ignore,
         }
 
         self.control_characters = {
