@@ -11,9 +11,9 @@ class TestEmulator(unittest.TestCase):
         self._cols = 80
         self._terminal = Terminal(self._rows, self._cols)
 
-    def check_screen_char(self, c, pos):
-        """A helper function that checks if screen has the character ``c`` on the
-        corresponding position ``pos``.
+    def _check_screen_char(self, c, pos):
+        """A helper function that checks if the screen has the character ``c``
+        on the corresponding position ``pos``.
         """
 
         term = self._terminal
@@ -31,18 +31,20 @@ class TestEmulator(unittest.TestCase):
         self.assertFalse(self._terminal._eol)
         self.assertEqual(1, self._terminal._cur_x)
 
-        # Existing tests cover the cases when cursor is on the most right position.
+        # Existing tests cover the cases when cursor is on the most right
+        # position.
         #
         # These positions will never be achieved, because if cursor is on the
         # most right position - 1 then the next position will be equal to
-        # the number of columns in the emulator and EOL(end of line) will be
-        # riched and the cursor position will not be changed.
+        # the number of columns in the emulator and EOL (end of line) will be
+        # reached and the cursor position will not be changed.
 
         # Test the most right position - 1
         self._terminal._cur_x = self._cols - 1
         self._terminal.cursor_right()
 
-        # Cursor is on the most right position - 1. It position must no be changed.
+        # Cursor is on the most right position - 1. Its position must not be
+        # changed.
         self.assertTrue(self._terminal._eol)
         self.assertEqual(self._cols - 1, self._terminal._cur_x)
 
@@ -51,7 +53,8 @@ class TestEmulator(unittest.TestCase):
         self._terminal._cur_x = self._cols
         self._terminal.cursor_right()
 
-        # Cursor is on the most right position. It position must no be changed.
+        # Cursor is on the most right position. Its position must not be
+        # changed.
         self.assertTrue(self._terminal._eol)
         self.assertEqual(self._terminal._cols, self._terminal._cur_x)
 
@@ -63,24 +66,28 @@ class TestEmulator(unittest.TestCase):
 
         self.assertEqual(1, self._terminal._cur_y)
 
-        # Existing tests cover the cases when cursor is on the most down position.
+        # Existing tests cover the cases when cursor is on the most down
+        # position.
         #
         # These positions will never be achieved, because if cursor is on the
-        # most down position - 1 then the next position will be equal to the number
-        # of rows in the emulator and the cursor position will not be changed.
+        # most down position - 1 then the next position will be equal to the
+        # number of rows in the emulator and the cursor position will not be
+        # changed.
 
         # Test most down position - 1
         self._terminal._cur_y = self._rows - 1
         self._terminal.cursor_down()
 
-        # Cursor is on the most down position -1. It position must no be changed.
+        # Cursor is on the most down position - 1. Its position must not be
+        # changed.
         self.assertEqual(self._rows - 1, self._terminal._cur_y)
 
         # Test most down position
         self._terminal._cur_y = self._rows
         self._terminal.cursor_down()
 
-        # Cursor is on the most down position. It position must no be changed.
+        # Cursor is on the most down position. Its position must not be
+        # changed.
         self.assertEqual(self._rows, self._terminal._cur_y)
 
     def test_echo(self):
@@ -98,8 +105,9 @@ class TestEmulator(unittest.TestCase):
         # Check the correctness or cursor right shift.
         self.assertEqual(2, term._cur_x)
 
-        # Check if screen has the correct character on the corresponding position.
-        self.check_screen_char(
+        # Check if the screen has the correct character on the corresponding
+        # position.
+        self._check_screen_char(
             c,
             (term._cur_y * term._cols) + (term._cur_x - 1)
         )
@@ -112,7 +120,7 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
         term._eol = False
 
-        # put the cursor on the right most position - 1.
+        # Put the cursor on the right most position - 1.
         term._cur_x = term._cols - 1
         term._cur_y = 1
         term.echo('d')
@@ -122,8 +130,9 @@ class TestEmulator(unittest.TestCase):
         self.assertTrue(term._eol)
         self.assertEqual(term._cols - 1, term._cur_x)
 
-        # Check if screen has the correct character on the corresponding position.
-        self.check_screen_char(
+        # Check if the screen has the correct character on the corresponding
+        # position.
+        self._check_screen_char(
             'd',
             (term._cur_y * term._cols) + term._cur_x
         )
@@ -135,8 +144,9 @@ class TestEmulator(unittest.TestCase):
         self.assertFalse(term._eol)
         self.assertEqual(2, term._cur_y)
 
-        # Check if screen has the correct character on the corresponding position.
-        self.check_screen_char(
+        # Check if the screen has the correct character on the corresponding
+        # position.
+        self._check_screen_char(
             'a',
             (term._cur_y * term._cols) + (term._cur_x - 1)
         )
