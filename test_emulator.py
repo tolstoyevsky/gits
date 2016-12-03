@@ -12,6 +12,10 @@ class TestEmulator(unittest.TestCase):
         self._terminal = Terminal(self._rows, self._cols)
 
     def check_screen_char(self, c, pos):
+        """A helper function that checks if screen has the character ``c`` on the
+        corresponding position ``pos``.
+        """
+
         term = self._terminal
         want = term._sgr | ord(c)
         got = term._screen[pos]
@@ -20,17 +24,17 @@ class TestEmulator(unittest.TestCase):
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
 
+        # Test the most left position.
         self._terminal._cur_x = 0
         self._terminal.cursor_right()
 
         self.assertEqual(self._terminal._cur_x, 1)
 
-        # test the most right position
+        # Test the most right position.
         self._terminal._cur_x = self._cols
         self._terminal.cursor_right()
 
-        # cursor is on the most right position
-        # it position must no be changed.
+        # Cursor is on the most right position. It position must no be changed.
         self.assertEqual(self._terminal._cur_x, self._cols)
 
     def test_cursor_down(self):
@@ -41,17 +45,16 @@ class TestEmulator(unittest.TestCase):
 
         self.assertEqual(self._terminal._cur_y, 1)
 
-        # test most down position
+        # Test most down position
         self._terminal._cur_y = self._rows
         self._terminal.cursor_down()
 
-        # cursor is on the most down position
-        # it position must no be changed.
+        # Cursor is on the most down position. it position must no be changed.
         self.assertEqual(self._terminal._cur_y, self._rows)
 
     def test_echo(self):
-        """Emulator should put the specified character ``c``
-        on the screen and move cursor right by one position.
+        """Emulator should put the specified character ``c`` on the screen and 
+        move cursor right by one position.
         """
 
         c = 'd'
@@ -61,52 +64,47 @@ class TestEmulator(unittest.TestCase):
         term._cur_y = 1
         term.echo(c)
 
-        # check the correctness or cursor right shift
+        # Check the correctness or cursor right shift.
         self.assertEqual(2, term._cur_x)
 
-        # check if screen has the correct character
-        # on the corresponding position.
+        # Check if screen has the correct character on the corresponding position.
         self.check_screen_char(
             c, 
             (term._cur_y * term._cols) + (term._cur_x - 1)
         )
 
     def test_echo_eol(self):
-        """Emulator should put specified character ``c``
-        on the screen and move cursor down by one position
-        if cursor reaches the end of line.
+        """Emulator should put specified character ``c`` on the screen and move 
+        cursor down by one position if cursor reaches the end of line.
         """
         
         term = self._terminal
         term._eol = False
 
-        # put the cursor on the right most position - 1
+        # put the cursor on the right most position - 1.
         term._cur_x = term._cols - 1
         term._cur_y = 1
         term.echo('d')
 
-        # the end of line was reached, eol must be True
+        # The end of line was reached, eol must be True.
         # x position of cursor must not be changed.
         self.assertTrue(term._eol)
         self.assertEqual(term._cols - 1, term._cur_x)
 
-        # check if screen has the correct character
-        # on the corresponding position.
+        # Check if screen has the correct character on the corresponding position.
         self.check_screen_char(
             'd',
             (term._cur_y * term._cols) + term._cur_x
         )
 
-        # echo one more character.
-        # eol was reached, that's why cursor
-        # must be moved down by one position.
+        # Echo one more character. EOL was reached, that's why cursor must be 
+        # moved down by one position.
         term.echo('a')
         self.assertEqual(1, term._cur_x)
         self.assertFalse(term._eol)
         self.assertEqual(2, term._cur_y)
 
-        # check if screen has the correct character
-        # on the corresponding position.
+        # Check if screen has the correct character on the corresponding position.
         self.check_screen_char(
             'a', 
             (term._cur_y * term._cols) + (term._cur_x - 1)
