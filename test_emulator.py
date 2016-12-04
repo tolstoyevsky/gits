@@ -45,32 +45,14 @@ class TestEmulator(unittest.TestCase):
         self.assertFalse(self._terminal._eol)
         self.assertEqual(1, self._terminal._cur_x)
 
-        # Existing tests cover the cases when cursor is on the most right
-        # position.
-        #
-        # These positions will never be achieved, because if cursor is on the
-        # most right position - 1 then the next position will be equal to
-        # the number of columns in the emulator and EOL (end of line) will be
-        # reached and the cursor position will not be changed.
-
-        # Test the most right position - 1
-        self._terminal._cur_x = self._cols - 1
-        self._terminal.cursor_right()
-
-        # Cursor is on the most right position - 1. Its position must not be
-        # changed.
-        self.assertTrue(self._terminal._eol)
-        self.assertEqual(self._cols - 1, self._terminal._cur_x)
-
         # Test the most right position.
-        self._terminal._eol = False
-        self._terminal._cur_x = self._cols
+        self._terminal._cur_x = self._cols - 1
         self._terminal.cursor_right()
 
         # Cursor is on the most right position. Its position must not be
         # changed.
         self.assertTrue(self._terminal._eol)
-        self.assertEqual(self._terminal._cols, self._terminal._cur_x)
+        self.assertEqual(self._cols - 1, self._terminal._cur_x)
 
     def test_cursor_down(self):
         """Emulator should move cursor down by 1 position."""
@@ -80,29 +62,13 @@ class TestEmulator(unittest.TestCase):
 
         self.assertEqual(1, self._terminal._cur_y)
 
-        # Existing tests cover the cases when cursor is on the most down
-        # position.
-        #
-        # These positions will never be achieved, because if cursor is on the
-        # most down position - 1 then the next position will be equal to the
-        # number of rows in the emulator and the cursor position will not be
-        # changed.
-
-        # Test most down position - 1
+        # Test most down position.
         self._terminal._cur_y = self._rows - 1
         self._terminal.cursor_down()
 
         # Cursor is on the most down position - 1. Its position must not be
         # changed.
         self.assertEqual(self._rows - 1, self._terminal._cur_y)
-
-        # Test most down position
-        self._terminal._cur_y = self._rows
-        self._terminal.cursor_down()
-
-        # Cursor is on the most down position. Its position must not be
-        # changed.
-        self.assertEqual(self._rows, self._terminal._cur_y)
 
     def test_echo(self):
         """Emulator should put the specified character ``c`` on the screen and
