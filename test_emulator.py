@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import array
 import unittest
+import random
 
 from terminal import Terminal, MAGIC_NUMBER
 
@@ -35,101 +36,126 @@ class TestEmulator(unittest.TestCase):
         got = term._screen[pos]
         self.assertEqual(want, got)
 
+    def _check_cursor_right(self, cur_x, eol=False):
+        """A helper function that checks the cursor right shift."""
+
+        self._terminal._cur_x = cur_x
+        self._terminal.cursor_right()
+
+        if eol:
+            self.assertTrue(self._terminal._eol)
+            self.assertEqual(cur_x, self._terminal._cur_x)
+        else:
+            self.assertFalse(self._terminal._eol)
+            self.assertEqual(cur_x + 1, self._terminal._cur_x)
+
+    def _check_cursor_down(self, cur_y, top=False):
+        """A helper function that checks the cursor down shift."""
+
+        self._terminal._cur_y = cur_y
+        self._terminal.cursor_down()
+
+        if top:
+            self.assertEqual(cur_y, self._terminal._cur_y)
+        else:
+            self.assertEqual(cur_y + 1, self._terminal._cur_y)
+
+    def _check_echo(self, c, pos, eol=False, down=False):
+        """A helper function that checks the echo command.
+
+        pos represents a tuple of (x, y) - cursor coordinates.
+        c represents a character to put one the screen.
+        """
+
+        if len(pos) != 2:
+            self.fail("`pos` must have x and y as cursor coordinates.")
+
+        term = self._terminal
+        term._eol = False
+
+        cur_x, cur_y = pos[0], pos[1]
+        term._cur_x, term._cur_y = cur_x, cur_y
+
+        term.echo(c)
+
+        check_screen_pos = 0
+
+        if eol:
+            # EOL(end of line) was reached, cur_x position must no be changed.
+            self.assertTrue(term._eol)
+            self.assertEqual(cur_x, term._cur_x)
+            check_screen_pos = (term._cur_y * term._cols) + term._cur_x
+        else:
+            # EOL(end of line) was not reached, cur_x was moved right by 1
+            # position.
+            self.assertFalse(term._eol)
+            self.assertEqual(cur_x + 1, term._cur_x)
+            check_screen_pos = (term._cur_y * term._cols) + (term._cur_x - 1)
+
+        if down:
+            term.echo(c)
+            self.assertEqual(cur_y + 1, term._cur_y)
+            self.assertEqual(1, term._cur_x)
+            self.assertFalse(term._eol)
+        else:
+            self.assertEqual(cur_y, term._cur_y)
+
+        # Check if the screen has the correct character on the
+        # corresponding position.
+        self._check_screen_char(c, check_screen_pos)
+
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
 
-        # Test the most left position.
-        self._terminal._cur_x = 0
-        self._terminal.cursor_right()
+        # Cursor is one the most left position.
+        self._check_cursor_right(0)
 
-        self.assertFalse(self._terminal._eol)
-        self.assertEqual(1, self._terminal._cur_x)
+        # Cursor is one an arbitrary position.
+        rand_x = random.randint(1, self._cols - 2)
+        self._check_cursor_right(rand_x)
 
-        # Test the most right position.
-        self._terminal._cur_x = self._cols - 1
-        self._terminal.cursor_right()
-
-        # Cursor is on the most right position. Its position must not be
-        # changed.
-        self.assertTrue(self._terminal._eol)
-        self.assertEqual(self._cols - 1, self._terminal._cur_x)
+        # Cursor is one the most right position.
+        self._check_cursor_right(self._cols - 1, eol=True)
 
     def test_cursor_down(self):
         """Emulator should move cursor down by 1 position."""
 
-        self._terminal._cur_y = 0
-        self._terminal.cursor_down()
+        # Cursor is on the most top position.
+        self._check_cursor_down(0)
 
-        self.assertEqual(1, self._terminal._cur_y)
+        # Cursor is one an arbitrary position.
+        rand_y = random.randint(1, self._rows - 2)
+        self._check_cursor_down(rand_y)
 
-        # Test most down position.
-        self._terminal._cur_y = self._rows - 1
-        self._terminal.cursor_down()
-
-        # Cursor is on the most down position - 1. Its position must not be
-        # changed.
-        self.assertEqual(self._rows - 1, self._terminal._cur_y)
+        # Cursor is one the most down position.
+        self._check_cursor_down(self._cols - 1, top=True)
 
     def test_echo(self):
         """Emulator should put the specified character ``c`` on the screen and
         move cursor right by one position.
         """
 
-        c = 'd'
-        term = self._terminal
+        # Echo the character on the screen(most left corner).
+        self._check_echo('d', (0, 0))
 
-        term._cur_x = 1
-        term._cur_y = 1
-        term.echo(c)
+        # Echo the character on an arbitrary position on the screen.
+        rand_cur_x = random.randint(1, self._cols - 2)
+        rand_cur_y = random.randint(1, self._rows - 2)
+        self._check_echo('r', (rand_cur_x, rand_cur_y))
 
-        # Check the correctness or cursor right shift.
-        self.assertEqual(2, term._cur_x)
+        # Echo the character on the screen(most right position).
+        self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
 
-        # Check if the screen has the correct character on the corresponding
-        # position.
-        self._check_screen_char(
-            c,
-            (term._cur_y * term._cols) + (term._cur_x - 1)
+        # EOL was reached earlier, echo one more character on the screen.
+        self._check_echo(
+            't',
+            (self._cols - 1, rand_cur_y),
+            eol=True,
+            down=True,
         )
 
-    def test_echo_eol(self):
-        """Emulator should put specified character ``c`` on the screen and move
-        cursor down by one position if cursor reaches the end of line.
-        """
-
-        term = self._terminal
-        term._eol = False
-
-        # Put the cursor on the right most position - 1.
-        term._cur_x = term._cols - 1
-        term._cur_y = 1
-        term.echo('d')
-
-        # The end of line was reached, eol must be True.
-        # x position of cursor must not be changed.
-        self.assertTrue(term._eol)
-        self.assertEqual(term._cols - 1, term._cur_x)
-
-        # Check if the screen has the correct character on the corresponding
-        # position.
-        self._check_screen_char(
-            'd',
-            (term._cur_y * term._cols) + term._cur_x
-        )
-
-        # Echo one more character. EOL was reached, that's why cursor must be
-        # moved down by one position.
-        term.echo('a')
-        self.assertEqual(1, term._cur_x)
-        self.assertFalse(term._eol)
-        self.assertEqual(2, term._cur_y)
-
-        # Check if the screen has the correct character on the corresponding
-        # position.
-        self._check_screen_char(
-            'a',
-            (term._cur_y * term._cols) + (term._cur_x - 1)
-        )
+        # Echo the character on the screen(most right corner).
+        self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
     def test_zero(self):
         """Emulator should clear the area from left to right."""
