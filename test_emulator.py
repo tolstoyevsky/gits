@@ -11,6 +11,20 @@ class TestEmulator(unittest.TestCase):
         self._cols = 80
         self._terminal = Terminal(self._rows, self._cols)
 
+    def _put_string(self, s):
+        for character in s:
+            self._terminal.echo(character)
+
+    def _check_string(self, s, left_border, right_border):
+        x1, y1 = left_border
+        x2, y2 = right_border
+
+        got = array.array('L', [])
+        for c in s:
+            got.append(self._terminal._sgr | ord(c))
+
+        self.assertEqual(self._terminal.peek((x1, y1), (x2, y2)), got)
+
     def _check_screen_char(self, c, pos):
         """A helper function that checks if the screen has the character ``c``
         on the corresponding position ``pos``.
@@ -179,6 +193,34 @@ class TestEmulator(unittest.TestCase):
     def test_scroll_right(self):
         """Emulator should move area by one position right."""
         pass
+
+    def test_cap_ed(self):
+        term = self._terminal
+
+        prompt = 'spam@ham:~$ '
+        self._put_string(prompt)  # put a prompt on the screen
+
+        # Check that the prompt was put correctly
+        self._check_string(prompt, (0, 0), (len(prompt), 0))
+
+        # Fill the rest of the screen with x
+        length = term._cols * term._rows - len(prompt)
+        self._put_string(['x'] * length)
+
+        # Clear the screen after the prompt till the end of the screen
+        term._cur_x = len(prompt)
+        term._cur_y = 0
+        term.cap_ed()
+
+        # Check that the prompt was not corrupted
+        self._check_string(prompt, (0, 0), (len(prompt), 0))
+
+        # Check that the screen was cleared correctly
+        want = array.array('L', [MAGIC_NUMBER] * length)
+        got = term.peek((term._cur_x, 0), (term._cols - 1, term._rows - 1),
+                        inclusively=True)
+        self.assertEqual(want, got)
+
 
 if __name__ == '__main__':
     unittest.main()

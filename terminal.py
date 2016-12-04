@@ -216,7 +216,7 @@ class Terminal:
         self._buf = ''
         self._outbuf = ''
 
-    def peek(self, left_border, right_border):
+    def peek(self, left_border, right_border, inclusively=False):
         """Captures and returns a rectangular region of the screen.
 
         The ``left_border`` and ``right_border`` arguments must be tuples or
@@ -228,7 +228,7 @@ class Terminal:
         x1, y1 = left_border
         x2, y2 = right_border
         begin = self._cols * y1 + x1
-        end = self._cols * y2 + x2
+        end = self._cols * y2 + x2 + (1 if inclusively else 0)
         return self._screen[begin:end]
 
     def poke(self, pos, s):
@@ -524,15 +524,11 @@ class Terminal:
         self._cur_y = min(self._rows, l[0]) - 1
         self._eol = False
 
-    def cap_ed(self, l=[0]):
-        """Clear to end of display """
-        if l[0] == 0:
-            self.zero((self._cur_x, self._cur_y),
-                      (self._cols - 1, self._rows - 1))
-        elif l[0] == 1:
-            self.zero((0, 0), (self._cur_x, self._cur_y))
-        elif l[0] == 2:
-            self.zero((0, 0), (self._cols - 1, self._rows - 1))
+    def cap_ed(self, l=None):
+        """Clears the screen from the current cursor position to the end of the
+        screen.
+        """
+        self.zero((self._cur_x, self._cur_y), (self._cols - 1, self._rows - 1))
 
     def cap_el(self, l=[0]):
         """Clear to end of line """
