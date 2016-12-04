@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import array
-import unittest
 import random
+import unittest
 
 from terminal import Terminal, MAGIC_NUMBER
 
@@ -61,32 +61,30 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_y + 1, self._terminal._cur_y)
 
     def _check_echo(self, c, pos, eol=False, down=False):
-        """A helper function that checks the echo command.
+        """A helper function that checks the `echo` command.
 
-        pos represents a tuple of (x, y) - cursor coordinates.
-        c represents a character to put one the screen.
+        ``pos`` represents a tuple of (x, y) - cursor coordinates.
+        ``c`` represents a character that screen will have on the
+        position ``pos``.
         """
 
         if len(pos) != 2:
-            self.fail("`pos` must have x and y as cursor coordinates.")
+            self.fail("`pos` must have x and y as cursor's coordinates.")
 
         term = self._terminal
         term._eol = False
 
-        cur_x, cur_y = pos[0], pos[1]
-        term._cur_x, term._cur_y = cur_x, cur_y
+        cur_x, cur_y = term._cur_x, term._cur_y = pos
 
         term.echo(c)
 
-        check_screen_pos = 0
-
         if eol:
-            # EOL(end of line) was reached, cur_x position must no be changed.
+            # EOL (end of line) was reached, cur_x position must no be changed.
             self.assertTrue(term._eol)
             self.assertEqual(cur_x, term._cur_x)
             check_screen_pos = (term._cur_y * term._cols) + term._cur_x
         else:
-            # EOL(end of line) was not reached, cur_x was moved right by 1
+            # EOL (end of line) was not reached, cur_x was moved right by 1
             # position.
             self.assertFalse(term._eol)
             self.assertEqual(cur_x + 1, term._cur_x)
@@ -135,7 +133,7 @@ class TestEmulator(unittest.TestCase):
         move cursor right by one position.
         """
 
-        # Echo the character on the screen(most left corner).
+        # Echo the character on the screen (most left corner).
         self._check_echo('d', (0, 0))
 
         # Echo the character on an arbitrary position on the screen.
@@ -143,18 +141,14 @@ class TestEmulator(unittest.TestCase):
         rand_cur_y = random.randint(1, self._rows - 2)
         self._check_echo('r', (rand_cur_x, rand_cur_y))
 
-        # Echo the character on the screen(most right position).
+        # Echo the character on the screen (most right position).
         self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
 
         # EOL was reached earlier, echo one more character on the screen.
-        self._check_echo(
-            't',
-            (self._cols - 1, rand_cur_y),
-            eol=True,
-            down=True,
-        )
+        self._check_echo('t', (self._cols - 1, rand_cur_y),
+                         eol=True, down=True)
 
-        # Echo the character on the screen(most right corner).
+        # Echo the character on the screen (most right corner).
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
     def test_zero(self):
