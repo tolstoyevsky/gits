@@ -16,7 +16,7 @@ class TestEmulator(unittest.TestCase):
         """A helper function that puts the string ``s`` to the screen
         beginning from the position ``pos``.
 
-        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         self._terminal._cur_x, self._terminal._cur_y = pos
@@ -74,7 +74,7 @@ class TestEmulator(unittest.TestCase):
     def _check_echo(self, c, pos, eol=False, down=False):
         """A helper function that checks the `echo` command.
 
-        ``pos`` represents a tuple of (x, y) - cursor coordinates.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         ``c`` represents a character that screen will have on the
         position ``pos``.
         """
@@ -117,20 +117,21 @@ class TestEmulator(unittest.TestCase):
         """A helper function that checks the cleaning of the screen.
 
         ``s`` defines a string that will be cleared from the screen.
-        ``pos`` defines a position from which string ``s`` begins.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         term = self._terminal
+        cur_x, cur_y = pos
 
         self._put_string(s, pos)
-        self._check_string(s, pos, (pos[0] + len(s), pos[1]))
+        self._check_string(s, pos, (cur_x + len(s), cur_y))
 
-        clear_len = term.zero(pos, (pos[0] + len(s), pos[1]))
+        clear_len = term.zero(pos, (cur_x + len(s), cur_y))
 
         self.assertEqual(len(s) + 1, clear_len)
 
         clear_area = array.array('L', [MAGIC_NUMBER] * len(s))
-        self.assertEqual(clear_area, term.peek(pos, (pos[0] + len(s), pos[1])))
+        self.assertEqual(clear_area, term.peek(pos, (cur_x + len(s), cur_y)))
 
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
