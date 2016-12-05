@@ -12,19 +12,30 @@ class TestEmulator(unittest.TestCase):
         self._cols = 80
         self._terminal = Terminal(self._rows, self._cols)
 
-    def _put_string(self, s):
+    def _put_string(self, s, pos):
+        """A helper function that puts the string ``s`` to the screen
+        beginning from the position ``pos``.
+
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
+        """
+
+        self._terminal._cur_x, self._terminal._cur_y = pos
         for character in s:
             self._terminal.echo(character)
 
     def _check_string(self, s, left_border, right_border):
+        """A helper function that checks if screen has the string ``s`` from
+        ``left_border`` to ``right_border``.
+        """
+
         x1, y1 = left_border
         x2, y2 = right_border
 
-        got = array.array('L', [])
+        want = array.array('L', [])
         for c in s:
-            got.append(self._terminal._sgr | ord(c))
+            want.append(self._terminal._sgr | ord(c))
 
-        self.assertEqual(self._terminal.peek((x1, y1), (x2, y2)), got)
+        self.assertEqual(want, self._terminal.peek((x1, y1), (x2, y2)))
 
     def _check_screen_char(self, c, pos):
         """A helper function that checks if the screen has the character ``c``
@@ -102,6 +113,25 @@ class TestEmulator(unittest.TestCase):
         # corresponding position.
         self._check_screen_char(c, check_screen_pos)
 
+    def _check_zero(self, s, pos):
+        """A helper function that checks the cleaning of the screen.
+
+        ``s`` defines a string that will be cleared from the screen.
+        ``pos`` defines a position from which string ``s`` begins.
+        """
+
+        term = self._terminal
+
+        self._put_string(s, pos)
+        self._check_string(s, pos, (pos[0] + len(s), pos[1]))
+
+        clear_len = term.zero(pos, (pos[0] + len(s), pos[1]))
+
+        self.assertEqual(len(s) + 1, clear_len)
+
+        clear_area = array.array('L', [MAGIC_NUMBER] * len(s))
+        self.assertEqual(clear_area, term.peek(pos, (pos[0] + len(s), pos[1])))
+
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
 
@@ -154,10 +184,20 @@ class TestEmulator(unittest.TestCase):
     def test_zero(self):
         """Emulator should clear the area from left to right."""
 
-        # Clear the first five lines (from 0 to 4)
-        length = self._terminal.zero((0, 0), (0, 4))
-        area = self._terminal.peek((0, 0), (0, 4))
-        self.assertEqual(length, len(area) + 1)
+        # Clear first line.
+        self._check_zero(["a"] * (self._cols - 1), (0, 0))
+
+        # Clear last line.
+        self._check_zero(["z"] * (self._cols - 1), (0, self._rows - 1))
+
+        # Clear random number of line.
+        rand_x = random.randint(1, self._cols - 2)
+        rand_y = random.randint(1, self._rows - 2)
+        rand_len = random.randint(1, (self._cols - 1) - rand_x)
+        self._check_zero(["p"] * rand_len, (rand_x, rand_y))
+
+        # Clear the whole screen.
+        self._check_zero(["w"] * (self._cols - 1) * (self._rows - 1), (0, 0))
 
     def test_scroll_up(self):
         """Emulator should move area one line up."""
@@ -184,14 +224,14 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         prompt = 'spam@ham:~$ '
-        self._put_string(prompt)  # put a prompt on the screen
+        self._put_string(prompt, (0, 0))  # put a prompt on the screen
 
         # Check that the prompt was put correctly
         self._check_string(prompt, (0, 0), (len(prompt), 0))
 
         # Fill the rest of the screen with x
         length = term._cols * term._rows - len(prompt)
-        self._put_string(['x'] * length)
+        self._put_string(['x'] * length, (len(prompt), 0))
 
         # Clear the screen after the prompt till the end of the screen
         term._cur_x = len(prompt)
