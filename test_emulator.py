@@ -75,8 +75,16 @@ class TestEmulator(unittest.TestCase):
         """A helper function that checks the `echo` command.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+
         ``c`` represents a character that screen will have on the
         position ``pos``.
+
+        ``eol`` defines end of file. Set it to true if you expect that after
+        calling `echo` method cursor must be at the end of line.
+
+        Set ``down`` to true and `echo` method will be called twice. It is used
+        to check when cursor is on the most right position and `echo` method
+        correctly puts the character at the beginning of the next line.
         """
 
         if len(pos) != 2:
