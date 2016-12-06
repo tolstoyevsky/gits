@@ -82,9 +82,10 @@ class TestEmulator(unittest.TestCase):
         ``eol`` defines end of file. Set it to true if you expect that after
         calling `echo` method cursor must be at the end of line.
 
-        Set ``down`` to true and `echo` method will be called twice. It is used
-        to check when cursor is on the most right position and `echo` method
-        correctly puts the character at the beginning of the next line.
+        Set ``down`` to True to check the case when the cursor is on the most
+        right position and the `echo` method puts a character at the beginning
+        of the next line. The parameter should be used only when ``eol`` is set
+        to True.
         """
 
         if len(pos) != 2:
@@ -109,7 +110,7 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_x + 1, term._cur_x)
             check_screen_pos = (term._cur_y * term._cols) + (term._cur_x - 1)
 
-        if down:
+        if eol and down:
             term.echo(c)
             self.assertEqual(cur_y + 1, term._cur_y)
             self.assertEqual(1, term._cur_x)
