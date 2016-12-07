@@ -81,7 +81,6 @@ class Terminal:
 
         self.control_characters.update(iterm_control_characters)
 
-        self.decoder = codecs.getincrementaldecoder('utf8')()
         self.esc_re = []
         self.new_sci_seq = {
             '\x1b7': 'sc',
@@ -646,7 +645,7 @@ class Terminal:
         self._buf = ''
 
     def write(self, s):
-        for i in self.decoder.decode(s):
+        for i in s.decode('utf8'):
             if i in self.control_characters:
                 self._buf += i
                 self.exec_single_character_command()
