@@ -24,8 +24,12 @@ class TestEmulator(unittest.TestCase):
             self._terminal.echo(character)
 
     def _check_string(self, s, left_border, right_border):
-        """A helper function that checks if screen has the string ``s`` from
-        ``left_border`` to ``right_border``.
+        """A helper function that checks if the screen has the string ``s``
+        with a left border starting at position x1, yx, and a right border
+        starting at position x2, y2.
+
+        The ``left_border`` and ``right_border`` arguments must be tuples or
+        lists of coordinates ``(x1, y1)`` and ``(x2, y2)``, respectively.
         """
 
         x1, y1 = left_border
@@ -40,6 +44,8 @@ class TestEmulator(unittest.TestCase):
     def _check_screen_char(self, c, pos):
         """A helper function that checks if the screen has the character ``c``
         on the corresponding position ``pos``.
+
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         term = self._terminal
@@ -75,10 +81,8 @@ class TestEmulator(unittest.TestCase):
         """A helper function that checks the `echo` method.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
-
-        ``c`` represents a character that screen will have on the
-        position ``pos``.
-
+        The ``c`` argument is a character that screen will have on the position
+        ``pos``.
         Set ``eol`` to True if you expect that after calling the `echo` method
         cursor must be at the end of a line.
         """
@@ -109,7 +113,8 @@ class TestEmulator(unittest.TestCase):
     def _check_zero(self, s, pos):
         """A helper function that checks the cleaning of the screen.
 
-        ``s`` defines a string that will be cleared from the screen.
+        The ``s`` argument defines a string that will be cleared from the
+        screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
@@ -177,7 +182,7 @@ class TestEmulator(unittest.TestCase):
         term.zero((0, 0), (self._cols - 1, term._bottom))
 
     def test_cursor_right(self):
-        """Emulator should move cursor right by 1 position."""
+        """The terminal should move the cursor right by 1 position."""
 
         # Cursor is one the most left position.
         self._check_cursor_right(0)
@@ -190,7 +195,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_right(self._cols - 1, eol=True)
 
     def test_cursor_down(self):
-        """Emulator should move cursor down by 1 position."""
+        """The terminal should move the cursor down by 1 position."""
 
         # Cursor is on the most top position.
         self._check_cursor_down(0)
@@ -203,8 +208,8 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_down(self._cols - 1, top=True)
 
     def test_echo(self):
-        """Emulator should put the specified character ``c`` on the screen and
-        move cursor right by one position.
+        """The terminal should put the specified character ``c`` on the screen
+        and move the cursor right by one position.
         """
 
         # Echo the character on the screen (most left corner).
@@ -222,7 +227,7 @@ class TestEmulator(unittest.TestCase):
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
     def test_zero(self):
-        """Emulator should clear the area from left to right."""
+        """The terminal should clear the area from left to right."""
 
         # Clear first line.
         self._check_zero(["a"] * (self._cols - 1), (0, 0))
