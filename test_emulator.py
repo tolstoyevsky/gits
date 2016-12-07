@@ -71,21 +71,16 @@ class TestEmulator(unittest.TestCase):
         else:
             self.assertEqual(cur_y + 1, self._terminal._cur_y)
 
-    def _check_echo(self, c, pos, eol=False, down=False):
-        """A helper function that checks the `echo` command.
+    def _check_echo(self, c, pos, eol=False):
+        """A helper function that checks the `echo` method.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
 
         ``c`` represents a character that screen will have on the
         position ``pos``.
 
-        ``eol`` defines end of file. Set it to true if you expect that after
-        calling `echo` method cursor must be at the end of line.
-
-        Set ``down`` to True to check the case when the cursor is on the most
-        right position and the `echo` method puts a character at the beginning
-        of the next line. The parameter should be used only when ``eol`` is set
-        to True.
+        Set ``eol`` to True if you expect that after calling the `echo` method
+        cursor must be at the end of a line.
         """
 
         term = self._terminal
@@ -99,24 +94,16 @@ class TestEmulator(unittest.TestCase):
             # EOL (end of line) was reached, cur_x position must no be changed.
             self.assertTrue(term._eol)
             self.assertEqual(cur_x, term._cur_x)
-            check_screen_pos = (term._cur_y * term._cols) + term._cur_x
+            check_screen_pos = term._cur_y * term._cols + term._cur_x
         else:
             # EOL (end of line) was not reached, cur_x was moved right by 1
             # position.
             self.assertFalse(term._eol)
             self.assertEqual(cur_x + 1, term._cur_x)
-            check_screen_pos = (term._cur_y * term._cols) + (term._cur_x - 1)
+            check_screen_pos = term._cur_y * term._cols + (term._cur_x - 1)
 
-        if eol and down:
-            term.echo(c)
-            self.assertEqual(cur_y + 1, term._cur_y)
-            self.assertEqual(1, term._cur_x)
-            self.assertFalse(term._eol)
-        else:
-            self.assertEqual(cur_y, term._cur_y)
-
-        # Check if the screen has the correct character on the
-        # corresponding position.
+        # Check if the screen has the correct character on the corresponding
+        # position.
         self._check_screen_char(c, check_screen_pos)
 
     def _check_zero(self, s, pos):
@@ -230,10 +217,6 @@ class TestEmulator(unittest.TestCase):
 
         # Echo the character on the screen (most right position).
         self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
-
-        # EOL was reached earlier, echo one more character on the screen.
-        self._check_echo('t', (self._cols - 1, rand_cur_y),
-                         eol=True, down=True)
 
         # Echo the character on the screen (most right corner).
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
