@@ -184,14 +184,14 @@ class TestEmulator(unittest.TestCase):
     def test_cursor_right(self):
         """The terminal should move the cursor right by 1 position."""
 
-        # Cursor is one the most left position.
+        # Cursor is on the most left position.
         self._check_cursor_right(0)
 
-        # Cursor is one an arbitrary position.
+        # Cursor is on an arbitrary position.
         rand_x = random.randint(1, self._cols - 2)
         self._check_cursor_right(rand_x)
 
-        # Cursor is one the most right position.
+        # Cursor is on the most right position.
         self._check_cursor_right(self._cols - 1, eol=True)
 
     def test_cursor_down(self):
@@ -200,11 +200,11 @@ class TestEmulator(unittest.TestCase):
         # Cursor is on the most top position.
         self._check_cursor_down(0)
 
-        # Cursor is one an arbitrary position.
+        # Cursor is on an arbitrary position.
         rand_y = random.randint(1, self._rows - 2)
         self._check_cursor_down(rand_y)
 
-        # Cursor is one the most down position.
+        # Cursor is on the most down position.
         self._check_cursor_down(self._cols - 1, top=True)
 
     def test_echo(self):
