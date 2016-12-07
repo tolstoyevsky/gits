@@ -88,9 +88,6 @@ class TestEmulator(unittest.TestCase):
         to True.
         """
 
-        if len(pos) != 2:
-            self.fail("`pos` must have x and y as cursor's coordinates.")
-
         term = self._terminal
         term._eol = False
 
