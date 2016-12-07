@@ -209,15 +209,22 @@ class TestEmulator(unittest.TestCase):
         self._check_zero(["w"] * (self._cols - 1) * (self._rows - 1), (0, 0))
 
     def test_scroll_up(self):
-        """Emulator should move area one line up."""
+        """Emulator should move area by one line up."""
 
-        stub = array.array('L', [MAGIC_NUMBER] * self._terminal._cols)
-        # Clear the whole second line
-        self._terminal.poke((0, 1), stub)
-        self._terminal.scroll_up(1, self._terminal._rows)
-        # Check that after scrolling up the line moved up one position
-        line = self._terminal.peek((0, 0), (len(stub), 0))
-        self.assertEqual(stub, line)
+        # Put the string on the second line.
+        self._put_string(["a"] * (self._cols - 1), (0, 1))
+        self._check_string(["a"] * (self._cols - 1),
+                           (0, 1), (self._cols - 1, 1))
+
+        # Scroll up the whole screen.
+        self._terminal.scroll_up(0, self._rows - 1)
+
+        self._check_string(["a"] * (self._cols - 1),
+                           (0, 0), (self._cols - 1, 0))
+
+        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
+        got = self._terminal.peek((0, 1), (self._cols - 1, 1))
+        self.assertEqual(want, got)
 
     @unittest.skip("skip")
     def test_scroll_down(self):
