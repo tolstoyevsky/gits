@@ -645,7 +645,7 @@ class Terminal:
         self._buf = ''
 
     def write(self, s):
-        for i in s.decode('utf8'):
+        for i in s.decode('utf8', errors='replace'):
             if i in self.control_characters:
                 self._buf += i
                 self.exec_single_character_command()
