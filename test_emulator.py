@@ -226,6 +226,20 @@ class TestEmulator(unittest.TestCase):
         # Echo the character on the screen (right-most position).
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
+    def test_echo_eol(self):
+        term = self._terminal
+
+        term._cur_x = term._cols - 2  # the next to the last position
+
+        term.echo('e')  # moves the cursor to the right-most position
+        term.echo('g')  # puts a new character and sets eol to True
+        self.assertTrue(term._eol)
+
+        term.echo('g')  # puts a new character on the next line
+        self.assertEqual(1, term._cur_x)
+        self.assertEqual(1, term._cur_y)
+        self.assertFalse(term._eol)
+
     def test_zero(self):
         """The terminal should clear the area from left to right."""
 
