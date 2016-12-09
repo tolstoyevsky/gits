@@ -293,6 +293,38 @@ class TestEmulator(unittest.TestCase):
         """The terminal should move area by one position right."""
         pass
 
+    def test_peek(self):
+        term = self._terminal
+
+        start = 3
+        end = 7
+        zeros = array.array('L', [0] * (end - start))
+
+        # The last '0' will be on the 6th position
+        term._screen[start:end] = zeros
+
+        # Get an area from the 3rd to the 6th character
+        got = term.peek((start, 0), (end, 0))
+        self.assertEqual(zeros, got)
+
+        # Get an area from the 3rd to the 7th character
+        got = term.peek((start, 0), (end, 0), inclusively=True)
+        self.assertEqual(zeros + array.array('L', [MAGIC_NUMBER]), got)
+
+    def test_poke(self):
+        term = self._terminal
+
+        start = 3
+        end = 7
+        zeros = array.array('L', [0] * (end - start))
+
+        # The last '0' will be on the 6th position
+        term.poke((start, 0), zeros)
+
+        # Get an area from the 3rd to the 6th character
+        got = term.peek((start, 0), (end, 0))
+        self.assertEqual(zeros, got)
+
     def test_cap_ed(self):
         term = self._terminal
 
