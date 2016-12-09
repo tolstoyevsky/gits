@@ -184,27 +184,27 @@ class TestEmulator(unittest.TestCase):
     def test_cursor_right(self):
         """The terminal should move the cursor right by 1 position."""
 
-        # Cursor is on the most left position.
+        # Cursor is on the left-most position.
         self._check_cursor_right(0)
 
         # Cursor is on an arbitrary position.
         rand_x = random.randint(1, self._cols - 2)
         self._check_cursor_right(rand_x)
 
-        # Cursor is on the most right position.
+        # Cursor is on the right-most position.
         self._check_cursor_right(self._cols - 1, eol=True)
 
     def test_cursor_down(self):
         """The terminal should move the cursor down by 1 position."""
 
-        # Cursor is on the most top position.
+        # Cursor is on the top-most position.
         self._check_cursor_down(0)
 
         # Cursor is on an arbitrary position.
         rand_y = random.randint(1, self._rows - 2)
         self._check_cursor_down(rand_y)
 
-        # Cursor is on the most down position.
+        # Cursor is on the down-most position.
         self._check_cursor_down(self._cols - 1, top=True)
 
     def test_echo(self):
@@ -212,7 +212,7 @@ class TestEmulator(unittest.TestCase):
         and move the cursor right by one position.
         """
 
-        # Echo the character on the screen (most left corner).
+        # Echo the character on the screen (left-most position).
         self._check_echo('d', (0, 0))
 
         # Echo the character on an arbitrary position on the screen.
@@ -220,10 +220,10 @@ class TestEmulator(unittest.TestCase):
         rand_cur_y = random.randint(1, self._rows - 2)
         self._check_echo('r', (rand_cur_x, rand_cur_y))
 
-        # Echo the character on the screen (most right position).
+        # Echo the character on the screen (right-most position).
         self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
 
-        # Echo the character on the screen (most right corner).
+        # Echo the character on the screen (right-most position).
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
     def test_zero(self):
