@@ -141,6 +141,27 @@ class TestEmulator(unittest.TestCase):
         clear_area = array.array('L', [MAGIC_NUMBER] * len(s))
         self.assertEqual(clear_area, term.peek(pos, (cur_x + len(s), cur_y)))
 
+    def _check_scroll_up(self, s, pos):
+        """A helper function that checks the screen scrolling up.
+
+        The ``s`` argument represents a test string putting on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        x, y = pos
+
+        self._put_string(s, pos)
+        self._check_string(s, pos, (self._cols - 1, y))
+
+        # Scroll up the whole screen.
+        self._terminal.scroll_up(0, self._rows - 1)
+
+        self._check_string(s, (0, y - 1), (self._cols - 1, y - 1))
+
+        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
+        got = self._terminal.peek(pos, (self._cols - 1, y))
+        self.assertEqual(want, got)
+
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
 
@@ -209,22 +230,17 @@ class TestEmulator(unittest.TestCase):
         self._check_zero(["w"] * (self._cols - 1) * (self._rows - 1), (0, 0))
 
     def test_scroll_up(self):
-        """Emulator should move area by one line up."""
+        """The terminal should move area by one line up."""
 
-        # Put the string on the second line.
-        self._put_string(["a"] * (self._cols - 1), (0, 1))
-        self._check_string(["a"] * (self._cols - 1),
-                           (0, 1), (self._cols - 1, 1))
+        # Scroll up the first line.
+        self._check_scroll_up(['f'] * (self._cols - 1), (0, 1))
 
-        # Scroll up the whole screen.
-        self._terminal.scroll_up(0, self._rows - 1)
+        # Scroll up the last line.
+        self._check_scroll_up(['l'] * (self._cols - 1), (0, self._rows - 1))
 
-        self._check_string(["a"] * (self._cols - 1),
-                           (0, 0), (self._cols - 1, 0))
-
-        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
-        got = self._terminal.peek((0, 1), (self._cols - 1, 1))
-        self.assertEqual(want, got)
+        # Scroll up the random line.
+        rand_y = random.randint(2, self._rows - 2)
+        self._check_scroll_up(['r'] * (self._cols - 1), (0, rand_y))
 
     @unittest.skip("skip")
     def test_scroll_down(self):
@@ -233,7 +249,7 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_scroll_right(self):
-        """Emulator should move area by one position right."""
+        """The should move area by one position right."""
         pass
 
     def test_cap_ed(self):
