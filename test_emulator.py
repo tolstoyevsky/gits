@@ -141,12 +141,12 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         self._put_string(s, pos)
-        self._check_string(s, pos, (self._cols - 1, y))
+        self._check_string(s, pos, (x + len(s), y))
 
         # Scroll up the whole screen.
         term.scroll_up(0, term._bottom)
 
-        self._check_string(s, (0, y - 1), (self._cols - 1, y - 1))
+        self._check_string(s, (x, y - 1), (x + len(s), y - 1))
 
         want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
         got = term.peek(pos, (self._cols - 1, y))
@@ -166,12 +166,12 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         self._put_string(s, pos)
-        self._check_string(s, pos, (self._cols - 1, y))
+        self._check_string(s, pos, (x + len(s), y))
 
         # Scroll down the whole screen.
         term.scroll_down(0, term._bottom)
 
-        self._check_string(s, (0, y + 1), (self._cols - 1, y + 1))
+        self._check_string(s, (x, y + 1), (x + len(s), y + 1))
 
         want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
         got = term.peek(pos, (self._cols - 1, y))
@@ -303,6 +303,7 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(2, term._bottom - 2)
         self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
 
+<<<<<<< 983362edf9e3a86a77ba50bc325c619b6fd2c6b2
     @unittest.skip("skip")
     def test_scroll_right(self):
         """The terminal should move an area by 1 position right."""
@@ -350,6 +351,8 @@ class TestEmulator(unittest.TestCase):
         got = term.peek((start, 0), (end, 0))
         self.assertEqual(zeros, got)
 
+=======
+>>>>>>> Tests: Refactoring `_check_scroll_down`, `_check_scroll_up`
     def test_cap_ed(self):
         """The terminal should have the possibility of clearing the screen from
         the current cursor position to the end of the screen.
