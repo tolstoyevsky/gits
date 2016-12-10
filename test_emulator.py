@@ -125,7 +125,7 @@ class TestEmulator(unittest.TestCase):
 
         clear_len = term.zero(pos, (cur_x + len(s), cur_y))
 
-        self.assertEqual(len(s) + 1, clear_len)
+        self.assertEqual(len(s), clear_len)
 
         clear_area = array.array('L', [MAGIC_NUMBER] * len(s))
         self.assertEqual(clear_area, term.peek(pos, (cur_x + len(s), cur_y)))
