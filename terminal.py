@@ -279,9 +279,10 @@ class Terminal:
         self.poke((0, y1 + 1), line)
         self.zero((0, y1), (self._cols, y1))
 
-    def scroll_right(self, y, x):
+    def scroll_right(self, x, y):
         """Moves a piece of a row specified by coordinates ``x`` and ``y``
         right by 1 position."""
+
         self.poke((x + 1, y), self.peek((x, y), (self._cols, y)))
         self.zero((x, y), (x, y), inclusively=True)
 
@@ -484,7 +485,7 @@ class Terminal:
 
     def cap_ich1(self, l=[1]):
         """Insert character """
-        self.scroll_right(self._cur_y, self._cur_x)
+        self.scroll_right(self._cur_x, self._cur_y)
 
     def cap_smir(self, l=''):
         """Insert mode (enter) """
