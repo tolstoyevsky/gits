@@ -162,6 +162,32 @@ class TestEmulator(unittest.TestCase):
         got = self._terminal.peek(pos, (self._cols - 1, y))
         self.assertEqual(want, got)
 
+        # Restore the initial position of the screen.
+        self._terminal.zero((0, 0), (self._cols - 1, self._rows - 1))
+
+    def _check_scroll_down(self, s, pos):
+        """A helper function that checks the screen scrolling up.
+
+        The ``s`` argument represents a test string putting on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        x, y = pos
+        self._put_string(s, pos)
+        self._check_string(s, pos, (self._cols - 1, y))
+
+        # Scroll down the whole screen.
+        self._terminal.scroll_down(0, self._rows - 1)
+
+        self._check_string(s, (0, y + 1), (self._cols - 1, y + 1))
+
+        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
+        got = self._terminal.peek(pos, (self._cols - 1, y))
+        self.assertEqual(want, got)
+
+        # Restore the initial position of the screen.
+        self._terminal.zero((0, 0), (self._cols - 1, self._rows - 1))
+
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
 
@@ -242,14 +268,22 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(2, self._rows - 2)
         self._check_scroll_up(['r'] * (self._cols - 1), (0, rand_y))
 
-    @unittest.skip("skip")
     def test_scroll_down(self):
-        """Emulator should move area by one line down."""
-        pass
+        """The terminal should move area by one line down."""
+
+        # Scroll down the first line.
+        self._check_scroll_down(['f'] * (self._cols - 1), (0, 0))
+
+        # # Scroll down the last line.
+        self._check_scroll_down(['l'] * (self._cols - 1), (0, self._rows - 2))
+
+        # Scroll down the random line.
+        rand_y = random.randint(2, self._rows - 3)
+        self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
 
     @unittest.skip("skip")
     def test_scroll_right(self):
-        """The should move area by one position right."""
+        """The terminal should move area by one position right."""
         pass
 
     def test_cap_ed(self):
