@@ -144,49 +144,52 @@ class TestEmulator(unittest.TestCase):
     def _check_scroll_up(self, s, pos):
         """A helper function that checks the screen scrolling up.
 
-        The ``s`` argument represents a test string putting on the screen.
-        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string putting on the screen.
+        The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
         """
 
         x, y = pos
+        term = self._terminal
 
         self._put_string(s, pos)
         self._check_string(s, pos, (self._cols - 1, y))
 
         # Scroll up the whole screen.
-        self._terminal.scroll_up(0, self._rows - 1)
+        term.scroll_up(0, term._bottom)
 
         self._check_string(s, (0, y - 1), (self._cols - 1, y - 1))
 
         want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
-        got = self._terminal.peek(pos, (self._cols - 1, y))
+        got = term.peek(pos, (self._cols - 1, y))
         self.assertEqual(want, got)
 
         # Restore the initial position of the screen.
-        self._terminal.zero((0, 0), (self._cols - 1, self._rows - 1))
+        term.zero((0, 0), (self._cols - 1, term._bottom))
 
     def _check_scroll_down(self, s, pos):
-        """A helper function that checks the screen scrolling up.
+        """A helper function that checks the screen scrolling down.
 
-        The ``s`` argument represents a test string putting on the screen.
-        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string putting on the screen.
+        The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
         """
 
         x, y = pos
+        term = self._terminal
+
         self._put_string(s, pos)
         self._check_string(s, pos, (self._cols - 1, y))
 
         # Scroll down the whole screen.
-        self._terminal.scroll_down(0, self._rows - 1)
+        term.scroll_down(0, term._bottom)
 
         self._check_string(s, (0, y + 1), (self._cols - 1, y + 1))
 
         want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
-        got = self._terminal.peek(pos, (self._cols - 1, y))
+        got = term.peek(pos, (self._cols - 1, y))
         self.assertEqual(want, got)
 
         # Restore the initial position of the screen.
-        self._terminal.zero((0, 0), (self._cols - 1, self._rows - 1))
+        term.zero((0, 0), (self._cols - 1, term._bottom))
 
     def test_cursor_right(self):
         """Emulator should move cursor right by 1 position."""
@@ -258,27 +261,31 @@ class TestEmulator(unittest.TestCase):
     def test_scroll_up(self):
         """The terminal should move area by one line up."""
 
+        term = self._terminal
+
         # Scroll up the first line.
         self._check_scroll_up(['f'] * (self._cols - 1), (0, 1))
 
         # Scroll up the last line.
-        self._check_scroll_up(['l'] * (self._cols - 1), (0, self._rows - 1))
+        self._check_scroll_up(['l'] * (self._cols - 1), (0, term._bottom))
 
         # Scroll up the random line.
-        rand_y = random.randint(2, self._rows - 2)
+        rand_y = random.randint(2, term._bottom - 1)
         self._check_scroll_up(['r'] * (self._cols - 1), (0, rand_y))
 
     def test_scroll_down(self):
         """The terminal should move area by one line down."""
 
+        term = self._terminal
+
         # Scroll down the first line.
         self._check_scroll_down(['f'] * (self._cols - 1), (0, 0))
 
-        # # Scroll down the last line.
-        self._check_scroll_down(['l'] * (self._cols - 1), (0, self._rows - 2))
+        # Scroll down the last line.
+        self._check_scroll_down(['l'] * (self._cols - 1), (0, term._bottom - 1))
 
         # Scroll down the random line.
-        rand_y = random.randint(2, self._rows - 3)
+        rand_y = random.randint(2, term._bottom - 2)
         self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
 
     @unittest.skip("skip")
