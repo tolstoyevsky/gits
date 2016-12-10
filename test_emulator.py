@@ -180,6 +180,14 @@ class TestEmulator(unittest.TestCase):
         # Restore the initial position of the screen.
         term.zero((0, 0), (self._cols - 1, term._bottom))
 
+    def _check_scroll_right(self, s, pos):
+        """A helper function that checks the screen scrolling right.
+
+        The ``s`` argument is a test string putting on the screen.
+        The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
+        """
+        pass
+
     def test_cursor_right(self):
         """The terminal should move the cursor right by 1 position."""
 
@@ -303,12 +311,6 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(2, term._bottom - 2)
         self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
 
-<<<<<<< 983362edf9e3a86a77ba50bc325c619b6fd2c6b2
-    @unittest.skip("skip")
-    def test_scroll_right(self):
-        """The terminal should move an area by 1 position right."""
-        pass
-
     def test_peek(self):
         """The terminal should have the possibility of capturing the area from
         a left border starting at position x1, y1 to a right border starting at
@@ -351,8 +353,20 @@ class TestEmulator(unittest.TestCase):
         got = term.peek((start, 0), (end, 0))
         self.assertEqual(zeros, got)
 
-=======
->>>>>>> Tests: Refactoring `_check_scroll_down`, `_check_scroll_up`
+    def test_scroll_right(self):
+        """The terminal should move area by one position right."""
+
+        # Scroll right the string (begin at left-most position).
+        self._check_scroll_right('test', (0, 0))
+
+        # Scroll right the string (begin at random position).
+        self._check_scroll_right('test', 
+                                 (random.randint(1, self._cols - 1),
+                                 random.randint(1, self._terminal._bottom)))
+
+        # Scroll right the string (begin at right-most position).
+        self._check_scroll_right('test', (self._cols - 1, 0))
+
     def test_cap_ed(self):
         """The terminal should have the possibility of clearing the screen from
         the current cursor position to the end of the screen.
