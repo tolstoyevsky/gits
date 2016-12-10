@@ -13,8 +13,8 @@ class TestEmulator(unittest.TestCase):
         self._terminal = Terminal(self._rows, self._cols)
 
     def _put_string(self, s, pos):
-        """A helper function that puts the string ``s`` to the screen
-        beginning from the position ``pos``.
+        """A helper function that puts the string ``s`` to the screen beginning
+        with the position ``pos``.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
@@ -25,7 +25,7 @@ class TestEmulator(unittest.TestCase):
 
     def _check_string(self, s, left_border, right_border):
         """A helper function that checks if the screen has the string ``s``
-        with a left border starting at position x1, yx, and a right border
+        with a left border starting at position x1, y1, and a right border
         starting at position x2, y2.
 
         The ``left_border`` and ``right_border`` arguments must be tuples or
@@ -54,7 +54,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(want, got)
 
     def _check_cursor_right(self, cur_x, eol=False):
-        """A helper function that checks the cursor right shift."""
+        """A helper function that checks the `cursor_right` method."""
 
         self._terminal._cur_x = cur_x
         self._terminal.cursor_right()
@@ -67,7 +67,7 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_x + 1, self._terminal._cur_x)
 
     def _check_cursor_down(self, cur_y, top=False):
-        """A helper function that checks the cursor down shift."""
+        """A helper function that checks the `cursor_down` method."""
 
         self._terminal._cur_y = cur_y
         self._terminal.cursor_down()
@@ -80,11 +80,11 @@ class TestEmulator(unittest.TestCase):
     def _check_echo(self, c, pos, eol=False):
         """A helper function that checks the `echo` method.
 
+        The ``c`` argument is a character that will be put on the screen
+        starting with the position ``pos``.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
-        The ``c`` argument is a character that screen will have on the position
-        ``pos``.
-        Set ``eol`` to True if you expect that after calling the `echo` method
-        cursor must be at the end of a line.
+        Set ``eol`` to True if after calling the `echo` method the cursor will
+        be at the end of a line.
         """
 
         term = self._terminal
@@ -111,10 +111,9 @@ class TestEmulator(unittest.TestCase):
         self._check_screen_char(c, check_screen_pos)
 
     def _check_zero(self, s, pos):
-        """A helper function that checks the cleaning of the screen.
+        """A helper function that checks the `zero` method.
 
-        The ``s`` argument defines a string that will be cleared from the
-        screen.
+        The ``s`` argument is a string that will be removed from the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
@@ -132,10 +131,10 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(clear_area, term.peek(pos, (cur_x + len(s), cur_y)))
 
     def _check_scroll_up(self, s, pos):
-        """A helper function that checks the screen scrolling up.
+        """A helper function that checks the `scroll_up` method.
 
-        The ``s`` argument is a test string putting on the screen.
-        The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         x, y = pos
@@ -157,10 +156,10 @@ class TestEmulator(unittest.TestCase):
         term.zero((0, 0), (self._cols - 1, term._bottom))
 
     def _check_scroll_down(self, s, pos):
-        """A helper function that checks the screen scrolling down.
+        """A helper function that checks the `scroll_down` method.
 
-        The ``s`` argument is a test string putting on the screen.
-        The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         x, y = pos
@@ -208,8 +207,8 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_down(self._cols - 1, top=True)
 
     def test_echo(self):
-        """The terminal should put the specified character ``c`` on the screen
-        and move the cursor right by one position.
+        """The terminal should put the specified character on the screen and
+        move the cursor right by 1 position.
         """
 
         # Echo the character on the screen (left-most position).
@@ -227,39 +226,51 @@ class TestEmulator(unittest.TestCase):
         self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
 
     def test_echo_eol(self):
+        """The terminal should move the cursor to the next line when the
+        current position of the cursor is at the end of a line.
+        """
+
         term = self._terminal
 
-        term._cur_x = term._cols - 2  # the next to the last position
+        # Put the cursor to the right-most position - 1
+        term._cur_x = term._cols - 2
 
-        term.echo('e')  # moves the cursor to the right-most position
-        term.echo('g')  # puts a new character and sets eol to True
+        # Put a character to move the cursor to the right-most position
+        term.echo('e')
+
+        # After putting another character we will reach the end of the line
+        term.echo('g')
         self.assertTrue(term._eol)
 
-        term.echo('g')  # puts a new character on the next line
+        # After putting one more character the cursor will be moved the next
+        # line
+        term.echo('g')
         self.assertEqual(1, term._cur_x)
         self.assertEqual(1, term._cur_y)
         self.assertFalse(term._eol)
 
     def test_zero(self):
-        """The terminal should clear the area from left to right."""
+        """The terminal should clear the area from a left border starting at
+        position x1, y1 to a right border starting at position x2, y2.
+        """
 
-        # Clear first line.
-        self._check_zero(["a"] * (self._cols - 1), (0, 0))
+        # Clear the first line.
+        self._check_zero(['s'] * (self._cols - 1), (0, 0))
 
-        # Clear last line.
-        self._check_zero(["z"] * (self._cols - 1), (0, self._rows - 1))
+        # Clear the last line.
+        self._check_zero(['p'] * (self._cols - 1), (0, self._rows - 1))
 
-        # Clear random number of line.
+        # Clear a random number of lines.
         rand_x = random.randint(1, self._cols - 2)
         rand_y = random.randint(1, self._rows - 2)
         rand_len = random.randint(1, (self._cols - 1) - rand_x)
-        self._check_zero(["p"] * rand_len, (rand_x, rand_y))
+        self._check_zero(['a'] * rand_len, (rand_x, rand_y))
 
         # Clear the whole screen.
-        self._check_zero(["w"] * (self._cols - 1) * (self._rows - 1), (0, 0))
+        self._check_zero(['m'] * (self._cols - 1) * (self._rows - 1), (0, 0))
 
     def test_scroll_up(self):
-        """The terminal should move area by one line up."""
+        """The terminal should move an area by 1 line up."""
 
         term = self._terminal
 
@@ -274,7 +285,7 @@ class TestEmulator(unittest.TestCase):
         self._check_scroll_up(['r'] * (self._cols - 1), (0, rand_y))
 
     def test_scroll_down(self):
-        """The terminal should move area by one line down."""
+        """The terminal should move an area by 1 line down."""
 
         term = self._terminal
 
@@ -290,10 +301,15 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_scroll_right(self):
-        """The terminal should move area by one position right."""
+        """The terminal should move an area by 1 position right."""
         pass
 
     def test_peek(self):
+        """The terminal should have the possibility of capturing the area from
+        a left border starting at position x1, y1 to a right border starting at
+        position x2, y2.
+        """
+
         term = self._terminal
 
         start = 3
@@ -312,6 +328,10 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(zeros + array.array('L', [MAGIC_NUMBER]), got)
 
     def test_poke(self):
+        """The terminal should have the possibility of putting the specified
+        string on the screen staring at the specified position.
+        """
+
         term = self._terminal
 
         start = 3
@@ -326,6 +346,10 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(zeros, got)
 
     def test_cap_ed(self):
+        """The terminal should have the possibility of clearing the screen from
+        the current cursor position to the end of the screen.
+        """
+
         term = self._terminal
 
         prompt = 'spam@ham:~$ '
