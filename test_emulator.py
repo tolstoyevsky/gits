@@ -133,7 +133,7 @@ class TestEmulator(unittest.TestCase):
     def _check_scroll_up(self, s, pos):
         """A helper function that checks the `scroll_up` method.
 
-        The ``s`` argument is a test string put on the screen.
+        The ``s`` argument is a test string that will be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
@@ -158,7 +158,7 @@ class TestEmulator(unittest.TestCase):
     def _check_scroll_down(self, s, pos):
         """A helper function that checks the `scroll_down` method.
 
-        The ``s`` argument is a test string put on the screen.
+        The ``s`` argument is a test string that will be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
@@ -200,7 +200,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_down(0)
 
         # Cursor is on an arbitrary position.
-        rand_y = random.randint(1, self._rows - 2)
+        rand_y = random.randint(1, self._terminal._bottom - 1)
         self._check_cursor_down(rand_y)
 
         # Cursor is on the down-most position.
@@ -211,19 +211,21 @@ class TestEmulator(unittest.TestCase):
         move the cursor right by 1 position.
         """
 
+        term = self._terminal
+
         # Echo the character on the screen (left-most position).
         self._check_echo('d', (0, 0))
 
         # Echo the character on an arbitrary position on the screen.
         rand_cur_x = random.randint(1, self._cols - 2)
-        rand_cur_y = random.randint(1, self._rows - 2)
+        rand_cur_y = random.randint(1, term._bottom - 1)
         self._check_echo('r', (rand_cur_x, rand_cur_y))
 
         # Echo the character on the screen (right-most position).
         self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
 
         # Echo the character on the screen (right-most position).
-        self._check_echo('p', (self._cols - 1, self._rows - 1), eol=True)
+        self._check_echo('p', (self._cols - 1, term._bottom), eol=True)
 
     def test_echo_eol(self):
         """The terminal should move the cursor to the next line when the
@@ -242,7 +244,7 @@ class TestEmulator(unittest.TestCase):
         term.echo('g')
         self.assertTrue(term._eol)
 
-        # After putting one more character the cursor will be moved the next
+        # After putting one more character the cursor will be moved to the next
         # line
         term.echo('g')
         self.assertEqual(1, term._cur_x)
@@ -254,20 +256,22 @@ class TestEmulator(unittest.TestCase):
         position x1, y1 to a right border starting at position x2, y2.
         """
 
+        term = self._terminal
+
         # Clear the first line.
         self._check_zero(['s'] * (self._cols - 1), (0, 0))
 
         # Clear the last line.
-        self._check_zero(['p'] * (self._cols - 1), (0, self._rows - 1))
+        self._check_zero(['p'] * (self._cols - 1), (0, term._bottom))
 
         # Clear a random number of lines.
         rand_x = random.randint(1, self._cols - 2)
-        rand_y = random.randint(1, self._rows - 2)
+        rand_y = random.randint(1, term._bottom - 1)
         rand_len = random.randint(1, (self._cols - 1) - rand_x)
         self._check_zero(['a'] * rand_len, (rand_x, rand_y))
 
         # Clear the whole screen.
-        self._check_zero(['m'] * (self._cols - 1) * (self._rows - 1), (0, 0))
+        self._check_zero(['m'] * (self._cols - 1) * term._bottom, (0, 0))
 
     def test_scroll_up(self):
         """The terminal should move an area by 1 line up."""
@@ -325,7 +329,8 @@ class TestEmulator(unittest.TestCase):
 
         # Get an area from the 3rd to the 7th character
         got = term.peek((start, 0), (end, 0), inclusively=True)
-        self.assertEqual(zeros + array.array('L', [MAGIC_NUMBER]), got)
+        zeros.append(MAGIC_NUMBER)
+        self.assertEqual(zeros, got)
 
     def test_poke(self):
         """The terminal should have the possibility of putting the specified
@@ -372,7 +377,7 @@ class TestEmulator(unittest.TestCase):
 
         # Check that the screen was cleared correctly
         want = array.array('L', [MAGIC_NUMBER] * length)
-        got = term.peek((term._cur_x, 0), (term._cols - 1, term._rows - 1),
+        got = term.peek((term._cur_x, 0), (term._cols - 1, term._bottom),
                         inclusively=True)
         self.assertEqual(want, got)
 
