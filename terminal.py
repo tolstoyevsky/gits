@@ -259,27 +259,30 @@ class Terminal:
         return length
 
     def scroll_up(self, y1, y2):
-        """Передвигает участок 0,y1 x 0,y2 на одну строку вверх,
-        где 0 < y1 < y2.
+        """Moves the area specified by coordinates 0, ``y1`` and 0, ``y2`` up 1
+        row.
         """
-        # y1 + 1 потому, что копирование происходит со следующей строки
+        # Start copying from the next row (y1 + 1).
         line = self.peek((0, y1 + 1), (self._cols, y2))
         self.poke((0, y1), line)
         self.zero((0, y2), (self._cols - 1, y2))
 
     def scroll_down(self, y1, y2):
-        """Передвигает участок 0,y1 x 0,y2 на одну строку вниз,
-        где 0 < y1 < y2.
+        """Moves the area specified by coordinates 0, ``y1`` and 0, ``y2`` down
+        1 row.
         """
         line = self.peek((0, y1), (self._cols, y2 - 1))
         self.poke((0, y1 + 1), line)
         self.zero((0, y1), (self._cols - 1, y1))
 
     def scroll_right(self, y, x):
+        """Moves a piece of a row specified by coordinates ``x`` and ``y``
+        right by 1 position."""
         self.poke((x + 1, y), self.peek((x, y), (self._cols, y)))
         self.zero((x, y), (x, y))
 
     def cursor_down(self):
+        """Moves the cursor down by 1 position."""
         if self._top <= self._cur_y <= self._bottom:
             self._eol = False
             q, r = divmod(self._cur_y + 1, self._bottom + 1)
@@ -290,6 +293,7 @@ class Terminal:
                 self._cur_y = r
 
     def cursor_right(self):
+        """Moves the cursor right by 1 position."""
         q, r = divmod(self._cur_x + 1, self._cols)
         if q:
             self._eol = True
@@ -298,8 +302,8 @@ class Terminal:
 
     def echo(self, c):
         """Puts the specified character ``c`` on the screen and moves the
-        cursor right by one position. If the cursor reaches the right side of
-        the screen, it is moved to the next line."""
+        cursor right by 1 position. If the cursor reaches the right side of the
+        screen, it is moved to the next line."""
         if self._eol:
             self.cursor_down()
             self._cur_x = 0
@@ -416,12 +420,12 @@ class Terminal:
             pass
         elif colour == 27:  # rmso
             self._sgr = MAGIC_NUMBER
-        elif 30 <= colour <= 37:  # 7 или 8 цветов
+        elif 30 <= colour <= 37:  # setaf
             c = colour - 30
             self._sgr = (self._sgr & 0xf8ffffff) | (c << 24)
         elif colour == 39:
             self._sgr = MAGIC_NUMBER
-        elif 40 <= colour <= 47:
+        elif 40 <= colour <= 47:  # setab
             c = colour - 40
             self._sgr = (self._sgr & 0x0fffffff) | (c << 28)
         elif colour == 49:
