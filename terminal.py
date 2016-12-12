@@ -56,18 +56,18 @@ class Terminal:
         #   - http://iterm2-tools.readthedocs.io/en/latest/shell_integration.html
         #   - https://www.iterm2.com/documentation-shell-integration.html
         iterm_control_characters = {
-            "\x1b]133;D;0\x07": self.esc_ignore,
-            "\x1b]133;A\x07": self.esc_ignore,
-            "\x1b]133;B\x07": self.esc_ignore,
-            "\x1b]133;C;\x07": self.esc_ignore,
-            "\x1b]133;D;1\x07": self.esc_ignore,
-            "\x1b]133;D;127\x07": self.esc_ignore,
+            "\x1b]133;D;0\x07": self.cap_ignore,
+            "\x1b]133;A\x07": self.cap_ignore,
+            "\x1b]133;B\x07": self.cap_ignore,
+            "\x1b]133;C;\x07": self.cap_ignore,
+            "\x1b]133;D;1\x07": self.cap_ignore,
+            "\x1b]133;D;127\x07": self.cap_ignore,
         }
 
         self.control_characters = {
             "\x00": None,
             "\x05": self.esc_da,  # ENQ, Ctrl-E
-            "\x07": self.esc_ignore,
+            "\x07": self.cap_ignore,
             "\x08": self.esc_0x08,  # BS, Ctrl-H
             "\x09": self.esc_0x09,  # HT. Ctrl-I
             "\x0a": self.esc_0x0a,  # LF, Ctrl-J
@@ -84,6 +84,10 @@ class Terminal:
         self.new_sci_seq = {
             '\x1b7': 'sc',
             '\x1b8': 'rc',
+
+            # rs1 consists of \x1bc\x1b]R. The second part is ignored so far.
+            '\x1bc': 'rs1',
+            '\x1bH': 'ignore',
             '\x1b[@': 'ich1',
             '\x1b[4h': 'smir',
             '\x1b[4l': 'rmir',
@@ -114,6 +118,7 @@ class Terminal:
             '\x1b[L': 'il1',
             '\x1b[M': 'dl1',
             '\x1b[P': 'dch1',
+            '\x1b]R': 'ignore',
 
             # '\x1b[?25l': 'civis',
             # '\x1b[?25h\x1b[?8c': 'cvvis',
@@ -171,7 +176,7 @@ class Terminal:
             # 'u': (self.csi_u, [1]),  # TODO: удалить
         }
         self.init()
-        self.reset()
+        self.cap_rs1()
         # self._top = None
         # self._bottom = None
 
@@ -195,14 +200,14 @@ class Terminal:
         d = {
             r'\[\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])':
                 self.csi_dispatch,
-            r'\]([^\x07]+)\x07': self.esc_ignore,
+            r'\]([^\x07]+)\x07': self.cap_ignore,
         }
 
         for k, v in list(d.items()):
             self.esc_re.append((re.compile('\x1b' + k), v))
 
-    def reset(self, s=''):
-        """Initializes the terminal."""
+    def cap_rs1(self, s=''):
+        """Reset terminal completely to sane modes."""
         cells_number = self._cols * self._rows
         self._screen = array.array('L', [MAGIC_NUMBER] * cells_number)
         self._sgr = MAGIC_NUMBER
@@ -379,7 +384,7 @@ class Terminal:
         if self._cur_y == self._top:
             self.scroll_down(self._top, self._bottom)
 
-    def esc_ignore(self, *s):
+    def cap_ignore(self, *s):
         pass
 
     def cap_set_colour_pair(self, mo=None, p1=None, p2=None):
