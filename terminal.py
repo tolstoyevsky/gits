@@ -14,7 +14,6 @@
 # under the License.
 
 import array
-import codecs
 import html
 import re
 
