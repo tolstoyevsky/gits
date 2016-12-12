@@ -713,8 +713,3 @@ class Terminal:
                 span += '\n'
 
         return r
-
-    def set_resolution(self, row, col):
-        self._rows = row
-        self._cols = col
-        self.reset()
