@@ -186,7 +186,18 @@ class TestEmulator(unittest.TestCase):
         The ``s`` argument is a test string putting on the screen.
         The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
         """
-        pass
+        x, y = pos
+        term = self._terminal
+
+        self._put_string(s, pos)
+        self._check_string(s, pos, (x + len(s), y))
+
+        term.scroll_right(x, y)
+
+        self._check_string(s, (x + 1, y), (x + len(s) + 1, y))
+
+        # Restore the initial position of the screen.
+        term.zero((0, 0), (self._cols - 1, term._bottom))
 
     def test_cursor_right(self):
         """The terminal should move the cursor right by 1 position."""
@@ -311,6 +322,18 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(2, term._bottom - 2)
         self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
 
+    def test_scroll_right(self):
+        """The terminal should move area by 1 position right."""
+
+        # Scroll right the string (begin at left-most position).
+        self._check_scroll_right('test', (0, 0))
+
+        # Scroll right the string (begin at random position).
+        s = 'test'
+        self._check_scroll_right(s,
+                                 (random.randint(1, self._cols - 1 - len(s)),
+                                  random.randint(1, self._terminal._bottom)))
+
     def test_peek(self):
         """The terminal should have the possibility of capturing the area from
         a left border starting at position x1, y1 to a right border starting at
@@ -352,20 +375,6 @@ class TestEmulator(unittest.TestCase):
         # Get an area from the 3rd to the 6th character
         got = term.peek((start, 0), (end, 0))
         self.assertEqual(zeros, got)
-
-    def test_scroll_right(self):
-        """The terminal should move area by one position right."""
-
-        # Scroll right the string (begin at left-most position).
-        self._check_scroll_right('test', (0, 0))
-
-        # Scroll right the string (begin at random position).
-        self._check_scroll_right('test', 
-                                 (random.randint(1, self._cols - 1),
-                                 random.randint(1, self._terminal._bottom)))
-
-        # Scroll right the string (begin at right-most position).
-        self._check_scroll_right('test', (self._cols - 1, 0))
 
     def test_cap_ed(self):
         """The terminal should have the possibility of clearing the screen from
