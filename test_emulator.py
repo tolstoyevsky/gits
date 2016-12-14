@@ -148,12 +148,12 @@ class TestEmulator(unittest.TestCase):
 
         self._check_string(s, (x, y - 1), (x + len(s), y - 1))
 
-        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
-        got = term.peek(pos, (self._cols - 1, y))
+        want = array.array('L', [MAGIC_NUMBER] * term._right)
+        got = term.peek(pos, (term._right, y))
         self.assertEqual(want, got)
 
         # Restore the initial position of the screen.
-        term.zero((0, 0), (self._cols - 1, term._bottom))
+        term.zero((0, 0), (term._right, term._bottom))
 
     def _check_scroll_down(self, s, pos):
         """A helper function that checks the `scroll_down` method.
@@ -173,12 +173,12 @@ class TestEmulator(unittest.TestCase):
 
         self._check_string(s, (x, y + 1), (x + len(s), y + 1))
 
-        want = array.array('L', [MAGIC_NUMBER] * (self._cols - 1))
-        got = term.peek(pos, (self._cols - 1, y))
+        want = array.array('L', [MAGIC_NUMBER] * term._right)
+        got = term.peek(pos, (term._right, y))
         self.assertEqual(want, got)
 
         # Restore the initial position of the screen.
-        term.zero((0, 0), (self._cols - 1, term._bottom))
+        term.zero((0, 0), (term._right, term._bottom))
 
     def _check_scroll_right(self, s, pos):
         """A helper function that checks the screen scrolling right.
@@ -197,7 +197,7 @@ class TestEmulator(unittest.TestCase):
         self._check_string(s, (x + 1, y), (x + len(s) + 1, y))
 
         # Restore the initial position of the screen.
-        term.zero((0, 0), (self._cols - 1, term._bottom))
+        term.zero((0, 0), (term._right, term._bottom))
 
     def test_cursor_right(self):
         """The terminal should move the cursor right by 1 position."""
@@ -210,7 +210,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_right(rand_x)
 
         # Cursor is on the right-most position.
-        self._check_cursor_right(self._cols - 1, eol=True)
+        self._check_cursor_right(self._terminal._right, eol=True)
 
     def test_cursor_down(self):
         """The terminal should move the cursor down by 1 position."""
@@ -223,7 +223,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cursor_down(rand_y)
 
         # Cursor is on the down-most position.
-        self._check_cursor_down(self._cols - 1, top=True)
+        self._check_cursor_down(self._terminal._right, top=True)
 
     def test_echo(self):
         """The terminal should put the specified character on the screen and
@@ -241,10 +241,10 @@ class TestEmulator(unittest.TestCase):
         self._check_echo('r', (rand_cur_x, rand_cur_y))
 
         # Echo the character on the screen (right-most position).
-        self._check_echo('a', (self._cols - 1, rand_cur_y), eol=True)
+        self._check_echo('a', (term._right, rand_cur_y), eol=True)
 
         # Echo the character on the screen (right-most position).
-        self._check_echo('p', (self._cols - 1, term._bottom), eol=True)
+        self._check_echo('p', (term._right, term._bottom), eol=True)
 
     def test_echo_eol(self):
         """The terminal should move the cursor to the next line when the
@@ -278,19 +278,19 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Clear the first line.
-        self._check_zero(['s'] * (self._cols - 1), (0, 0))
+        self._check_zero(['s'] * term._right, (0, 0))
 
         # Clear the last line.
-        self._check_zero(['p'] * (self._cols - 1), (0, term._bottom))
+        self._check_zero(['p'] * term._right, (0, term._bottom))
 
         # Clear a random number of lines.
         rand_x = random.randint(1, self._cols - 2)
         rand_y = random.randint(1, term._bottom - 1)
-        rand_len = random.randint(1, (self._cols - 1) - rand_x)
+        rand_len = random.randint(1, term._right - rand_x)
         self._check_zero(['a'] * rand_len, (rand_x, rand_y))
 
         # Clear the whole screen.
-        self._check_zero(['m'] * (self._cols - 1) * term._bottom, (0, 0))
+        self._check_zero(['m'] * term._right * term._bottom, (0, 0))
 
     def test_scroll_up(self):
         """The terminal should move an area by 1 line up."""
@@ -298,14 +298,14 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Scroll up the first line.
-        self._check_scroll_up(['f'] * (self._cols - 1), (0, 1))
+        self._check_scroll_up(['f'] * term._right, (0, 1))
 
         # Scroll up the last line.
-        self._check_scroll_up(['l'] * (self._cols - 1), (0, term._bottom))
+        self._check_scroll_up(['l'] * term._right, (0, term._bottom))
 
         # Scroll up the random line.
         rand_y = random.randint(2, term._bottom - 1)
-        self._check_scroll_up(['r'] * (self._cols - 1), (0, rand_y))
+        self._check_scroll_up(['r'] * term._right, (0, rand_y))
 
     def test_scroll_down(self):
         """The terminal should move an area by 1 line down."""
@@ -313,17 +313,19 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Scroll down the first line.
-        self._check_scroll_down(['f'] * (self._cols - 1), (0, 0))
+        self._check_scroll_down(['f'] * term._right, (0, 0))
 
         # Scroll down the last line.
-        self._check_scroll_down(['l'] * (self._cols - 1), (0, term._bottom - 1))
+        self._check_scroll_down(['l'] * term._right, (0, term._bottom - 1))
 
         # Scroll down the random line.
         rand_y = random.randint(2, term._bottom - 2)
-        self._check_scroll_down(['r'] * (self._cols - 1), (0, rand_y))
+        self._check_scroll_down(['r'] * term._right, (0, rand_y))
 
     def test_scroll_right(self):
         """The terminal should move area by 1 position right."""
+
+        term = self._terminal
 
         # Scroll right the string (begin at left-most position).
         self._check_scroll_right('test', (0, 0))
@@ -331,8 +333,8 @@ class TestEmulator(unittest.TestCase):
         # Scroll right the string (begin at random position).
         s = 'test'
         self._check_scroll_right(s,
-                                 (random.randint(1, self._cols - 1 - len(s)),
-                                  random.randint(1, self._terminal._bottom)))
+                                 (random.randint(1, term._right - len(s)),
+                                  random.randint(1, term._bottom)))
 
     def test_peek(self):
         """The terminal should have the possibility of capturing the area from
@@ -403,7 +405,7 @@ class TestEmulator(unittest.TestCase):
 
         # Check that the screen was cleared correctly
         want = array.array('L', [MAGIC_NUMBER] * length)
-        got = term.peek((term._cur_x, 0), (term._cols - 1, term._bottom),
+        got = term.peek((term._cur_x, 0), (term._right, term._bottom),
                         inclusively=True)
         self.assertEqual(want, got)
 

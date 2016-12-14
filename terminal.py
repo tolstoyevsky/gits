@@ -45,6 +45,7 @@ class Terminal:
         self._eol = False
         self._top = None
         self._bottom = None
+        self._right = None
 
         self._sgr = None  # Select Graphic Rendition
 
@@ -216,6 +217,7 @@ class Terminal:
         self._eol = False
         self._top = 0
         self._bottom = self._rows - 1
+        self._right = self._cols - 1
 
         self._buf = ''
         self._outbuf = ''
@@ -515,7 +517,7 @@ class Terminal:
         if mo:
             p1 = int(mo.group(1))
 
-        self._cur_x = min(self._cols - 1, self._cur_x + p1)
+        self._cur_x = min(self._right, self._cur_x + p1)
         self._eol = False
 
     def cap_kcub1(self, l=[1]):
