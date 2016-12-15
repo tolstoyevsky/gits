@@ -424,6 +424,168 @@ class TestEmulator(unittest.TestCase):
                         inclusively=True)
         self.assertEqual(want, got)
 
+    @unittest.skip("skip")
+    def test_cap_rs1(self):
+        """The terminal should have the possibility to completely reset to
+        sane mode.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_0x08(self):
+        """The terminal should have the possibility to set cursos's `x` position
+        to maximum between `0` and current cursor position - 1.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_0x09(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_0x0a(self):
+        """The terminal should have the possibility to move cursor down by 1
+        position.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_0x0d(self):
+        """The terminal should have the possibility to set cursor at beginning
+        of the line.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_da(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_esc_ri(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_set_colour_pair(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_set_colour(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_sgr0(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_op(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_noname(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_bold(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_dim(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_smul(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_blink(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_smso_rev(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_rmpch(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_smpch(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_rmul(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_rmso(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_sc(self):
+        """The terminal should have the posibility to save current cursror
+        position.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_rc(self):
+        """The terminal should have the posibility to set cursor's position to
+        recently saved position.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_ich1(self):
+        """The terminal should have the posibility to insert character. """
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_smso(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_kcuu1(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_kcuf1(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_cuf(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_kcub1(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_kb2(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_home(self):
+        """The terminal should have the possibility to set cursor to the home
+        position (the upper left corner).
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_el(self):
+        """The emulator should have the posibility to clear the screen from the
+        current cursor position to the end of line.
+        """
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_el1(self):
+        pass
+
+    @unittest.skip("skip")
+    def test_cap_il1(self):
+        """The terminal should have the possibility to add new blank line. """
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()
