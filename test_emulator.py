@@ -433,7 +433,7 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_esc_0x08(self):
-        """The terminal should have the possibility to set cursos's `x` position
+        """The terminal should have the possibility to set cursor's `x` position
         to maximum between `0` and current cursor position - 1.
         """
         pass
@@ -522,21 +522,21 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_cap_sc(self):
-        """The terminal should have the posibility to save current cursror
+        """The terminal should have the possibility to save current cursor
         position.
         """
         pass
 
     @unittest.skip("skip")
     def test_cap_rc(self):
-        """The terminal should have the posibility to set cursor's position to
+        """The terminal should have the possibility to set cursor's position to
         recently saved position.
         """
         pass
 
     @unittest.skip("skip")
     def test_cap_ich1(self):
-        """The terminal should have the posibility to insert character. """
+        """The terminal should have the possibility to insert character. """
         pass
 
     @unittest.skip("skip")
@@ -572,7 +572,7 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_cap_el(self):
-        """The emulator should have the posibility to clear the screen from the
+        """The emulator should have the possibility to clear the screen from the
         current cursor position to the end of line.
         """
         pass
