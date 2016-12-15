@@ -527,12 +527,31 @@ class TestEmulator(unittest.TestCase):
         """
         pass
 
-    @unittest.skip("skip")
     def test_cap_rc(self):
         """The terminal should have the possibility to set cursor's position to
         recently saved position.
         """
-        pass
+        term = self._terminal
+
+        # Put the cursor to the right-most position - 1
+        term._cur_x = term._right - 1
+
+        # Put a character to move the cursor to the right-most position
+        term.echo('e')
+
+        # After putting another character we will reach the end of the line
+        term.echo('g')
+        self.assertTrue(term._eol)
+
+        cur_x_bck = term._cur_x
+        term.cap_sc()  # save the cursor's current position
+
+        # Put one more character to move the cursor to the next line
+        term.echo('g')
+
+        term.cap_rc()  # restore a previously saved cursor's position
+        self.assertEqual(cur_x_bck, term._cur_x)
+        self.assertTrue(term._eol)
 
     @unittest.skip("skip")
     def test_cap_ich1(self):
