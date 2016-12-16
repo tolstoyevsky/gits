@@ -1,0 +1,53 @@
+escape_sequences:
+  '\x1b7': 'sc'
+  '\x1b8': 'rc'
+
+  # rs1 consists of \x1bc\x1b]R. The second part is ignored so far.
+  '\x1bc': 'rs1'
+  '\x1bH': 'ignore'
+  '\x1b[@': 'ich1'
+  '\x1b[4h': 'smir'
+  '\x1b[4l': 'rmir'
+
+  # There's no such sequence, however ls sends it
+  '\x1b[0m': 'noname'
+  '\x1b[1m': 'bold'
+  '\x1b[2m': 'dim'
+  '\x1b[4m': 'smul'
+  '\x1b[5m': 'blink'
+  '\x1b[7m': 'smso_rev'
+  '\x1b[10m': 'rmpch'
+  '\x1b[11m': 'smpch'
+  '\x1b[24m': 'rmul'
+  '\x1b[27m': 'rmso'
+  '\x1b[0;10m': 'sgr0'
+  '\x1b[39;49m': 'op'
+  '\x1b[A': 'kcuu1'
+  '\x1b[B': 'kcud1'
+
+  # cuf1
+  '\x1b[C': 'kcuf1'
+  '\x1b[D': 'kcub1'
+  '\x1b[G': 'kb2'
+  '\x1b[H': 'home'
+  '\x1b[J': 'ed'
+  '\x1b[K': 'el'
+  '\x1b[1K': 'el1'
+  '\x1b[L': 'il1'
+  '\x1b[M': 'dl1'
+  '\x1b[P': 'dch1'
+  '\x1b]R': 'ignore'
+
+  # '\x1b[?25l': civis
+
+escape_sequences_re:
+  '\x1b[%dd': 'vpa'
+  '\x1b[%d;%dm': 'set_colour_pair'
+  '\x1b[%dm': 'set_colour'
+  '\x1b[%dC': 'cuf'
+  '\x1b[%dL': 'il'
+  '\x1b[%dM': 'dl'
+  '\x1b[%dP': 'dch'
+  '\x1b[%dX': 'ech'
+  '\x1b[%d;%dr': 'csr'
+  '\x1b[%d;%dH': 'cup'

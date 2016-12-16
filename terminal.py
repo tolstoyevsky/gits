@@ -17,6 +17,8 @@ import array
 import html
 import re
 
+import yaml
+
 # XXX: Есть один баг. Для воспроизведения необходимо выполнить в домашней
 # директории ls | less, а затем сделать поиск по new books. Программа
 # выволится с исключением KeyError: '\x1bMmm\r'. mm -- это директория перед
@@ -81,100 +83,16 @@ class Terminal:
 
         self.control_characters.update(iterm_control_characters)
 
+        with open('linux_console.yml') as f:
+            sequences = yaml.load(f.read())
+
         self.esc_re = []
-        self.new_sci_seq = {
-            '\x1b7': 'sc',
-            '\x1b8': 'rc',
+        self.new_sci_seq = sequences['escape_sequences']
+        self.new_sci_seq_re = sequences['escape_sequences_re']
 
-            # rs1 consists of \x1bc\x1b]R. The second part is ignored so far.
-            '\x1bc': 'rs1',
-            '\x1bH': 'ignore',
-            '\x1b[@': 'ich1',
-            '\x1b[4h': 'smir',
-            '\x1b[4l': 'rmir',
-
-            # такой управляющей последовательности нет, но это не мешает,
-            # к примеру, ls слать ее
-            '\x1b[0m': 'noname',
-            '\x1b[1m': 'bold',
-            '\x1b[2m': 'dim',
-            '\x1b[4m': 'smul',
-            '\x1b[5m': 'blink',
-            '\x1b[7m': 'smso_rev',
-            '\x1b[10m': 'rmpch',
-            '\x1b[11m': 'smpch',
-            '\x1b[24m': 'rmul',
-            '\x1b[27m': 'rmso',
-            '\x1b[0;10m': 'sgr0',
-            '\x1b[39;49m': 'op',
-            '\x1b[A': 'kcuu1',
-            '\x1b[B': 'kcud1',
-            '\x1b[C': 'kcuf1',  # cuf1
-            '\x1b[D': 'kcub1',
-            '\x1b[G': 'kb2',
-            '\x1b[H': 'home',
-            '\x1b[J': 'ed',
-            '\x1b[K': 'el',
-            '\x1b[1K': 'el1',
-            '\x1b[L': 'il1',
-            '\x1b[M': 'dl1',
-            '\x1b[P': 'dch1',
-            '\x1b]R': 'ignore',
-
-            # '\x1b[?25l': 'civis',
-            # '\x1b[?25h\x1b[?8c': 'cvvis',
-        }
-        self.new_sci_seq_re = {
-            '\x1b[%dd': 'vpa',
-            '\x1b[%d;%dm': 'set_colour_pair',  # custom
-            '\x1b[%dm': 'set_colour',  # custom
-            '\x1b[%dC': 'cuf',
-            '\x1b[%dL': 'il',
-            '\x1b[%dM': 'dl',
-            '\x1b[%dP': 'dch',
-            '\x1b[%dX': 'ech',
-            '\x1b[%d;%dr': 'csr',
-            '\x1b[%d;%dH': 'cup',
-        }
         self.new_sci_seq_re_compiled = []
         self.csi_seq = {
             '`': (self.cap_kb2, [1]),
-            # 'A': (self.csi_A, [1]),
-            # 'B': (self.csi_B, [1]),
-            # 'C': (self.csi_C, [1]),
-            # 'D': (self.csi_D, [1]),
-            # 'G': (self.csi_G, [1]),  # hpa: ESC [ %d G
-            # 'H': (self.csi_H, [1]),  # cup: ESC [ %d ; %d H
-            # 'J': (self.csi_J, [0]),
-            # 'K': (self.csi_K, [0]),
-            # Две следующие последовательности не встречаются ни в mc, ни в
-            # htop, ни в vim
-            # 'L': (self.csi_L, [1]),
-            # 'M': (self.csi_M, [1]),
-            # 'P': (self.csi_P, [1]),  # dch: ESC [ %d P
-            # 'X': (self.csi_X, [1]),  # _only_ ech: ESC [ %d X
-            # представляет собой вторую часть последовательностей
-            # \x1b[?25l\x1b[?1c и \x1b[?25h\x1b[?8c, поэтому она игнорируется,
-            # т.к. является бесполезной без своей первой части
-            # 'c': (self.csi_c, [1]),
-            # 'd': (self.csi_d, [1]),  # _only_ vpa: ESC [ %d d
-            # 'h': (self.csi_h, [1]),  # _only_ smir: ESC [ 4 h
-            # 'l': (self.csi_l, [1]),  # _only_ rmir= ESC [ 4 l
-            # 'm': (self.csi_m, [1]),  # blink: ESC [ 5 m
-                                       # bold: ESC [ 1 m
-                                       # dim: ESC [ 2 m
-                                       # op: ESC [ 39 ; 49 m
-                                       # rev: ESC [ 7 m
-                                       # rmacs: ESC [ 10 m
-                                       # rmpch: ESC [ 10 m
-                                       # rmso: ESC [ 27 m
-                                       # rmul: ESC [ 24 m
-                                       # setab: ESC [ 4 %d m
-                                       # setaf: ESC [ 3 %d m
-                                       # sgr0: ESC [ 0 ; 10 m
-            # 'r': (self.csi_r, [1]),  # csr: ESC [ %d; %d r
-            # 's': (self.csi_s, [1]),  # TODO: удалить
-            # 'u': (self.csi_u, [1]),  # TODO: удалить
         }
         self.init()
         self.cap_rs1()
