@@ -195,12 +195,9 @@ class Terminal:
                 (re.compile(res), v)
             )
 
-        # спотыкнулся об \x1b[?2004l, когда удалил следующие строки;
-        # видимо это хороший способ генерировать заглушки для различных
-        # несуществующих последовательностей.
         d = {
             r'\[\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])':
-                self.csi_dispatch,
+                self.cap_ignore,
             r'\]([^\x07]+)\x07': self.cap_ignore,
         }
 
@@ -318,22 +315,6 @@ class Terminal:
         pos = self._cur_y * self._cols + self._cur_x
         self._screen[pos] = self._sgr | ord(c)
         self.cursor_right()
-
-    def csi_dispatch(self, seq, mo):
-        # CSI sequences
-        s = mo.group(1)
-        c = mo.group(2)
-        f = self.csi_seq.get(c, None)
-        if f:
-            try:
-                l = [min(int(i), 1024) for i in s.split(';') if len(i) < 4]
-            except ValueError:
-                l = []
-
-            if len(l) == 0:
-                l = f[1]
-
-            f[0](l)
 
     def csi_at(self, l):
         for i in range(l[0]):
