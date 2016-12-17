@@ -54,19 +54,6 @@ class Terminal:
         self._buf = ''
         self._outbuf = ''
 
-        # esc sequences related to ITERM.
-        # for more deatails see:
-        #   - http://iterm2-tools.readthedocs.io/en/latest/shell_integration.html
-        #   - https://www.iterm2.com/documentation-shell-integration.html
-        iterm_control_characters = {
-            "\x1b]133;D;0\x07": self.cap_ignore,
-            "\x1b]133;A\x07": self.cap_ignore,
-            "\x1b]133;B\x07": self.cap_ignore,
-            "\x1b]133;C;\x07": self.cap_ignore,
-            "\x1b]133;D;1\x07": self.cap_ignore,
-            "\x1b]133;D;127\x07": self.cap_ignore,
-        }
-
         self.control_characters = {
             "\x00": None,
             "\x05": self.esc_da,  # ENQ, Ctrl-E
@@ -80,8 +67,6 @@ class Terminal:
             # "\x0e": None,
             # "\x0f": None,
         }
-
-        self.control_characters.update(iterm_control_characters)
 
         with open('linux_console.yml') as f:
             sequences = yaml.load(f.read())
@@ -563,7 +548,7 @@ class Terminal:
     def write(self, s):
         for i in s.decode('utf8', errors='replace'):
             if i in self.control_characters:
-                self._buf += i
+                self._buf = i
                 self.exec_single_character_command()
             elif i == '\x1b':
                 self._buf += i
