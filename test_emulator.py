@@ -426,43 +426,87 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_cap_rs1(self):
-        """The terminal should have the possibility to completely reset to
-        sane mode.
+        """The terminal should have the possibility to completely reset to sane
+        mode.
         """
-        pass
 
-    @unittest.skip("skip")
+        # Exec some operations with terminal.
+        self._terminal.echo('a')
+        self._terminal.cursor_right()
+        self._terminal.cursor_down()
+        self._terminal.scroll_down(0, self._terminal._bottom)
+
+        # Reset the terminal to the sane mode.
+        self._terminal.cap_rs1()
+        self.assertEqual(0, self._terminal._cur_x)
+        self.assertEqual(0, self._terminal._cur_y)
+        self.assertFalse(self._terminal._eol)
+
     def test_esc_0x08(self):
         """The terminal should have the possibility to set cursor's `x` position
         to maximum between `0` and current cursor position - 1.
         """
-        pass
+
+        # Cursor at the left-most position.
+        self._terminal.esc_0x08('')
+        self.assertEqual(0, self._terminal._cur_x)
+
+        # Set cursor's `x` position to random.
+        rand_x = random.randint(1, self._terminal._right)
+        self._terminal._cur_x = rand_x
+        
+        self._terminal.esc_0x08('')
+        self.assertEqual(rand_x - 1, self._terminal._cur_x)
 
     @unittest.skip("skip")
     def test_esc_0x09(self):
+        # ATTN: need a decription.
         pass
 
-    @unittest.skip("skip")
     def test_esc_0x0a(self):
         """The terminal should have the possibility to move cursor down by 1
         position.
         """
-        pass
 
-    @unittest.skip("skip")
+        # Cursor at left-most position.
+        self._terminal.esc_0x0a('')
+        self.assertEqual(1, self._terminal._cur_y)
+
     def test_esc_0x0d(self):
         """The terminal should have the possibility to set cursor at beginning
         of the line.
         """
-        pass
+
+        self._terminal._cur_x = random.randint(1, self._terminal._right)
+        self._terminal.esc_0x0d('')
+        self.assertEqual(0, self._terminal._cur_x)
+        self.assertFalse(self._terminal._eol)
 
     @unittest.skip("skip")
     def test_esc_da(self):
+        # ATTN: need a decription.
         pass
 
-    @unittest.skip("skip")
     def test_esc_ri(self):
-        pass
+        """The terminal should scroll down by 1 position when terminal's `top`
+        was chosen as maximum between terminal's `top` and terminal's `cur_y`.
+        """
+        
+        # Cursor at left-most position, `top` and `cur_y` equal 0.
+        s = ['a'] * self._terminal._right
+        self._put_string(s, (0, 0))
+        self._terminal.esc_ri('')
+        self._check_string(s, (0, 1), (len(s), 1))
+
+        # Reset the terminal to the sane mode.
+        self._terminal.cap_rs1()
+
+        # Put `cur_y` at random position.
+        rand_y = random.randint(1, self._terminal._bottom)
+        self._terminal._cur_y = rand_y
+        self._terminal.esc_ri('')
+        self.assertEqual(rand_y - 1, self._terminal._cur_y)
+
 
     @unittest.skip("skip")
     def test_cap_set_colour_pair(self):
@@ -520,12 +564,18 @@ class TestEmulator(unittest.TestCase):
     def test_cap_rmso(self):
         pass
 
-    @unittest.skip("skip")
     def test_cap_sc(self):
         """The terminal should have the possibility to save current cursor
         position.
         """
-        pass
+
+        term = self._terminal
+        x, y = random.randint(0, term._right), random.randint(0, term._bottom)
+        term._cur_x, term._cur_y = x, y
+        term.cap_sc()
+
+        self.assertEqual(x, term._cur_x_bak)
+        self.assertEqual(y, term._cur_y_bak)
 
     def test_cap_rc(self):
         """The terminal should have the possibility to set cursor's position to
@@ -555,12 +605,18 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip("skip")
     def test_cap_ich1(self):
+        # ATTN: corresponding method has the following doc: Insert character.
+        #       Is it ok? I'm confused because this method just executes scroll
+        #       right terminal method.
+
         """The terminal should have the possibility to insert character. """
         pass
 
-    @unittest.skip("skip")
     def test_cap_smso(self):
-        pass
+        """The terminal should have the possibility to begin standout mode. """
+        self._terminal._sgr = None
+        self._terminal.cap_smso()
+        self.assertEqual(0x70000000, self._terminal._sgr)
 
     @unittest.skip("skip")
     def test_cap_kcuu1(self):
@@ -603,6 +659,48 @@ class TestEmulator(unittest.TestCase):
     @unittest.skip("skip")
     def test_cap_il1(self):
         """The terminal should have the possibility to add new blank line. """
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_dl1(self):
+        """The terminal should have the possibility to delete a line. """
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_dch1(self):
+        """The terminal should have the possibility to delete a character. """
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_vpa(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_il(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_dl(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_dch(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_csr(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_ech(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_cap_cup(self):
+        pass
+
+    @unittest.skip('skip')
+    def test_exec_escape_sequence(self):
         pass
 
 
