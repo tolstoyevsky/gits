@@ -45,7 +45,7 @@ escape_sequences:
   'ESC]133;D;0': 'ignore'
   'ESC]133;A': 'ignore'
   'ESC]133;B': 'ignore'
-  'ESC]133;C': 'ignore'
+  'ESC]133;C;': 'ignore'
   'ESC]133;D;1': 'ignore'
   'ESC]133;D;127': 'ignore'
 
