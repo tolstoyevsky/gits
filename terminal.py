@@ -237,6 +237,7 @@ class Terminal:
     # новый стиль именования методов, реализующих возможности
 
     def cap_cub1(self):
+        """Moves the cursor 1 position left. """
         self._cur_x = max(0, self._cur_x - 1)
 
     def cap_ht(self):
@@ -248,6 +249,7 @@ class Terminal:
         self.cursor_down()
 
     def cap_cr(self):
+        """Does carriage return. """
         self._eol = False
         self._cur_x = 0
 
