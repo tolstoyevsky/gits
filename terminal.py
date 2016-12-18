@@ -54,22 +54,10 @@ class Terminal:
         self._buf = ''
         self._outbuf = ''
 
-        self.control_characters = {
-            "\x00": None,
-            "\x05": self.esc_da,  # ENQ, Ctrl-E
-            "\x07": self.cap_ignore,
-            "\x08": self.esc_0x08,  # BS, Ctrl-H
-            "\x09": self.esc_0x09,  # HT. Ctrl-I
-            "\x0a": self.esc_0x0a,  # LF, Ctrl-J
-            "\x0b": self.esc_0x0a,  # VT, Ctrl-K
-            "\x0c": self.esc_0x0a,  # FF, Ctrl-L
-            "\x0d": self.esc_0x0d,  # CR, Ctrl-M
-            # "\x0e": None,
-            # "\x0f": None,
-        }
-
         with open('linux_console.yml') as f:
             sequences = yaml.load(f.read())
+
+        self.control_characters = sequences['control_characters']
 
         self.esc_re = []
         self.new_sci_seq = {}
@@ -253,24 +241,26 @@ class Terminal:
 
     # новый стиль именования методов, реализующих возможности
 
-    def esc_0x08(self, s):
+    def cap_cub1(self):
         self._cur_x = max(0, self._cur_x - 1)
 
-    def esc_0x09(self, s):
+    def cap_ht(self):
         x = self._cur_x + 8
         q, r = divmod(x, 8)
         self._cur_x = (q * 8) % self._cols
 
-    def esc_0x0a(self, s):
+    def cap_ind(self):
         self.cursor_down()
 
-    def esc_0x0d(self, s):
+    def cap_cr(self):
         self._eol = False
         self._cur_x = 0
 
-    def esc_da(self, s):
-        self._outbuf = "\x1b[?6c"
+    # TODO: rework later
+    def esc_da(self):
+        self._outbuf = "\x1b[?6c"  # u8
 
+    # XXX: never used
     def esc_ri(self, s):
         self._cur_y = max(self._top, self._cur_y - 1)
         if self._cur_y == self._top:
@@ -542,13 +532,15 @@ class Terminal:
                     break
 
     def exec_single_character_command(self):
-        self.control_characters[self._buf](self._buf)
+        method_name = self.control_characters[self._buf]
+        method = getattr(self, 'cap_' + method_name)
+        method()
         self._buf = ''
 
     def write(self, s):
         for i in s.decode('utf8', errors='replace'):
-            if i in self.control_characters:
-                self._buf = i
+            if ord(i) in self.control_characters:
+                self._buf = ord(i)
                 self.exec_single_character_command()
             elif i == '\x1b':
                 self._buf += i

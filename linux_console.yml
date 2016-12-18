@@ -1,3 +1,23 @@
+control_characters:
+  0: 'ignore'
+  # ENQ, Ctrl-E
+  5: self.esc_da
+  7: 'ignore'
+  # BS, Ctrl-H
+  8: 'cub1'
+  # HT, Ctrl-I
+  9: 'ht'
+  # LF, Ctrl-J
+  10: 'ind'
+  # VT, Ctrl-K
+  11: 'ind'
+  # FF, Ctrl-L
+  12: 'ind'
+  # CR, Ctrl-M
+  13: 'cr'
+  # '14': 'ignore'
+  # '15': 'ignore'
+
 escape_sequences:
   'ESC7': 'sc'
   'ESC8': 'rc'
