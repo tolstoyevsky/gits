@@ -207,10 +207,6 @@ class Terminal:
         self._screen[pos] = self._sgr | ord(c)
         self.cursor_right()
 
-    def csi_at(self, l):
-        for i in range(l[0]):
-            self.cap_ich1()
-
     # def csi_E(self, l):
     #     self.csi_B(l)
     #     self._cur_x = 0
@@ -262,6 +258,11 @@ class Terminal:
         self._cur_y = max(self._top, self._cur_y - 1)
         if self._cur_y == self._top:
             self.scroll_down(self._top, self._bottom)
+
+    # XXX: never used
+    def csi_at(self, l):
+        for i in range(l[0]):
+            self.cap_ich1()
 
     def cap_ignore(self, *s):
         pass
