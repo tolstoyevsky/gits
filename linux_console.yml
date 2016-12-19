@@ -24,6 +24,7 @@ escape_sequences:
 
   # rs1 consists of \x1bc\x1b]R. The second part is ignored so far.
   'ESCc': 'rs1'
+
   'ESCH': 'ignore'
   'ESC[@': 'ich1'
   'ESC[4h': 'smir'
@@ -31,6 +32,7 @@ escape_sequences:
 
   # There's no such sequence, however ls sends it
   'ESC[0m': 'noname'
+
   'ESC[1m': 'bold'
   'ESC[2m': 'dim'
   'ESC[4m': 'smul'
