@@ -1,7 +1,7 @@
 control_characters:
   0: 'ignore'
   # ENQ, Ctrl-E
-  5: self.esc_da
+  5: 'ignore'
   7: 'ignore'
   # BS, Ctrl-H
   8: 'cub1'
