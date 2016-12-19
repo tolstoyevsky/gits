@@ -177,7 +177,8 @@ class Terminal:
         self.zero((x, y), (x, y), inclusively=True)
 
     def cursor_down(self):
-        """Moves the cursor down by 1 position."""
+        """Moves the cursor down by 1 position. If the cursor reaches the
+        bottom of the screen, its content moves up 1 row. """
         if self._top <= self._cur_y <= self._bottom:
             self._eol = False
             q, r = divmod(self._cur_y + 1, self._bottom + 1)
@@ -242,6 +243,7 @@ class Terminal:
         self._cur_x = (q * 8) % self._cols
 
     def cap_ind(self):
+        """Scrolls the screen up moving its content down. """
         self.cursor_down()
 
     def cap_cr(self):
