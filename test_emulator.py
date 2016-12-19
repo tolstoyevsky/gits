@@ -442,21 +442,35 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(0, self._terminal._cur_y)
         self.assertFalse(self._terminal._eol)
 
+    def _check_esc_0x08(self, pos, want_cur_x):
+        """A helper function that checks the `esc_0x08` method.
+
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``want_cur_x`` argument is an expected terminal's `cur_x` value
+        after `esc_0x08` method.
+        """
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+        term.esc_0x08('')
+        self.assertEqual(want_cur_x, term._cur_x)
+
     def test_esc_0x08(self):
         """The terminal should have the possibility to set cursor's `x` position
         to maximum between `0` and current cursor position - 1.
         """
 
+        term = self._terminal
+
         # Cursor at the left-most position.
-        self._terminal.esc_0x08('')
-        self.assertEqual(0, self._terminal._cur_x)
+        self._check_esc_0x08((0, 0), want_cur_x=0)
+
+        # Cursor at the right-most position.
+        self._check_esc_0x08((term._right, 0), want_cur_x=term._right - 1)
 
         # Set cursor's `x` position to random.
-        rand_x = random.randint(1, self._terminal._right)
-        self._terminal._cur_x = rand_x
-        
-        self._terminal.esc_0x08('')
-        self.assertEqual(rand_x - 1, self._terminal._cur_x)
+        rand_x = random.randint(1, term._right - 1)
+        self._check_esc_0x08((rand_x, 0), want_cur_x=rand_x - 1)
 
     @unittest.skip("skip")
     def test_esc_0x09(self):
@@ -613,6 +627,7 @@ class TestEmulator(unittest.TestCase):
 
     def test_cap_smso(self):
         """The terminal should have the possibility to begin standout mode. """
+
         self._terminal._sgr = None
         self._terminal.cap_smso()
         self.assertEqual(0x70000000, self._terminal._sgr)
