@@ -617,17 +617,16 @@ class TestEmulator(unittest.TestCase):
         self._terminal.cap_smso()
         self.assertEqual(0x70000000, self._terminal._sgr)
 
-    def _check_cap_kcuu1(self, l, pos, want_cur_y):
+    def _check_cap_kcuu1(self, pos, want_cur_y):
         """A helper function that checks `cap_kcuu1` method.
 
-        The ``l`` argument ... . (Need Eugene comments)
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_y`` argument is an expected terminal's `cur_y` value
         after `cap_kcud1` method.
         """
 
         self._terminal._cur_x, self._terminal._cur_y = pos
-        self._terminal.cap_kcuu1(l)
+        self._terminal.cap_kcuu1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
 
         self._terminal.cap_rs1()
@@ -635,53 +634,50 @@ class TestEmulator(unittest.TestCase):
     def test_cap_kcuu1(self):
         """The terminal should have the possibility to receive string of input
         characters sent by typing the up-arrow key.
-        ATTN: rework after Eugene comments.
         """
 
         term = self._terminal
 
         # Terminal's `cur_y` is on the top-most position.
-        self._check_cap_kcuu1([1], (0, 0), term._top)
+        self._check_cap_kcuu1((0, 0), term._top)
 
         # Terminal's `cur_y` is on the bottom-most position.
-        l = [1]
-        self._check_cap_kcuu1(l, (0, term._bottom), term._bottom - l[0])
+        self._check_cap_kcuu1((0, term._bottom), term._bottom - 1)
 
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom - 1)
-        l = [1]
-        self._check_cap_kcuu1(l, (0, rand_y), rand_y - l[0])
+        self._check_cap_kcuu1((0, rand_y), rand_y - 1)
 
-    def _check_cap_kcud1(self, l, pos, want_cur_y):
+    def _check_cap_kcud1(self, pos, want_cur_y):
         """A helper function that checks `cap_kcud1` method.
 
-        The ``l`` argument ... . (Need Eugene comments)
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_y`` argument is an expected terminal's `cur_y` value
         after `cap_kcud1` method.
         """
 
         self._terminal._cur_x, self._terminal._cur_y = pos
-        self._terminal.cap_kcud1(l)
+        self._terminal.cap_kcud1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
 
         self._terminal.cap_rs1()
 
     def test_cap_kcud1(self):
-        # ATTN: rework after Eugene comments.
+        """The terminal should have the possibility to receive string of input
+        characters sent by typing the down-arrow key.
+        """
 
         term = self._terminal
 
         # Terminal's `cur_y` is on the top-most position.
-        self._check_cap_kcud1([1], (0, 0), 1)
+        self._check_cap_kcud1((0, 0), 1)
 
         # Terminal's `cur_y` is on the bottom-most position.
-        self._check_cap_kcud1([1], (0, term._bottom), term._bottom)
+        self._check_cap_kcud1((0, term._bottom), term._bottom)
 
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom - 1)
-        l = [1]
-        self._check_cap_kcud1(l, (0, rand_y), rand_y + l[0])
+        self._check_cap_kcud1((0, rand_y), rand_y + 1)
 
     @unittest.skip('skip')
     def test_cap_kcuf1(self):
