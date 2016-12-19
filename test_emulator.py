@@ -424,7 +424,6 @@ class TestEmulator(unittest.TestCase):
                         inclusively=True)
         self.assertEqual(want, got)
 
-    @unittest.skip("skip")
     def test_cap_rs1(self):
         """The terminal should have the possibility to completely reset to sane
         mode.
@@ -486,15 +485,31 @@ class TestEmulator(unittest.TestCase):
         self._terminal.esc_0x0a('')
         self.assertEqual(1, self._terminal._cur_y)
 
+    def _check_esc_0x0d(self, pos):
+        """A helper function that checks `esc_0x0d` method.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+
+        self._terminal.esc_0x0d('')
+        self.assertEqual(0, self._terminal._cur_x)
+        self.assertFalse(self._terminal._eol)
+
     def test_esc_0x0d(self):
         """The terminal should have the possibility to set cursor at beginning
         of the line.
         """
 
-        self._terminal._cur_x = random.randint(1, self._terminal._right)
-        self._terminal.esc_0x0d('')
-        self.assertEqual(0, self._terminal._cur_x)
-        self.assertFalse(self._terminal._eol)
+        # Cursor at left-most position.
+        self._check_esc_0x0d((0, 0))
+
+        # Cursor at right-most position.
+        self._check_esc_0x0d((self._terminal._right, 0))
+
+        # Cursor at random position.
+        self._check_esc_0x0d((random.randint(1, self._terminal._right), 0))
 
     @unittest.skip("skip")
     def test_esc_da(self):
