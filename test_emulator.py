@@ -700,26 +700,49 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Terminal's `cur_y` is on the top-most position.
-        self._check_cap_kcud1((0, 0), 1)
+        self._check_cap_kcud1((0, 0), want_cur_y=1)
 
         # Terminal's `cur_y` is on the bottom-most position.
-        self._check_cap_kcud1((0, term._bottom), term._bottom)
+        self._check_cap_kcud1((0, term._bottom), want_cur_y=term._bottom)
 
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom - 1)
-        self._check_cap_kcud1((0, rand_y), rand_y + 1)
+        self._check_cap_kcud1((0, rand_y), want_cur_y=rand_y + 1)
 
     @unittest.skip('skip')
     def test_cap_kcuf1(self):
         pass
 
-    @unittest.skip("skip")
-    def test_cap_cuf(self):
-        pass
+    def _check_cap_kcub1(self, pos, want_cur_x):
+        """A helper function that checks `cap_kcub1` method.
 
-    @unittest.skip("skip")
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``want_cur_x`` argument is an expected terminal's `cur_x` value
+        after `cap_kcub1` method.
+        """
+
+        self._terminal._cur_x, self._terminal._cur_y = pos
+        self._terminal.cap_kcub1()
+        self.assertEqual(want_cur_x, self._terminal._cur_x)
+
+        self._terminal.cap_rs1()
+
     def test_cap_kcub1(self):
-        pass
+        """The terminal should the possibility to receive string of input
+        characters sent by typing the left-arrow key.
+        """
+
+        term = self._terminal
+
+        # Terminal's `cur_x` is on the left-most position.
+        self._check_cap_kcub1((0, 0), want_cur_x=0)
+
+        # Terminal's `cur_x` is on the right-most position.
+        self._check_cap_kcub1((term._right, 0), want_cur_x=term._right - 1)
+
+        # Terminal's `cur_x` is on the random position.
+        rand_x = random.randint(1, term._right - 1)
+        self._check_cap_kcub1((rand_x, 0), want_cur_x=rand_x - 1)
 
     @unittest.skip("skip")
     def test_cap_kb2(self):
