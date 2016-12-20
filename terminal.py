@@ -57,11 +57,11 @@ class Terminal:
         self.esc_re = []
         self.new_sci_seq = {}
         for k, v in sequences['escape_sequences'].items():
-            self.new_sci_seq[k.replace('ESC', '\x1b')] = v
+            self.new_sci_seq[k.replace('\\E', '\x1b')] = v
 
         self.new_sci_seq_re = {}
         for k, v in sequences['escape_sequences_re'].items():
-            self.new_sci_seq_re[k.replace('ESC', '\x1b')] = v
+            self.new_sci_seq_re[k.replace('\\E', '\x1b')] = v
 
         self.new_sci_seq_re_compiled = []
         self.csi_seq = {
