@@ -441,20 +441,20 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(0, self._terminal._cur_y)
         self.assertFalse(self._terminal._eol)
 
-    def _check_esc_0x08(self, pos, want_cur_x):
-        """A helper function that checks the `esc_0x08` method.
+    def _check_cap_cub1(self, pos, want_cur_x):
+        """A helper function that checks the `cap_cub1` method.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_x`` argument is an expected terminal's `cur_x` value
-        after `esc_0x08` method.
+        after `cap_cub1` method.
         """
 
         term = self._terminal
         term._cur_x, term._cur_y = pos
-        term.esc_0x08('')
+        term.cap_cub1()
         self.assertEqual(want_cur_x, term._cur_x)
 
-    def test_esc_0x08(self):
+    def test_cap_cub1(self):
         """The terminal should have the possibility to set cursor's `x` position
         to maximum between `0` and current cursor position - 1.
         """
@@ -462,56 +462,56 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Cursor at the left-most position.
-        self._check_esc_0x08((0, 0), want_cur_x=0)
+        self._check_cap_cub1((0, 0), want_cur_x=0)
 
         # Cursor at the right-most position.
-        self._check_esc_0x08((term._right, 0), want_cur_x=term._right - 1)
+        self._check_cap_cub1((term._right, 0), want_cur_x=term._right - 1)
 
         # Set cursor's `x` position to random.
         rand_x = random.randint(1, term._right - 1)
-        self._check_esc_0x08((rand_x, 0), want_cur_x=rand_x - 1)
+        self._check_cap_cub1((rand_x, 0), want_cur_x=rand_x - 1)
 
-    @unittest.skip("skip")
-    def test_esc_0x09(self):
+    @unittest.skip('skip')
+    def test_cap_ht(self):
         # ATTN: need a decription.
         pass
 
-    def test_esc_0x0a(self):
+    def test_cap_ind(self):
         """The terminal should have the possibility to move cursor down by 1
         position.
         """
 
         # Cursor at left-most position.
-        self._terminal.esc_0x0a('')
+        self._terminal.cap_ind()
         self.assertEqual(1, self._terminal._cur_y)
 
-    def _check_esc_0x0d(self, pos):
-        """A helper function that checks `esc_0x0d` method.
+    def _check_cap_cr(self, pos):
+        """A helper function that checks `cap_cr` method.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
         term = self._terminal
         term._cur_x, term._cur_y = pos
 
-        self._terminal.esc_0x0d('')
+        self._terminal.cap_cr()
         self.assertEqual(0, self._terminal._cur_x)
         self.assertFalse(self._terminal._eol)
 
-    def test_esc_0x0d(self):
+    def test_cap_cr(self):
         """The terminal should have the possibility to set cursor at beginning
         of the line.
         """
 
         # Cursor at left-most position.
-        self._check_esc_0x0d((0, 0))
+        self._check_cap_cr((0, 0))
 
         # Cursor at right-most position.
-        self._check_esc_0x0d((self._terminal._right, 0))
+        self._check_cap_cr((self._terminal._right, 0))
 
         # Cursor at random position.
-        self._check_esc_0x0d((random.randint(1, self._terminal._right), 0))
+        self._check_cap_cr((random.randint(1, self._terminal._right), 0))
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_esc_da(self):
         # ATTN: need a decription.
         pass
