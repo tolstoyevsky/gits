@@ -60,16 +60,12 @@ escape_sequences:
   '\E[P': 'dch1'
   '\E]R': 'ignore'
 
-  # esc sequences related to ITERM.
-  # for more deatails see:
-  #   - http://iterm2-tools.readthedocs.io/en/latest/shell_integration.html
-  #   - https://www.iterm2.com/documentation-shell-integration.html
-  '\E]133;D;0': 'ignore'
+  # Shell sequence to be run before the command output (Mac OS X-specific)
   '\E]133;A': 'ignore'
+  # Shell sequence to be run after the prompt (Mac OS X-specific)
   '\E]133;B': 'ignore'
+  # Shell sequence to be run before the command output (Mac OS X-specific)
   '\E]133;C;': 'ignore'
-  '\E]133;D;1': 'ignore'
-  '\E]133;D;127': 'ignore'
 
   # '\x1b[?25l': civis
 
@@ -84,3 +80,7 @@ escape_sequences_re:
   '\E[%dX': 'ech'
   '\E[%d;%dr': 'csr'
   '\E[%d;%dH': 'cup'
+
+  # Shell sequence to be run after the command output (Mac OS X-specific)
+  # %d is the command status, 0-255.
+  '\E]133;D;%d': 'ignore'
