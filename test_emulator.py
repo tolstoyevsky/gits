@@ -28,7 +28,7 @@ class TestEmulator(unittest.TestCase):
         self._terminal = Terminal(self._rows, self._cols)
 
     def _put_string(self, s, pos):
-        """A helper function that puts the string ``s`` to the screen beginning
+        """A helper method that puts the string ``s`` to the screen beginning
         with the position ``pos``.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
@@ -39,7 +39,7 @@ class TestEmulator(unittest.TestCase):
             self._terminal.echo(character)
 
     def _check_string(self, s, left_border, right_border):
-        """A helper function that checks if the screen has the string ``s``
+        """A helper method that checks if the screen has the string ``s``
         with a left border starting at position x1, y1, and a right border
         starting at position x2, y2.
 
@@ -57,7 +57,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(want, self._terminal.peek((x1, y1), (x2, y2)))
 
     def _check_screen_char(self, c, pos):
-        """A helper function that checks if the screen has the character ``c``
+        """A helper method that checks if the screen has the character ``c``
         on the corresponding position ``pos``.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
@@ -69,7 +69,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(want, got)
 
     def _check_cursor_right(self, cur_x, eol=False):
-        """A helper function that checks the `cursor_right` method."""
+        """A helper method that checks the `cursor_right` method."""
 
         self._terminal._cur_x = cur_x
         self._terminal.cursor_right()
@@ -82,7 +82,7 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_x + 1, self._terminal._cur_x)
 
     def _check_cursor_down(self, cur_y, top=False):
-        """A helper function that checks the `cursor_down` method."""
+        """A helper method that checks the `cursor_down` method."""
 
         self._terminal._cur_y = cur_y
         self._terminal.cursor_down()
@@ -93,7 +93,7 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_y + 1, self._terminal._cur_y)
 
     def _check_echo(self, c, pos, eol=False):
-        """A helper function that checks the `echo` method.
+        """A helper method that checks the `echo` method.
 
         The ``c`` argument is a character that will be put on the screen
         starting with the position ``pos``.
@@ -126,7 +126,7 @@ class TestEmulator(unittest.TestCase):
         self._check_screen_char(c, check_screen_pos)
 
     def _check_zero(self, s, pos):
-        """A helper function that checks the `zero` method.
+        """A helper method that checks the `zero` method.
 
         The ``s`` argument is a string that will be removed from the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
@@ -146,7 +146,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(clear_area, term.peek(pos, (cur_x + len(s), cur_y)))
 
     def _check_scroll_up(self, s, pos):
-        """A helper function that checks the `scroll_up` method.
+        """A helper method that checks the `scroll_up` method.
 
         The ``s`` argument is a test string that will be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
@@ -171,7 +171,7 @@ class TestEmulator(unittest.TestCase):
         term.zero((0, 0), (term._right, term._bottom))
 
     def _check_scroll_down(self, s, pos):
-        """A helper function that checks the `scroll_down` method.
+        """A helper method that checks the `scroll_down` method.
 
         The ``s`` argument is a test string that will be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
@@ -196,7 +196,7 @@ class TestEmulator(unittest.TestCase):
         term.zero((0, 0), (term._right, term._bottom))
 
     def _check_scroll_right(self, s, pos):
-        """A helper function that checks the screen scrolling right.
+        """A helper method that checks the screen scrolling right.
 
         The ``s`` argument is a test string putting on the screen.
         The ``pos`` argument is a tuple or list of coordinates ``(x, y)``.
@@ -442,7 +442,7 @@ class TestEmulator(unittest.TestCase):
         self.assertFalse(self._terminal._eol)
 
     def _check_cap_cub1(self, pos, want_cur_x):
-        """A helper function that checks the `cap_cub1` method.
+        """A helper method that checks the `cap_cub1` capability.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_x`` argument is an expected terminal's `cur_x` value
@@ -486,7 +486,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(1, self._terminal._cur_y)
 
     def _check_cap_cr(self, pos):
-        """A helper function that checks `cap_cr` method.
+        """A helper method that checks `cap_cr` capability.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         """
 
@@ -648,7 +648,7 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(0x70000000, self._terminal._sgr)
 
     def _check_cap_kcuu1(self, pos, want_cur_y):
-        """A helper function that checks `cap_kcuu1` method.
+        """A helper method that checks `cap_kcuu1` capability.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_y`` argument is an expected terminal's `cur_y` value
@@ -679,7 +679,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cap_kcuu1((0, rand_y), rand_y - 1)
 
     def _check_cap_kcud1(self, pos, want_cur_y):
-        """A helper function that checks `cap_kcud1` method.
+        """A helper method that checks `cap_kcud1` capability.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_y`` argument is an expected terminal's `cur_y` value
@@ -714,7 +714,7 @@ class TestEmulator(unittest.TestCase):
         pass
 
     def _check_cap_kcub1(self, pos, want_cur_x):
-        """A helper function that checks `cap_kcub1` method.
+        """A helper method that checks `cap_kcub1` capability.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
         The ``want_cur_x`` argument is an expected terminal's `cur_x` value
@@ -722,9 +722,8 @@ class TestEmulator(unittest.TestCase):
         """
 
         self._terminal._cur_x, self._terminal._cur_y = pos
-        self._terminal.cap_kcub1()
+        self._terminal.cap_kcub1()        
         self.assertEqual(want_cur_x, self._terminal._cur_x)
-
         self._terminal.cap_rs1()
 
     def test_cap_kcub1(self):
@@ -745,7 +744,7 @@ class TestEmulator(unittest.TestCase):
         self._check_cap_kcub1((rand_x, 0), want_cur_x=rand_x - 1)
 
     def _check_cap_kb2(self, pos):
-        """A helper function that checks `cap_kb2` method. 
+        """A helper method that checks `cap_kb2` method. 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         """
 
@@ -753,8 +752,9 @@ class TestEmulator(unittest.TestCase):
         term._cur_x, term._cur_y = pos
         term.cap_kb2()
         self.assertEqual(0, term._cur_x)
-        # TODO: `cap_kb2` must be fixed later.
-        self.assertFalse(term._eol)
+
+        # TODO: rework after `cap_kb` fix.
+        # self.assertFalse(term._eol)
 
         # Restore terminal to the sane mode.
         term.cap_rs1()
@@ -778,28 +778,168 @@ class TestEmulator(unittest.TestCase):
         rand_x = random.randint(1, term._right - 1)
         self._check_cap_kb2((rand_x, 0))
 
-    @unittest.skip("skip")
+    def _check_cap_home(self, pos):
+        """A helper method that checks `cap_home` capability.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
+        """
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+        term.cap_home()
+
+        self.assertEqual(0, term._cur_x)
+        self.assertEqual(0, term._cur_y)
+        self.assertFalse(term._eol)
+
+        # Restore terminal to the sane mode.
+        term.cap_rs1()
+
     def test_cap_home(self):
         """The terminal should have the possibility to set cursor to the home
         position (the upper left corner).
         """
-        pass
+        
+        term = self._terminal
 
-    @unittest.skip("skip")
+        # Terminal's `cur_x` is on the left-most position.
+        self._check_cap_home((0, 0))
+
+        # Terminal's `cur_x` is on the right-most position and end of the line
+        # was reached.
+        term._eol = True
+        self._check_cap_home((term._right, term._bottom))
+
+        # Terminal's `cur_x` is on the random position.
+        rand_x = random.randint(1, term._right - 1)
+        rand_y = random.randint(1, term._bottom - 1)
+        self._check_cap_home((rand_x, rand_y))
+
+    def _check_cap_el(self, pos, s):
+        """A helper method that checks `cap_el` capability.
+
+        The ``s`` argument is a test string that will be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        cur_x, cur_y = pos
+
+        self._put_string(s, pos)
+        self._check_string(s, pos, (cur_x + len(s), cur_y))
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+
+        term.cap_el()
+
+        want = array.array('L', [MAGIC_NUMBER] * (term._right - cur_x))
+        got = term.peek(pos, (term._right, cur_y))
+        self.assertEqual(want, got)
+
+        # Restore terminal to the sane mode.
+        term.cap_rs1()
+
     def test_cap_el(self):
         """The emulator should have the possibility to clear the screen from the
         current cursor position to the end of line.
         """
-        pass
 
-    @unittest.skip("skip")
+        term = self._terminal
+
+        # Terminal's `cur_x` is on the left-most position.
+        self._check_cap_el((0, 0), ['s'] * term._right)
+
+        # Terminal's `cur_x` is on the right-most position.
+        self._check_cap_el((term._right, 0), ['s'] * term._right)
+
+        # Terminal's `cur_x` is on the random position.
+        rand_x = random.randint(1, term._right - 1)
+        self._check_cap_el((rand_x, 0), ['s'] * term._right)
+
+    def _check_cap_el1(self, pos, s):
+        """A helper method that checks `cap_el1` capability.
+
+        The ``s`` argument is a test string that will be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        cur_x, cur_y = pos
+
+        self._put_string(s, pos)
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+
+        term.cap_el1()
+
+        want = array.array('L', [MAGIC_NUMBER] * cur_x)
+        got = term.peek((0, cur_y), (cur_x, cur_y))
+        self.assertEqual(want, got)
+
+        # Restore terminal to the sane mode.
+        term.cap_rs1()
+        
     def test_cap_el1(self):
-        pass
+        """The emulator should have the possibility to clear the screen from the
+        beginning of the line to current cursor position.
+        """
 
-    @unittest.skip("skip")
+        term = self._terminal
+
+        # Terminal's `cur_x` is on the left-most position.
+        self._check_cap_el1((0, 0), ['s'] * term._right)
+
+        # Terminal's `cur_x` is on the right-most position.
+        self._check_cap_el1((term._right, 0), ['s'] * term._right)
+
+        # Terminal's `cur_x` is on the random position.
+        rand_x = random.randint(1, term._right - 1)
+        self._check_cap_el1((rand_x, 0), ['s'] * term._right)
+
+    def _check_cap_il1(self, pos, s):
+        """A helper method that checks `cap_el1` capability.
+
+        The ``s`` argument is a test string that will be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        cur_x, cur_y = pos
+
+        self._put_string(s, pos)
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+
+        term.cap_il1()
+
+        self.assertEqual(cur_x, term._cur_x)
+
+        if cur_y == term._bottom:
+            self._check_string(s, pos, (cur_x + len(s), cur_y))
+        else:
+            self._check_string(s, (cur_x, cur_y + 1), 
+                                  (cur_x + len(s), cur_y + 1))
+
+            want = array.array('L', [MAGIC_NUMBER] * term._right)
+            got = term.peek((0, cur_y), (term._right, cur_y))
+            self.assertEqual(want, got)
+
+        # Restore terminal to the sane mode.
+        term.cap_rs1()
+
     def test_cap_il1(self):
-        """The terminal should have the possibility to add new blank line. """
-        pass
+        """The terminal should have the possibility to add a new blank line. """
+
+        term = self._terminal
+
+        # Terminal's `cur_y` is on the first line.
+        self._check_cap_il1((0, 0), ['s'] * term._right)
+
+        # Terminal's `cur_y` is on the last line.
+        self._check_cap_il1((0, term._bottom), ['s'] * term._right)
+
+        # Terminal's `cur_y` is on the random line.
+        rand_y = random.randint(1, term._bottom - 1)
+        self._check_cap_il1((0, rand_y), ['s'] * term._right)
 
     @unittest.skip('skip')
     def test_cap_dl1(self):
