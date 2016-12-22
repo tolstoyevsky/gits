@@ -941,10 +941,51 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(1, term._bottom - 1)
         self._check_cap_il1((0, rand_y), ['s'] * term._right)
 
-    @unittest.skip('skip')
+    def _check_cap_dl1(self, pos, s):
+        """A helper method that checks `cap_dl1` capability.
+
+        The ``s`` argument is a test string that will be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        cur_x, cur_y = pos
+
+        self._put_string(s, pos)
+
+        term = self._terminal
+        term._cur_x, term._cur_y = pos
+
+        term.cap_dl1()
+
+        self.assertEqual(cur_x, term._cur_x)
+
+        if cur_y == 0:
+            self._check_string(s, pos, (cur_x + len(s), cur_y))
+        else:
+            self._check_string(s, (cur_x, cur_y - 1), 
+                                  (cur_x + len(s), cur_y - 1))
+
+            want = array.array('L', [MAGIC_NUMBER] * term._right)
+            got = term.peek((0, cur_y), (term._right, cur_y))
+            self.assertEqual(want, got)
+
+        # Restore terminal to the sane mode.
+        term.cap_rs1()
+
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
-        pass
+
+        term = self._terminal
+
+        # Terminal's `cur_y` is on the first line.
+        self._check_cap_dl1((0, 1), ['s'] * term._right)
+
+        # Terminal's `cur_y` is on the last line.
+        self._check_cap_dl1((0, term._bottom), ['s'] * term._right)
+
+        # Terminal's `cur_y` is on the random line.
+        rand_y = random.randint(1, term._bottom - 1)
+        self._check_cap_dl1((0, rand_y), ['s'] * term._right)
 
     @unittest.skip('skip')
     def test_cap_dch1(self):
@@ -953,14 +994,6 @@ class TestEmulator(unittest.TestCase):
 
     @unittest.skip('skip')
     def test_cap_vpa(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_il(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_dl(self):
         pass
 
     @unittest.skip('skip')
