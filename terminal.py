@@ -68,21 +68,9 @@ class Terminal:
         self.csi_seq = {
             '`': (self.cap_kb2, [1]),
         }
-        self.init()
-        self.cap_rs1()
-        # self._top = None
-        # self._bottom = None
-
-    def cap_civis(self):
-        pass
-
-    def cap_cvvis(self):
-        pass
-
-    def init(self):
         for k, v in list(self.new_sci_seq_re.items()):
-            res = k.replace('[', '\[').\
-                    replace('%d', '([0-9]+)')
+            res = k.replace('[', '\['). \
+                replace('%d', '([0-9]+)')
             self.new_sci_seq_re_compiled.append(
                 (re.compile(res), v)
             )
@@ -95,6 +83,16 @@ class Terminal:
 
         for k, v in list(d.items()):
             self.esc_re.append((re.compile('\x1b' + k), v))
+
+        self.cap_rs1()
+        # self._top = None
+        # self._bottom = None
+
+    def cap_civis(self):
+        pass
+
+    def cap_cvvis(self):
+        pass
 
     def cap_rs1(self, s=''):
         """Reset terminal completely to sane modes."""
