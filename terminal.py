@@ -40,10 +40,13 @@ class Terminal:
         # eol stands for 'end of line' and is set to True when the cursor
         # reaches the right side of the screen.
         self._eol = False
-        self._top = None
-        self._bottom = None
-        self._left = None
-        self._right = None
+
+        # The following fields allow abstracting from the rows and cols
+        # concept.
+        self._top_most = None
+        self._bottom_most = None
+        self._left_most = None
+        self._right_most = None
 
         self._sgr = None  # Select Graphic Rendition
 
@@ -100,9 +103,9 @@ class Terminal:
         self._cur_x_bak = self._cur_x = 0
         self._cur_y_bak = self._cur_y = 0
         self._eol = False
-        self._left = self._top = 0
-        self._bottom = self._rows - 1
-        self._right = self._cols - 1
+        self._left_most = self._top_most = 0
+        self._bottom_most = self._rows - 1
+        self._right_most = self._cols - 1
 
         self._buf = ''
         self._outbuf = ''
@@ -176,12 +179,12 @@ class Terminal:
     def cursor_down(self):
         """Moves the cursor down by 1 position. If the cursor reaches the
         bottom of the screen, its content moves up 1 row. """
-        if self._top <= self._cur_y <= self._bottom:
+        if self._top_most <= self._cur_y <= self._bottom_most:
             self._eol = False
-            q, r = divmod(self._cur_y + 1, self._bottom + 1)
+            q, r = divmod(self._cur_y + 1, self._bottom_most + 1)
             if q:
-                self.scroll_up(self._top, self._bottom)
-                self._cur_y = self._bottom
+                self.scroll_up(self._top_most, self._bottom_most)
+                self._cur_y = self._bottom_most
             else:
                 self._cur_y = r
 
@@ -209,8 +212,8 @@ class Terminal:
         """Moves the cursor left by 1 position. """
         self._cur_x = max(0, self._cur_x - 1)
 
-        if self._cur_x == self._left:
-            self._cur_x = self._right
+        if self._cur_x == self._left_most:
+            self._cur_x = self._right_most
             self._cur_y = max(0, self._cur_y - 1)
             self._eol = True
 
@@ -234,9 +237,9 @@ class Terminal:
 
     # XXX: never used
     def esc_ri(self, s):
-        self._cur_y = max(self._top, self._cur_y - 1)
-        if self._cur_y == self._top:
-            self.scroll_down(self._top, self._bottom)
+        self._cur_y = max(self._top_most, self._cur_y - 1)
+        if self._cur_y == self._top_most:
+            self.scroll_down(self._top_most, self._bottom_most)
 
     # XXX: never used
     def csi_at(self, l):
@@ -359,11 +362,11 @@ class Terminal:
 
     def cap_kcuu1(self, l=[1]):
         """sent by terminal up-arrow key """
-        self._cur_y = max(self._top, self._cur_y - l[0])
+        self._cur_y = max(self._top_most, self._cur_y - l[0])
 
     def cap_kcud1(self, l=[1]):
         """sent by terminal down-arrow key """
-        self._cur_y = min(self._bottom, self._cur_y + l[0])
+        self._cur_y = min(self._bottom_most, self._cur_y + l[0])
 
     def cap_kcuf1(self, l=[1]):
         """sent by terminal right-arrow key """
@@ -373,7 +376,7 @@ class Terminal:
         if mo:
             p1 = int(mo.group(1))
 
-        self._cur_x = min(self._right, self._cur_x + p1)
+        self._cur_x = min(self._right_most, self._cur_x + p1)
         self._eol = False
 
     def cap_kcub1(self, l=[1]):
@@ -434,17 +437,17 @@ class Terminal:
             p1 = int(mo.group(1))
 
         for i in range(p1):
-            if self._cur_y < self._bottom:
-                self.scroll_down(self._cur_y, self._bottom)
+            if self._cur_y < self._bottom_most:
+                self.scroll_down(self._cur_y, self._bottom_most)
 
     def cap_dl(self, mo=None, p1=None):
         """Delete #1 lines """
         if mo:
             p1 = int(mo.group(1))
 
-        if self._top <= self._cur_y <= self._bottom:
+        if self._top_most <= self._cur_y <= self._bottom_most:
             for i in range(p1):
-                self.scroll_up(self._cur_y, self._bottom)
+                self.scroll_up(self._cur_y, self._bottom_most)
 
     def cap_dch(self, mo=None, p1=None):
         """Delete #1 chars """
@@ -460,9 +463,9 @@ class Terminal:
         """Change to lines #1 through #2 (VT100) """
         p1 = int(mo.group(1))
         p2 = int(mo.group(2))
-        self._top = min(self._rows - 1, p1 - 1)
-        self._bottom = min(self._rows - 1, p2 - 1)
-        self._bottom = max(self._top, self._bottom)
+        self._top_most = min(self._rows - 1, p1 - 1)
+        self._bottom_most = min(self._rows - 1, p2 - 1)
+        self._bottom_most = max(self._top_most, self._bottom_most)
 
     def cap_ech(self, mo):
         """Erase #1 characters """
