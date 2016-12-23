@@ -71,8 +71,8 @@ escape_sequences:
 
 escape_sequences_re:
   '\E[%dd': 'vpa'
-  '\E[%d;%dm': 'set_colour_pair'
-  '\E[%dm': 'set_colour'
+  '\E[%d;%dm': 'set_color_pair'
+  '\E[%dm': 'set_color'
   '\E[%dC': 'cuf'
   '\E[%dL': 'il'
   '\E[%dM': 'dl'
