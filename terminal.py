@@ -42,6 +42,7 @@ class Terminal:
         self._eol = False
         self._top = None
         self._bottom = None
+        self._left = None
         self._right = None
 
         self._sgr = None  # Select Graphic Rendition
@@ -103,7 +104,7 @@ class Terminal:
         self._cur_x_bak = self._cur_x = 0
         self._cur_y_bak = self._cur_y = 0
         self._eol = False
-        self._top = 0
+        self._left = self._top = 0
         self._bottom = self._rows - 1
         self._right = self._cols - 1
 
@@ -236,6 +237,11 @@ class Terminal:
     def cap_cub1(self):
         """Moves the cursor left by 1 position. """
         self._cur_x = max(0, self._cur_x - 1)
+
+        if self._cur_x == self._left:
+            self._cur_x = self._right
+            self._cur_y = max(0, self._cur_y - 1)
+            self._eol = True
 
     def cap_ht(self):
         x = self._cur_x + 8
@@ -390,7 +396,7 @@ class Terminal:
 
     def cap_kcuf1(self, l=[1]):
         """sent by terminal right-arrow key """
-        self.cap_cuf(p1=0)
+        self.cap_cuf(p1=1)
 
     def cap_cuf(self, mo=None, p1=None):
         if mo:
