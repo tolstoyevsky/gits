@@ -150,14 +150,16 @@ class Terminal:
 
     def scroll_right(self, x, y):
         """Moves a piece of a row specified by coordinates ``x`` and ``y``
-        right by 1 position."""
+        right by 1 position.
+        """
 
         self.poke((x + 1, y), self.peek((x, y), (self._cols, y)))
         self.zero((x, y), (x, y), inclusively=True)
 
     def cursor_down(self):
         """Moves the cursor down by 1 position. If the cursor reaches the
-        bottom of the screen, its content moves up 1 row. """
+        bottom of the screen, its content moves up 1 row.
+        """
         if self._top_most <= self._cur_y <= self._bottom_most:
             self._eol = False
             q, r = divmod(self._cur_y + 1, self._bottom_most + 1)
@@ -168,7 +170,7 @@ class Terminal:
                 self._cur_y = r
 
     def cursor_right(self):
-        """Moves the cursor right by 1 position."""
+        """Moves the cursor right by 1 position. """
         q, r = divmod(self._cur_x + 1, self._cols)
         if q:
             self._eol = True
@@ -178,7 +180,8 @@ class Terminal:
     def echo(self, c):
         """Puts the specified character ``c`` on the screen and moves the
         cursor right by 1 position. If the cursor reaches the right side of the
-        screen, it is moved to the next line."""
+        screen, it is moved to the next line.
+        """
         if self._eol:
             self.cursor_down()
             self._cur_x = 0
@@ -244,12 +247,15 @@ class Terminal:
             self.cap_ich1()
 
     def cap_blink(self, p1=''):
+        """Produces blinking text. """
         self.cap_set_colour(colour=5)
 
     def cap_bold(self, p1=''):
+        """Produces bold text. """
         self.cap_set_colour(colour=1)
 
     def cap_civis(self):
+        """Makes the cursor invisible. See cap_cvvis. """
         pass
 
     def cap_cr(self):
@@ -266,7 +272,10 @@ class Terminal:
         self._bottom_most = max(self._top_most, self._bottom_most)
 
     def cap_cub1(self):
-        """Moves the cursor left by 1 position. """
+        """Moves the cursor left by 1 position.
+
+        Usually the method acts as a handler for a Backspace key-press.
+        """
         self._cur_x = max(0, self._cur_x - 1)
 
         if self._cur_x == self._left_most:
@@ -290,6 +299,7 @@ class Terminal:
         self._eol = False
 
     def cap_cvvis(self):
+        """Make the cursor visible. See cap_civis. """
         pass
 
     # TODO: rework later
@@ -297,7 +307,7 @@ class Terminal:
         self._outbuf = "\x1b[?6c"  # u8
 
     def cap_dch(self, mo=None, p1=None):
-        """Delete #1 chars """
+        """Deletes the specified number of characters. """
         if mo:
             p1 = int(mo.group(1))
 
@@ -307,14 +317,15 @@ class Terminal:
         self.poke((cx, cy), end[p1:])
 
     def cap_dch1(self, l=''):
-        """Delete character """
+        """Deletes a character. """
         self.cap_dch(1)
 
     def cap_dim(self, p1=''):
+        """Turns on half-bright mode. """
         self.cap_set_colour(colour=2)
 
     def cap_dl(self, mo=None, p1=None):
-        """Delete #1 lines """
+        """Deletes the specified number of lines. """
         if mo:
             p1 = int(mo.group(1))
 
@@ -323,11 +334,11 @@ class Terminal:
                 self.scroll_up(self._cur_y, self._bottom_most)
 
     def cap_dl1(self, l=''):
-        """Delete line """
+        """Deletes a line. """
         self.cap_dl(p1=1)
 
     def cap_ech(self, mo):
-        """Erase #1 characters """
+        """Erases the specified number of characters characters. """
         p = int(mo.group(1))
         self.zero((self._cur_x, self._cur_y), (self._cur_x + p, self._cur_y),
                   inclusively=True)
@@ -339,7 +350,7 @@ class Terminal:
         self.zero((self._cur_x, self._cur_y), (self._cols, self._rows - 1))
 
     def cap_el(self, l=[0]):
-        """Clear to end of line """
+        """Clears to the end of the line. """
         if l[0] == 0:
             self.zero((self._cur_x, self._cur_y), (self._cols, self._cur_y))
         elif l[0] == 1:
@@ -349,10 +360,11 @@ class Terminal:
             self.zero((0, self._cur_y), (self._cols, self._cur_y))
 
     def cap_el1(self, l=[0]):
+        """Clears to the beginning of the line. """
         self.cap_el([1])
 
     def cap_home(self, l=[1, 1]):
-        """Home cursor """
+        """Moves the cursor to the home position. """
         self._cur_x = min(self._cols, l[1]) - 1
         self._cur_y = min(self._rows, l[0]) - 1
         self._eol = False
@@ -363,11 +375,11 @@ class Terminal:
         self._cur_x = (q * 8) % self._cols
 
     def cap_ich1(self, l=[1]):
-        """Insert character """
+        """Inserts a character. """
         self.scroll_right(self._cur_x, self._cur_y)
 
     def cap_il(self, mo=None, p1=None):
-        """Add #1 new blank lines """
+        """Adds the specified number of new blank lines. """
         if mo:
             tmp = mo.group(1)
             p1 = int(mo.group(1))
@@ -377,7 +389,7 @@ class Terminal:
                 self.scroll_down(self._cur_y, self._bottom_most)
 
     def cap_il1(self, l=''):
-        """Add new blank line """
+        """Adds a new blank line. """
         self.cap_il(p1=1)
 
     def cap_ind(self):
@@ -385,31 +397,31 @@ class Terminal:
         self.cursor_down()
 
     def cap_kb2(self, l=[1]):
-        """center of keypad """
+        """Handles a Center key-press on keypad. """
         self._cur_x = min(self._cols, l[0]) - 1
 
     def cap_kcub1(self, l=[1]):
-        """sent by terminal left-arrow key """
+        """Handles a Left Arrow key-press. """
         self._cur_x = max(0, self._cur_x - l[0])
         self._eol = False
 
     def cap_kcud1(self, l=[1]):
-        """sent by terminal down-arrow key """
+        """Handles a Down Arrow key-press. """
         self._cur_y = min(self._bottom_most, self._cur_y + l[0])
 
     def cap_kcuf1(self, l=[1]):
-        """sent by terminal right-arrow key """
+        """Handles a Right Arrow key-press. """
         self.cap_cuf(p1=1)
 
     def cap_kcuu1(self, l=[1]):
-        """sent by terminal up-arrow key """
+        """Handles a Up Arrow key-press. """
         self._cur_y = max(self._top_most, self._cur_y - l[0])
 
     def cap_op(self, mo=None, p1=''):
         self.cap_set_colour_pair(p1=39, p2=49)
 
     def cap_rc(self, s=''):
-        """Restore cursor to position of last sc """
+        """Restores the cursor to the last saved position. See cap_sc. """
         self._cur_x = self._cur_x_bak
         self._cur_y = self._cur_y_bak
         self._eol = False
@@ -421,16 +433,19 @@ class Terminal:
             self.scroll_down(self._top_most, self._bottom_most)
 
     def cap_rmir(self, l=''):
-        """End insert mode """
+        """Leaves Insert mode. See cap_smir. """
         pass
 
     def cap_rmpch(self, p1=''):
+        """Leaves PC character display mode. See cap_smpch. """
         self.cap_set_colour(colour=10)
 
     def cap_rmso(self, p1=''):
+        """Leaves Standout mode. See cap_smso. """
         self.cap_set_colour(colour=27)
 
     def cap_rmul(self, p1=''):
+        """Leaves Underscore mode. See cap_smul. """
         self.cap_set_colour(colour=24)
 
     def cap_rs1(self, s=''):
@@ -449,7 +464,7 @@ class Terminal:
         self._outbuf = ''
 
     def cap_sc(self, s=''):
-        """Save cursor position """
+        """Saves the current cursor position. See cap_rc. """
         self._cur_x_bak = self._cur_x
         self._cur_y_bak = self._cur_y
 
@@ -457,24 +472,31 @@ class Terminal:
         self.cap_set_colour_pair(p1=0, p2=10)
 
     def cap_smir(self, l=''):
-        """Insert mode (enter) """
+        """Begins Insert mode. See cap_rmir. """
         pass
 
     def cap_smso(self, l=''):
-        """Begin standout mode """
+        """Begins Standout mode. See cap_rmso.
+
+        John Strang, in his book Programming with Curses, gives the following
+        definition for the term. Standout mode is whatever special highlighting
+        the terminal cad do, as defined in the terminal's database entry.
+        """
         self._sgr = 0x70000000
 
     def cap_smso_rev(self, p1=''):
         self.cap_set_colour(colour=7)
 
     def cap_smul(self, p1=''):
+        """Begins Underscore mode. See cap_rmul. """
         self.cap_set_colour(colour=4)
 
     def cap_smpch(self, p1=''):
+        """Enters PC character display mode. See cap_rmpch. """
         self.cap_set_colour(colour=11)
 
     def cap_vpa(self, mo):
-        """Set vertical position to absolute #1 """
+        """Sets the vertical position to the specified value. """
         p = int(mo.group(1))
         self._cur_y = min(self._rows, p) - 1
 
