@@ -85,8 +85,6 @@ class Terminal:
             self.esc_re.append((re.compile('\x1b' + k), v))
 
         self.cap_rs1()
-        # self._top = None
-        # self._bottom = None
 
     def cap_civis(self):
         pass
@@ -206,31 +204,6 @@ class Terminal:
         pos = self._cur_y * self._cols + self._cur_x
         self._screen[pos] = self._sgr | ord(c)
         self.cursor_right()
-
-    # def csi_E(self, l):
-    #     self.csi_B(l)
-    #     self._cur_x = 0
-    #     self._eol = False
-
-    # def csi_F(self, l):
-    #     self.csi_A(l)
-    #     self._cur_x = 0
-    #     self._eol = False
-
-    # def csi_a(self, l):
-    #     self.csi_C(l)
-
-    # def csi_c(self, l):
-    #     # '\x1b[?0c' 0-8 cursor size
-    #     pass
-
-    # def csi_e(self, l):
-    #     self.csi_B(l)
-
-    # def csi_f(self, l):
-    #     self.csi_H(l)
-
-    # новый стиль именования методов, реализующих возможности
 
     def cap_cub1(self):
         """Moves the cursor left by 1 position. """
