@@ -89,27 +89,6 @@ class Terminal:
 
         self.cap_rs1()
 
-    def cap_civis(self):
-        pass
-
-    def cap_cvvis(self):
-        pass
-
-    def cap_rs1(self, s=''):
-        """Reset terminal completely to sane modes."""
-        cells_number = self._cols * self._rows
-        self._screen = array.array('L', [MAGIC_NUMBER] * cells_number)
-        self._sgr = MAGIC_NUMBER
-        self._cur_x_bak = self._cur_x = 0
-        self._cur_y_bak = self._cur_y = 0
-        self._eol = False
-        self._left_most = self._top_most = 0
-        self._bottom_most = self._rows - 1
-        self._right_most = self._cols - 1
-
-        self._buf = ''
-        self._outbuf = ''
-
     def peek(self, left_border, right_border, inclusively=False):
         """Captures and returns a rectangular region of the screen.
 
@@ -208,47 +187,6 @@ class Terminal:
         self._screen[pos] = self._sgr | ord(c)
         self.cursor_right()
 
-    def cap_cub1(self):
-        """Moves the cursor left by 1 position. """
-        self._cur_x = max(0, self._cur_x - 1)
-
-        if self._cur_x == self._left_most:
-            self._cur_x = self._right_most
-            self._cur_y = max(0, self._cur_y - 1)
-            self._eol = True
-
-    def cap_ht(self):
-        x = self._cur_x + 8
-        q, r = divmod(x, 8)
-        self._cur_x = (q * 8) % self._cols
-
-    def cap_ind(self):
-        """Scrolls the screen up moving its content down. """
-        self.cursor_down()
-
-    def cap_cr(self):
-        """Does carriage return. """
-        self._eol = False
-        self._cur_x = 0
-
-    # TODO: rework later
-    def esc_da(self):
-        self._outbuf = "\x1b[?6c"  # u8
-
-    # XXX: never used
-    def esc_ri(self, s):
-        self._cur_y = max(self._top_most, self._cur_y - 1)
-        if self._cur_y == self._top_most:
-            self.scroll_down(self._top_most, self._bottom_most)
-
-    # XXX: never used
-    def csi_at(self, l):
-        for i in range(l[0]):
-            self.cap_ich1()
-
-    def cap_ignore(self, *s):
-        pass
-
     def cap_set_colour_pair(self, mo=None, p1=None, p2=None):
         if mo:
             p1 = int(mo.group(1))
@@ -297,80 +235,44 @@ class Terminal:
         elif colour == 49:
             self._sgr = MAGIC_NUMBER
 
-    def cap_sgr0(self, mo=None, p1=''):
-        self.cap_set_colour_pair(p1=0, p2=10)
+    def cap_ignore(self, *s):
+        pass
 
-    def cap_op(self, mo=None, p1=''):
-        self.cap_set_colour_pair(p1=39, p2=49)
-
-    def cap_noname(self, p1=''):
-        self.cap_set_colour(colour=0)
-
-    def cap_bold(self, p1=''):
-        self.cap_set_colour(colour=1)
-
-    def cap_dim(self, p1=''):
-        self.cap_set_colour(colour=2)
-
-    def cap_smul(self, p1=''):
-        self.cap_set_colour(colour=4)
+    # XXX: never used
+    def csi_at(self, l):
+        for i in range(l[0]):
+            self.cap_ich1()
 
     def cap_blink(self, p1=''):
         self.cap_set_colour(colour=5)
 
-    def cap_smso_rev(self, p1=''):
-        self.cap_set_colour(colour=7)
+    def cap_bold(self, p1=''):
+        self.cap_set_colour(colour=1)
 
-    def cap_rmpch(self, p1=''):
-        self.cap_set_colour(colour=10)
+    def cap_civis(self):
+        pass
 
-    def cap_smpch(self, p1=''):
-        self.cap_set_colour(colour=11)
-
-    def cap_rmul(self, p1=''):
-        self.cap_set_colour(colour=24)
-
-    def cap_rmso(self, p1=''):
-        self.cap_set_colour(colour=27)
-
-    def cap_sc(self, s=''):
-        """Save cursor position """
-        self._cur_x_bak = self._cur_x
-        self._cur_y_bak = self._cur_y
-
-    def cap_rc(self, s=''):
-        """Restore cursor to position of last sc """
-        self._cur_x = self._cur_x_bak
-        self._cur_y = self._cur_y_bak
+    def cap_cr(self):
+        """Does carriage return. """
         self._eol = False
+        self._cur_x = 0
 
-    def cap_ich1(self, l=[1]):
-        """Insert character """
-        self.scroll_right(self._cur_x, self._cur_y)
+    def cap_csr(self, mo):
+        """Change to lines #1 through #2 (VT100) """
+        p1 = int(mo.group(1))
+        p2 = int(mo.group(2))
+        self._top_most = min(self._rows - 1, p1 - 1)
+        self._bottom_most = min(self._rows - 1, p2 - 1)
+        self._bottom_most = max(self._top_most, self._bottom_most)
 
-    def cap_smir(self, l=''):
-        """Insert mode (enter) """
-        pass
+    def cap_cub1(self):
+        """Moves the cursor left by 1 position. """
+        self._cur_x = max(0, self._cur_x - 1)
 
-    def cap_rmir(self, l=''):
-        """End insert mode """
-        pass
-
-    def cap_smso(self, l=''):
-        """Begin standout mode """
-        self._sgr = 0x70000000
-
-    def cap_kcuu1(self, l=[1]):
-        """sent by terminal up-arrow key """
-        self._cur_y = max(self._top_most, self._cur_y - l[0])
-
-    def cap_kcud1(self, l=[1]):
-        """sent by terminal down-arrow key """
-        self._cur_y = min(self._bottom_most, self._cur_y + l[0])
-
-    def cap_kcuf1(self, l=[1]):
-        """sent by terminal right-arrow key """
-        self.cap_cuf(p1=1)
+        if self._cur_x == self._left_most:
+            self._cur_x = self._right_most
+            self._cur_y = max(0, self._cur_y - 1)
+            self._eol = True
 
     def cap_cuf(self, mo=None, p1=None):
         if mo:
@@ -379,20 +281,56 @@ class Terminal:
         self._cur_x = min(self._right_most, self._cur_x + p1)
         self._eol = False
 
-    def cap_kcub1(self, l=[1]):
-        """sent by terminal left-arrow key """
-        self._cur_x = max(0, self._cur_x - l[0])
+    def cap_cup(self, mo):
+        """Move to row #1 col #2 """
+        p1 = int(mo.group(1))
+        p2 = int(mo.group(2))
+        self._cur_x = min(self._cols, p2) - 1
+        self._cur_y = min(self._rows, p1) - 1
         self._eol = False
 
-    def cap_kb2(self, l=[1]):
-        """center of keypad """
-        self._cur_x = min(self._cols, l[0]) - 1
+    def cap_cvvis(self):
+        pass
 
-    def cap_home(self, l=[1, 1]):
-        """Home cursor """
-        self._cur_x = min(self._cols, l[1]) - 1
-        self._cur_y = min(self._rows, l[0]) - 1
-        self._eol = False
+    # TODO: rework later
+    def esc_da(self):
+        self._outbuf = "\x1b[?6c"  # u8
+
+    def cap_dch(self, mo=None, p1=None):
+        """Delete #1 chars """
+        if mo:
+            p1 = int(mo.group(1))
+
+        w, cx, cy = self._cols, self._cur_x, self._cur_y
+        end = self.peek((cx, cy), (w, cy))
+        self.cap_el([0])
+        self.poke((cx, cy), end[p1:])
+
+    def cap_dch1(self, l=''):
+        """Delete character """
+        self.cap_dch(1)
+
+    def cap_dim(self, p1=''):
+        self.cap_set_colour(colour=2)
+
+    def cap_dl(self, mo=None, p1=None):
+        """Delete #1 lines """
+        if mo:
+            p1 = int(mo.group(1))
+
+        if self._top_most <= self._cur_y <= self._bottom_most:
+            for i in range(p1):
+                self.scroll_up(self._cur_y, self._bottom_most)
+
+    def cap_dl1(self, l=''):
+        """Delete line """
+        self.cap_dl(p1=1)
+
+    def cap_ech(self, mo):
+        """Erase #1 characters """
+        p = int(mo.group(1))
+        self.zero((self._cur_x, self._cur_y), (self._cur_x + p, self._cur_y),
+                  inclusively=True)
 
     def cap_ed(self, l=None):
         """Clears the screen from the current cursor position to the end of the
@@ -413,22 +351,20 @@ class Terminal:
     def cap_el1(self, l=[0]):
         self.cap_el([1])
 
-    def cap_il1(self, l=''):
-        """Add new blank line """
-        self.cap_il(p1=1)
+    def cap_home(self, l=[1, 1]):
+        """Home cursor """
+        self._cur_x = min(self._cols, l[1]) - 1
+        self._cur_y = min(self._rows, l[0]) - 1
+        self._eol = False
 
-    def cap_dl1(self, l=''):
-        """Delete line """
-        self.cap_dl(p1=1)
+    def cap_ht(self):
+        x = self._cur_x + 8
+        q, r = divmod(x, 8)
+        self._cur_x = (q * 8) % self._cols
 
-    def cap_dch1(self, l=''):
-        """Delete character """
-        self.cap_dch(1)
-
-    def cap_vpa(self, mo):
-        """Set vertical position to absolute #1 """
-        p = int(mo.group(1))
-        self._cur_y = min(self._rows, p) - 1
+    def cap_ich1(self, l=[1]):
+        """Insert character """
+        self.scroll_right(self._cur_x, self._cur_y)
 
     def cap_il(self, mo=None, p1=None):
         """Add #1 new blank lines """
@@ -440,46 +376,110 @@ class Terminal:
             if self._cur_y < self._bottom_most:
                 self.scroll_down(self._cur_y, self._bottom_most)
 
-    def cap_dl(self, mo=None, p1=None):
-        """Delete #1 lines """
-        if mo:
-            p1 = int(mo.group(1))
+    def cap_il1(self, l=''):
+        """Add new blank line """
+        self.cap_il(p1=1)
 
-        if self._top_most <= self._cur_y <= self._bottom_most:
-            for i in range(p1):
-                self.scroll_up(self._cur_y, self._bottom_most)
+    def cap_ind(self):
+        """Scrolls the screen up moving its content down. """
+        self.cursor_down()
 
-    def cap_dch(self, mo=None, p1=None):
-        """Delete #1 chars """
-        if mo:
-            p1 = int(mo.group(1))
+    def cap_kb2(self, l=[1]):
+        """center of keypad """
+        self._cur_x = min(self._cols, l[0]) - 1
 
-        w, cx, cy = self._cols, self._cur_x, self._cur_y
-        end = self.peek((cx, cy), (w, cy))
-        self.cap_el([0])
-        self.poke((cx, cy), end[p1:])
-
-    def cap_csr(self, mo):
-        """Change to lines #1 through #2 (VT100) """
-        p1 = int(mo.group(1))
-        p2 = int(mo.group(2))
-        self._top_most = min(self._rows - 1, p1 - 1)
-        self._bottom_most = min(self._rows - 1, p2 - 1)
-        self._bottom_most = max(self._top_most, self._bottom_most)
-
-    def cap_ech(self, mo):
-        """Erase #1 characters """
-        p = int(mo.group(1))
-        self.zero((self._cur_x, self._cur_y), (self._cur_x + p, self._cur_y),
-                  inclusively=True)
-
-    def cap_cup(self, mo):
-        """Move to row #1 col #2 """
-        p1 = int(mo.group(1))
-        p2 = int(mo.group(2))
-        self._cur_x = min(self._cols, p2) - 1
-        self._cur_y = min(self._rows, p1) - 1
+    def cap_kcub1(self, l=[1]):
+        """sent by terminal left-arrow key """
+        self._cur_x = max(0, self._cur_x - l[0])
         self._eol = False
+
+    def cap_kcud1(self, l=[1]):
+        """sent by terminal down-arrow key """
+        self._cur_y = min(self._bottom_most, self._cur_y + l[0])
+
+    def cap_kcuf1(self, l=[1]):
+        """sent by terminal right-arrow key """
+        self.cap_cuf(p1=1)
+
+    def cap_kcuu1(self, l=[1]):
+        """sent by terminal up-arrow key """
+        self._cur_y = max(self._top_most, self._cur_y - l[0])
+
+    def cap_op(self, mo=None, p1=''):
+        self.cap_set_colour_pair(p1=39, p2=49)
+
+    def cap_rc(self, s=''):
+        """Restore cursor to position of last sc """
+        self._cur_x = self._cur_x_bak
+        self._cur_y = self._cur_y_bak
+        self._eol = False
+
+    # XXX: never used
+    def esc_ri(self, s):
+        self._cur_y = max(self._top_most, self._cur_y - 1)
+        if self._cur_y == self._top_most:
+            self.scroll_down(self._top_most, self._bottom_most)
+
+    def cap_rmir(self, l=''):
+        """End insert mode """
+        pass
+
+    def cap_rmpch(self, p1=''):
+        self.cap_set_colour(colour=10)
+
+    def cap_rmso(self, p1=''):
+        self.cap_set_colour(colour=27)
+
+    def cap_rmul(self, p1=''):
+        self.cap_set_colour(colour=24)
+
+    def cap_rs1(self, s=''):
+        """Resets terminal completely to sane modes. """
+        cells_number = self._cols * self._rows
+        self._screen = array.array('L', [MAGIC_NUMBER] * cells_number)
+        self._sgr = MAGIC_NUMBER
+        self._cur_x_bak = self._cur_x = 0
+        self._cur_y_bak = self._cur_y = 0
+        self._eol = False
+        self._left_most = self._top_most = 0
+        self._bottom_most = self._rows - 1
+        self._right_most = self._cols - 1
+
+        self._buf = ''
+        self._outbuf = ''
+
+    def cap_sc(self, s=''):
+        """Save cursor position """
+        self._cur_x_bak = self._cur_x
+        self._cur_y_bak = self._cur_y
+
+    def cap_sgr0(self, mo=None, p1=''):
+        self.cap_set_colour_pair(p1=0, p2=10)
+
+    def cap_smir(self, l=''):
+        """Insert mode (enter) """
+        pass
+
+    def cap_smso(self, l=''):
+        """Begin standout mode """
+        self._sgr = 0x70000000
+
+    def cap_smso_rev(self, p1=''):
+        self.cap_set_colour(colour=7)
+
+    def cap_smul(self, p1=''):
+        self.cap_set_colour(colour=4)
+
+    def cap_smpch(self, p1=''):
+        self.cap_set_colour(colour=11)
+
+    def cap_vpa(self, mo):
+        """Set vertical position to absolute #1 """
+        p = int(mo.group(1))
+        self._cur_y = min(self._rows, p) - 1
+
+    def cap_noname(self, p1=''):
+        self.cap_set_colour(colour=0)
 
     def exec_escape_sequence(self):
         e = self._buf
