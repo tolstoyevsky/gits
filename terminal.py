@@ -182,8 +182,8 @@ class Terminal:
 
     def _echo(self, c):
         """Puts the specified character ``c`` on the screen and moves the
-        cursor right by 1 position. If the cursor reaches the right side of the
-        screen, it is moved to the next line.
+        cursor right by 1 position. If the cursor reaches the end of a line,
+        it is moved to the next line.
         """
         if self._eol:
             self._cursor_down()
@@ -324,7 +324,7 @@ class Terminal:
         self._cap_dch(1)
 
     def _cap_dim(self, p1=''):
-        """Turns on half-bright mode. """
+        """Enters Half-bright mode. """
         self._cap_set_color(colour=2)
 
     def _cap_dl(self, mo=None, p1=None):
@@ -341,7 +341,7 @@ class Terminal:
         self._cap_dl(p1=1)
 
     def _cap_ech(self, mo):
-        """Erases the specified number of characters characters. """
+        """Erases the specified number of characters. """
         p = int(mo.group(1))
         self._zero((self._cur_x, self._cur_y), (self._cur_x + p, self._cur_y),
                    inclusively=True)
@@ -353,7 +353,7 @@ class Terminal:
         self._zero((self._cur_x, self._cur_y), (self._cols, self._rows - 1))
 
     def _cap_el(self, l=[0]):
-        """Clears to the end of the line. """
+        """Clears a line from the cursor position to the end of the line. """
         if l[0] == 0:
             self._zero((self._cur_x, self._cur_y), (self._cols, self._cur_y))
         elif l[0] == 1:
@@ -363,7 +363,9 @@ class Terminal:
             self._zero((0, self._cur_y), (self._cols, self._cur_y))
 
     def _cap_el1(self, l=[0]):
-        """Clears to the beginning of the line. """
+        """Clears a line from the beginning of the line to the current cursor
+        position.
+        """
         self._cap_el([1])
 
     def _cap_home(self, l=[1, 1]):
@@ -436,19 +438,19 @@ class Terminal:
             self._scroll_down(self._top_most, self._bottom_most)
 
     def _cap_rmir(self, l=''):
-        """Leaves Insert mode. See _cap_smir. """
+        """Exits Insert mode. See _cap_smir. """
         pass
 
     def _cap_rmpch(self, p1=''):
-        """Leaves PC character display mode. See _cap_smpch. """
+        """Exits PC character display mode. See _cap_smpch. """
         self._cap_set_color(colour=10)
 
-    def cap_rmso(self, p1=''):
-        """Leaves Standout mode. See _cap_smso. """
+    def _cap_rmso(self, p1=''):
+        """Exits Standout mode. See _cap_smso. """
         self._cap_set_color(colour=27)
 
-    def cap_rmul(self, p1=''):
-        """Leaves Underscore mode. See _cap_smul. """
+    def _cap_rmul(self, p1=''):
+        """Exits Underscore mode. See _cap_smul. """
         self._cap_set_color(colour=24)
 
     def _cap_rs1(self, s=''):
@@ -475,15 +477,15 @@ class Terminal:
         self._cap_set_color_pair(p1=0, p2=10)
 
     def _cap_smir(self, l=''):
-        """Begins Insert mode. See _cap_rmir. """
+        """Enters Insert mode. See _cap_rmir. """
         pass
 
     def _cap_smso(self, l=''):
-        """Begins Standout mode. See cap_rmso.
+        """Enters Standout mode. See _cap_rmso.
 
         John Strang, in his book Programming with Curses, gives the following
         definition for the term. Standout mode is whatever special highlighting
-        the terminal cad do, as defined in the terminal's database entry.
+        the terminal can do, as defined in the terminal's database entry.
         """
         self._sgr = 0x70000000
 
@@ -491,7 +493,7 @@ class Terminal:
         self._cap_set_color(colour=7)
 
     def _cap_smul(self, p1=''):
-        """Begins Underscore mode. See cap_rmul. """
+        """Enters Underscore mode. See _cap_rmul. """
         self._cap_set_color(colour=4)
 
     def _cap_smpch(self, p1=''):
