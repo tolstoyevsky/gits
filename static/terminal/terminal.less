@@ -1,0 +1,59 @@
+@import './colors.less';
+
+.terminal {
+    float: left;
+}
+
+.terminal-display {
+    font-family: 'Droid Sans Mono';
+    font-size: 14px;
+    margin: 0px;
+    overflow: hidden;
+
+    span {
+        /* Foreground colors (0-15) */
+        &.f0  { color: @foreground-color0 }
+        &.f1  { color: @foreground-color1 }
+        &.f2  { color: @foreground-color2 }
+        &.f3  { color: @foreground-color3; }
+        &.f4  { color: @foreground-color4; }
+        &.f5  { color: @foreground-color5; }
+        &.f6  { color: @foreground-color6; }
+        &.f7  { color: @foreground-color7; }
+        &.f8  { color: @foreground-color8; }
+        &.f9  { color: @foreground-color9; }
+        &.f10 { color: @foreground-color10; }
+        &.f11 { color: @foreground-color11; }
+        &.f12 { color: @foreground-color12; }
+        &.f13 { color: @foreground-color13; }
+        &.f14 { color: @foreground-color14; }
+        &.f15 { color: @foreground-color15; }
+
+        /* Background colors (0-7) */
+        &.b0  { background-color: @background-color0; }
+        &.b1  { background-color: @background-color1; }
+        &.b2  { background-color: @background-color2; }
+        &.b3  { background-color: @background-color3; }
+        &.b4  { background-color: @background-color4; }
+        &.b5  { background-color: @background-color5; }
+        &.b6  { background-color: @background-color6; }
+        &.b7  { background-color: @background-color7; }
+    }
+}
+
+.terminal-screen {
+    /*
+     * Внимание.
+     * Данный параметр не отвечает за цвет фона терминала, – цвет фона
+     * терминала задается на уровне самого терминала посредством команды setab.
+     * Блочный элемент, для которого предназначены эти стили, играет роль
+     * основы, на которой располагается текст терминала, поэтому параметр
+     * background-color отвечает за цвет фона отступов от внутренних краев
+     * терминала, размер которых, кстати, задается посредством параметра
+     * padding. При изменении цвета фона терминала командой setab нужно не
+     * забывать изменять и цвет фона отступов.
+     */
+    background-color: #000000;
+    overflow: hidden;
+    padding: 5px;
+}
