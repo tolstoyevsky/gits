@@ -244,11 +244,6 @@ class Terminal:
     def _cap_ignore(self, *s):
         pass
 
-    # XXX: never used
-    def csi_at(self, l):
-        for i in range(l[0]):
-            self._cap_ich1()
-
     def _cap_blink(self, p1=''):
         """Produces blinking text. """
         self._cap_set_color(colour=5)
@@ -379,9 +374,13 @@ class Terminal:
         q, r = divmod(x, 8)
         self._cur_x = (q * 8) % self._cols
 
-    def _cap_ich1(self, l=[1]):
-        """Inserts a character. """
-        self._scroll_right(self._cur_x, self._cur_y)
+    def _cap_ich(self, mo=None, p1=None):
+        """Inserts the specified number of blank characters. """
+        if mo:
+            p1 = int(mo.group(1))
+
+        for _ in range(p1):
+            self._scroll_right(self._cur_x, self._cur_y)
 
     def _cap_il(self, mo=None, p1=None):
         """Adds the specified number of new blank lines. """

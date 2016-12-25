@@ -26,7 +26,6 @@ escape_sequences:
   '\Ec': 'rs1'
 
   '\EH': 'ignore'
-  '\E[@': 'ich1'
   '\E[4h': 'smir'
   '\E[4l': 'rmir'
 
@@ -70,6 +69,7 @@ escape_sequences:
   # '\x1b[?25l': civis
 
 escape_sequences_re:
+  '\E[%d@': 'ich'
   '\E[%dd': 'vpa'
   '\E[%d;%dm': 'set_color_pair'
   '\E[%dm': 'set_color'
