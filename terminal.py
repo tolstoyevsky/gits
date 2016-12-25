@@ -281,12 +281,20 @@ class Terminal:
             self._cur_y = max(0, self._cur_y - 1)
             self._eol = True
 
-    def _cap_cuf(self, mo=None, p1=None):
+    def _cap_cud(self, mo=None, p1=None):
+        """Moves the cursor down the specified number of lines. """
         if mo:
             p1 = int(mo.group(1))
 
-        self._cur_x = min(self._right_most, self._cur_x + p1)
-        self._eol = False
+        self._cur_y = min(self._bottom_most, self._cur_y + p1)
+
+    def _cap_cuf(self, mo=None, p1=None):
+        """Moves the cursor right by a specified number of positions. """
+        if mo:
+            p1 = int(mo.group(1))
+
+        for _ in range(p1):
+            self._cursor_right()
 
     def _cap_cup(self, mo):
         """Move to row #1 col #2 """
@@ -411,7 +419,7 @@ class Terminal:
 
     def _cap_kcud1(self, l=[1]):
         """Handles a Down Arrow key-press. """
-        self._cur_y = min(self._bottom_most, self._cur_y + l[0])
+        self._cap_cud(p1=1)
 
     def _cap_kcuf1(self, l=[1]):
         """Handles a Right Arrow key-press. """
