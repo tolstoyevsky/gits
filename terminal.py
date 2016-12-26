@@ -394,8 +394,8 @@ class Terminal:
         if mo:
             p1 = int(mo.group(1))
 
-        for _ in range(p1):
-            self._scroll_right(self._cur_x, self._cur_y)
+        for i in range(p1):
+            self._scroll_right(self._cur_x + i, self._cur_y)
 
     def _cap_il(self, mo=None, p1=None):
         """Adds the specified number of new blank lines. """

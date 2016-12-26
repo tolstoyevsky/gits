@@ -642,14 +642,24 @@ class TestEmulator(unittest.TestCase):
         self.assertEqual(cur_x_bck, term._cur_x)
         self.assertTrue(term._eol)
 
-    @unittest.skip('skip')
-    def test_cap_ich1(self):
-        # ATTN: corresponding method has the following doc: Insert character.
-        #       Is it ok? I'm confused because this method just executes
-        #       `scroll_right` terminal method.
+    def test_cap_ich(self):
+        """The terminal should have the possibility to insert the specified
+        number of blank characters.
+        """
+        term = self._terminal
 
-        """The terminal should have the possibility to insert character. """
-        pass
+        # Fill the first line with x
+        self._put_string(['x'] * self._cols, (0, 0))
+
+        term._cur_x = term._cur_y = 0
+
+        n = random.randint(0, term._right_most)
+        # Insert n blank characters at the beginning of the first line
+        term._cap_ich(p1=n)
+
+        blank_characters = ['\x00'] * n
+        want = blank_characters + ['x'] * (self._cols - n)
+        self._check_string(want, (0, 0), (term._cols, 0))
 
     def test_cap_smso(self):
         """The terminal should have the possibility to begin standout mode. """
