@@ -500,10 +500,23 @@ class Terminal:
         """Enters PC character display mode. See _cap_rmpch. """
         self._cap_set_color(colour=11)
 
-    def _cap_vpa(self, mo):
-        """Sets the vertical position to the specified value. """
-        p = int(mo.group(1))
-        self._cur_y = min(self._rows, p) - 1
+    def _cap_vpa(self, mo=None):
+        """Sets the vertical position to the `mo` value.
+        The `mo` paramater has 1-based indexing, need to have 0-based indexing.
+        See _cap_hpa.
+        """
+
+        p = int(mo.group(1)) - 1
+        self._cur_y = min(self._bottom_most, p)
+
+    def _cap_hpa(self, mo=None):
+        """Sets the horizontal position to the `mo` value.
+        The `mo` paramater has 1-based indexing, need to have 0-based indexing.
+        See _cap_vpa.
+        """
+
+        p = int(mo.group(1)) - 1
+        self._cur_x = min(self._right_most, p)
 
     def _cap_noname(self, p1=''):
         self._cap_set_color(colour=0)

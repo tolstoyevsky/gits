@@ -74,6 +74,7 @@ escape_sequences_re:
   '\E[%d;%dm': 'set_color_pair'
   '\E[%dm': 'set_color'
   '\E[%dC': 'cuf'
+  '\E[%dG': 'hpa'
   '\E[%dL': 'il'
   '\E[%dM': 'dl'
   '\E[%dP': 'dch'
