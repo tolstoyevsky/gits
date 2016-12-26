@@ -449,7 +449,7 @@ class Terminal:
         """Restores the cursor to the last saved position. See _cap_sc. """
         self._cur_x = self._cur_x_bak
         self._cur_y = self._cur_y_bak
-        self._eol = False
+        self._eol = True if self._cur_x == self._right_most else False
 
     # XXX: never used
     def _esc_ri(self, s):
