@@ -351,6 +351,37 @@ class TestEmulator(unittest.TestCase):
                                  (random.randint(1, term._right_most - len(s)),
                                   random.randint(1, term._bottom_most)))
 
+    def _check_test_peek(self, a, lb, rb, inclusively=False):
+        """ A helper method that checks the `_peek` method.
+
+        The ``a`` argument is a test line/area that will be put on the screen.
+        The ``lb (left border)`` and ``rb (right border)`` arguments must be
+        tuples or lists of coordinates ``(x1, y1)`` and ``(x2, y2)``,
+        respectively.
+        """
+
+        term = self._terminal
+
+        x1, y1 = lb
+        x2, y2 = rb
+
+        start = self._cols * y1 + x1
+        end = self._cols * y2 + x2
+        
+        term._screen[start:end] = a
+
+        # Get the area from the start till the end.
+        got = term._peek(lb, rb, inclusively=inclusively)
+
+        if inclusively:
+            a.append(MAGIC_NUMBER)
+            self.assertEqual(a, got)
+        else:
+            self.assertEqual(a, got)
+
+        # Reset terminal completely to sane modes.
+        term._cap_rs1()
+
     def test_peek(self):
         """The terminal should have the possibility of capturing the area from
         a left border starting at position x1, y1 to a right border starting at
@@ -359,21 +390,18 @@ class TestEmulator(unittest.TestCase):
 
         term = self._terminal
 
+        # Peek the first line.
+        line = array.array('L', [0] * term._cols)
+        self._check_test_peek(line, (0, 0), (term._cols, 0))
+
+        # Peek the line inclusively.
         start = 3
         end = 7
-        zeros = array.array('L', [0] * (end - start))
+        self._check_test_peek(array.array('L', [0] * (end - start)), 
+                              (start, 0), (end, 0), inclusively=True)
 
-        # The last '0' will be on the 6th position
-        term._screen[start:end] = zeros
-
-        # Get an area from the 3rd to the 6th character
-        got = term._peek((start, 0), (end, 0))
-        self.assertEqual(zeros, got)
-
-        # Get an area from the 3rd to the 7th character
-        got = term._peek((start, 0), (end, 0), inclusively=True)
-        zeros.append(MAGIC_NUMBER)
-        self.assertEqual(zeros, got)
+        # Peek the last line.
+        self._check_test_peek(line, (0, term._rows), (term._cols, term._rows))
 
     def test_poke(self):
         """The terminal should have the possibility of putting the specified
