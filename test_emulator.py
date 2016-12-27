@@ -331,7 +331,8 @@ class TestEmulator(unittest.TestCase):
         self._check_scroll_down(['f'] * term._right_most, (0, 0))
 
         # Scroll down the last line.
-        self._check_scroll_down(['l'] * term._right_most, (0, term._bottom_most - 1))
+        self._check_scroll_down(['l'] * term._right_most,
+                                (0, term._bottom_most - 1))
 
         # Scroll down the random line.
         rand_y = random.randint(2, term._bottom_most - 2)
@@ -420,8 +421,9 @@ class TestEmulator(unittest.TestCase):
 
         # Check that the screen was cleared correctly
         want = array.array('L', [MAGIC_NUMBER] * length)
-        got = term._peek((term._cur_x, 0), (term._right_most, term._bottom_most),
-                        inclusively=True)
+        got = term._peek((term._cur_x, 0),
+                         (term._right_most, term._bottom_most),
+                         inclusively=True)
         self.assertEqual(want, got)
 
     def test_cap_rs1(self):
@@ -609,7 +611,8 @@ class TestEmulator(unittest.TestCase):
         """
 
         term = self._terminal
-        x, y = random.randint(0, term._right_most), random.randint(0, term._bottom_most)
+        x = random.randint(0, term._right_most)
+        y = random.randint(0, term._bottom_most)
         term._cur_x, term._cur_y = x, y
         term._cap_sc()
 
@@ -724,7 +727,8 @@ class TestEmulator(unittest.TestCase):
         self._check_cap_kcud1((0, 0), want_cur_y=1)
 
         # Terminal's `cur_y` is on the bottom-most position.
-        self._check_cap_kcud1((0, term._bottom_most), want_cur_y=term._bottom_most)
+        self._check_cap_kcud1((0, term._bottom_most),
+                              want_cur_y=term._bottom_most)
 
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom_most - 1)
@@ -758,7 +762,8 @@ class TestEmulator(unittest.TestCase):
         self._check_cap_kcub1((0, 0), want_cur_x=0)
 
         # Terminal's `cur_x` is on the right-most position.
-        self._check_cap_kcub1((term._right_most, 0), want_cur_x=term._right_most - 1)
+        self._check_cap_kcub1((term._right_most, 0),
+                              want_cur_x=term._right_most - 1)
 
         # Terminal's `cur_x` is on the random position.
         rand_x = random.randint(1, term._right_most - 1)
@@ -949,7 +954,8 @@ class TestEmulator(unittest.TestCase):
         term._cap_rs1()
 
     def test_cap_il1(self):
-        """The terminal should have the possibility to add a new blank line. """
+        """The terminal should have the possibility to add a new blank line.
+        """
 
         term = self._terminal
 
