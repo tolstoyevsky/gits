@@ -225,15 +225,12 @@ class TestEmulator(unittest.TestCase):
         # Echo the character on the screen (left-most position).
         self._check_echo('d', (0, 0))
 
-        # Echo the character on an arbitrary position on the screen.
-        rand_cur_x = random.randint(1, self._cols - 2)
+        # Echo characters on arbitrary positions on the screen.
+        rand_cur_x = random.randint(1, term._right_most - 1)
         rand_cur_y = random.randint(1, term._bottom_most - 1)
         self._check_echo('r', (rand_cur_x, rand_cur_y))
-
-        # Echo the character on the screen (right-most position).
         self._check_echo('a', (term._right_most, rand_cur_y), eol=True)
 
-        # Echo the character on the screen (right-most position).
         self._check_echo('p', (term._right_most, term._bottom_most), eol=True)
 
     def test_echo_eol(self):
