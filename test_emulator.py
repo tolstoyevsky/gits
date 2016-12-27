@@ -566,7 +566,7 @@ class TestEmulator(unittest.TestCase):
         # ATTN: need a decription.
         pass
 
-    def test_esc_ri(self):
+    def test_cap_ri(self):
         """The terminal should scroll down by 1 position when terminal's `top`
         was chosen as maximum between terminal's `top` and terminal's `cur_y`.
         """
@@ -574,7 +574,7 @@ class TestEmulator(unittest.TestCase):
         # Cursor at left-most position, `top` and `cur_y` equal 0.
         s = ['a'] * self._terminal._right_most
         self._put_string(s, (0, 0))
-        self._terminal._esc_ri('')
+        self._terminal._cap_ri()
         self._check_string(s, (0, 1), (len(s), 1))
 
         # Reset the terminal to the sane mode.
@@ -583,7 +583,7 @@ class TestEmulator(unittest.TestCase):
         # Put `cur_y` at random position.
         rand_y = random.randint(1, self._terminal._bottom_most)
         self._terminal._cur_y = rand_y
-        self._terminal._esc_ri('')
+        self._terminal._cap_ri()
         self.assertEqual(rand_y - 1, self._terminal._cur_y)
 
     @unittest.skip('skip')

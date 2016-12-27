@@ -26,6 +26,7 @@ escape_sequences:
   '\Ec': 'rs1'
 
   '\EH': 'ignore'
+  '\EM': 'ri'
   '\E[4h': 'smir'
   '\E[4l': 'rmir'
 

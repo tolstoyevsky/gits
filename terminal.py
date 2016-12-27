@@ -450,8 +450,8 @@ class Terminal:
         self._cur_y = self._cur_y_bak
         self._eol = True if self._cur_x == self._right_most else False
 
-    # XXX: never used
-    def _esc_ri(self, s):
+    def _cap_ri(self, s=''):
+        """Scrolls text down. See _cap_ind. """
         self._cur_y = max(self._top_most, self._cur_y - 1)
         if self._cur_y == self._top_most:
             self._scroll_down(self._top_most, self._bottom_most)
