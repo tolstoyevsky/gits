@@ -138,9 +138,8 @@ class Terminal:
         """Moves the area specified by coordinates 0, ``y1`` and 0, ``y2`` up 1
         row.
         """
-        # Start copying from the next row (y1 + 1).
-        line = self._peek((0, y1 + 1), (self._cols, y2))
-        self._poke((0, y1), line)
+        area = self._peek((0, y1), (self._right_most, y2), inclusively=True)
+        self._poke((0, y1 - 1), area)  # move the area up 1 row (y1 - 1)
         self._zero((0, y2), (self._cols, y2))
 
     def _scroll_down(self, y1, y2):
@@ -167,7 +166,7 @@ class Terminal:
             self._eol = False
             q, r = divmod(self._cur_y + 1, self._bottom_most + 1)
             if q:
-                self._scroll_up(self._top_most, self._bottom_most)
+                self._scroll_up(self._top_most + 1, self._bottom_most)
                 self._cur_y = self._bottom_most
             else:
                 self._cur_y = r
@@ -337,7 +336,7 @@ class Terminal:
 
         if self._top_most <= self._cur_y <= self._bottom_most:
             for i in range(p1):
-                self._scroll_up(self._cur_y, self._bottom_most)
+                self._scroll_up(self._cur_y + 1, self._bottom_most)
 
     def _cap_dl1(self, l=''):
         """Deletes a line. """

@@ -229,6 +229,7 @@ class TestEmulator(unittest.TestCase):
         rand_cur_x = random.randint(1, term._right_most - 1)
         rand_cur_y = random.randint(1, term._bottom_most - 1)
         self._check_echo('r', (rand_cur_x, rand_cur_y))
+
         self._check_echo('a', (term._right_most, rand_cur_y), eol=True)
 
         self._check_echo('p', (term._right_most, term._bottom_most), eol=True)
@@ -292,16 +293,18 @@ class TestEmulator(unittest.TestCase):
         self._put_string(s, pos)
         self._check_string(s, pos, (x + len(s), y))
 
-        # Scroll up the line.
-        term._scroll_up(y - 1, y + 1)
+        term._scroll_up(y, y + 1)
 
+        # Check that the line was moved correctly
         self._check_string(s, (x, y - 1), (x + len(s), y - 1))
 
-        want = array.array('L', [MAGIC_NUMBER] * term._right_most)
-        got = term._peek(pos, (term._right_most, y))
+        # Check that the place, where the line used to be, is filled with zeros
+        want = array.array('L', [MAGIC_NUMBER] * term._cols)
+        got = term._peek(pos, (term._right_most, y),
+                         inclusively=True)
         self.assertEqual(want, got)
 
-        # Restore the initial position of the screen.
+        # Reset terminal completely to sane modes.
         term._cap_rs1()
 
     def test_scroll_up(self):
@@ -310,14 +313,13 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Scroll up the first line.
-        self._check_scroll_up(['f'] * term._right_most, (0, 1))
-
-        # Scroll up the last line.
-        self._check_scroll_up(['l'] * term._right_most, (0, term._bottom_most))
+        self._check_scroll_up(['f'] * term._cols, (0, 1))
 
         # Scroll up the random line.
         rand_y = random.randint(2, term._bottom_most - 1)
-        self._check_scroll_up(['r'] * term._right_most, (0, rand_y))
+        self._check_scroll_up(['r'] * term._cols, (0, rand_y))
+
+        # ADDME: add test case for checking scroll up the last line.
 
     def test_scroll_down(self):
         """The terminal should move an area by 1 line down."""
@@ -741,7 +743,7 @@ class TestEmulator(unittest.TestCase):
 
         # Terminal's `cur_y` is on the bottom-most position.
         self._check_cap_kcud1((0, term._bottom_most),
-                              want_cur_y=term._bottom_most)
+                               want_cur_y=term._bottom_most)
 
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom_most - 1)
@@ -772,7 +774,7 @@ class TestEmulator(unittest.TestCase):
 
         # Terminal's `cur_x` is on the right-most position.
         self._check_cap_kcub1((term._right_most, 0),
-                              want_cur_x=term._right_most - 1)
+                               want_cur_x=term._right_most - 1)
 
         # Terminal's `cur_x` is on the random position.
         rand_x = random.randint(1, term._right_most - 1)
