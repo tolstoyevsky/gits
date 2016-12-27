@@ -605,6 +605,22 @@ class TestEmulator(unittest.TestCase):
     def test_cap_rmso(self):
         pass
 
+    def test_cap_cuf(self):
+        """The terminal should have the possibility to move the cursor right by
+        a specified number of positions.
+        """
+        term = self._terminal
+
+        # Move the cursor to the right-most position
+        term._cap_cuf(p1=term._right_most)
+        self.assertEqual(term._cur_x, term._right_most)
+        self.assertFalse(term._eol)
+
+        # Then move the cursor right by 1 position to check reaching the end of
+        # the line
+        term._cap_cuf(p1=1)
+        self.assertTrue(term._eol)
+
     def test_cap_sc(self):
         """The terminal should have the possibility to save current cursor
         position.
@@ -733,10 +749,6 @@ class TestEmulator(unittest.TestCase):
         # Terminal's `cur_y` is on the random position.
         rand_y = random.randint(1, term._bottom_most - 1)
         self._check_cap_kcud1((0, rand_y), want_cur_y=rand_y + 1)
-
-    @unittest.skip('skip')
-    def test_cap_kcuf1(self):
-        pass
 
     def _check_cap_kcub1(self, pos, want_cur_x):
         """A helper method that checks `_cap_kcub1` capability.
