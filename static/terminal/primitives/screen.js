@@ -58,12 +58,6 @@ export class Screen extends Events {
     getIndent() {
         const indent = this._style.getPropertyValue('padding-left');
 
-        /*
-         * В каких бы допустимых для CSS единицах не было задано значение
-         * padding-left, метотод getPropertyValue вернет его в пикселях,
-         * поэтому остается только избавиться от префикса px и привести его
-         * к целому.
-         */
         return parseInt(indent, 10);
     }
 

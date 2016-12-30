@@ -68,22 +68,14 @@ export class Display extends Events {
     }
 
     setResolution(row, col) {
-        /*
-         * Этот метод едва ли перегружен работой (все, что он делает, – это
-         * сохраняет количество строк и количество столбцов для последующего
-         * использования), но это не должно сбивать с толку. Хотя текущая
-         * реализация дисплея могла бы легко обойтись без этого метода,
-         * интерфейс разрабатывался с оглядкой на будущее.
-         */
         this._row = row;
         this._col = col;
 
         /*
-         * Изменение разрешения дисплея требует участия как клиента, так и
-         * сервера. Однако компонент display не знает и не должен знать о
-         * том, как взаимодействовать с сервером. Таким образом, обработчик
-         * события onsetresolution предназначен для расширение данного
-         * метода.
+         * Changing display resolution requires involvement of both the server
+         * and the client. However, the display component doesn't know how to
+         * interact with the server. Thus, the onsetresolution event handler is
+         * intended for expanding the method.
          */
         this.trigger('onsetresolution', {'row': row, 'col': col});
     }

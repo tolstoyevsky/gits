@@ -262,7 +262,7 @@ class Terminal:
         self._cur_x = 0
 
     def _cap_csr(self, mo):
-        """Change to lines #1 through #2 (VT100) """
+        """Change to lines #1 through #2 (VT100). """
         p1 = int(mo.group(1))
         p2 = int(mo.group(2))
         self._top_most = min(self._rows - 1, p1 - 1)
@@ -538,11 +538,11 @@ class Terminal:
 
         if len(e) > 32:
             self._buf = ''
-        elif method_name:  # т.н. статические последовательности
+        elif method_name:  # static sequences
             method = getattr(self, '_cap_' + method_name)
             method()
             self._buf = ''
-        else:  # последовательности с параметрами
+        else:  # sequences with params
             for k, v in self.new_sci_seq_re_compiled:
                 mo = k.match(e)
                 if mo:
@@ -585,35 +585,29 @@ class Terminal:
         w = self._cols
         r = ''
 
-        # Строка, содержащая готовый к выводу символ.
-        span = ''
+        span = ''  # ready-to-output character
         span_bg, span_fg = -1, -1
         for i in range(h * w):
             q, c = divmod(self._screen[i], 256 * 256 * 256)
             bg, fg = divmod(q, 16)
 
-            # AjaxTerm использует черный цвет в качестве фона для терминала,
-            # не имея при этом опции, которая позволяет его изменить. Таким
-            # образом, если AjaxTerm получит предложение об отображении экрана,
-            # содержащего _насыщенные_ цвета, он откорректирует это
-            # предложение, заменив каждый такой цвет на его _обычный_ аналог.
+            # Gits supports two color schemes: normal and bright. Each color
+            # scheme consists of 8 colors for a background and text. The
+            # terminal doesn't allow users to switch between them so far.
+            # Gits uses the normal color scheme by default.
             #
-            # Имея, к примеру, насыщенный зеленый цвет (номер 10), посредством
-            # побитового И, можно получить его обычный аналог, т.е. номер 2.
+            # Suppose we have a bright green color (10). Using bitwise AND, we
+            # can get a normal green color (2).
             bg &= 0x7
 
             if i == self._cur_y * w + self._cur_x:
                 bg, fg = 1, 7
 
-            # Если характеристики текущей ячейки совпадают с характеристиками
-            # предыдущей (или предыдущих), то объединить их в группу.
-            #
-            # XXX: терминал не отображает последний символ в правом нижнем углу
-            # (особенно это заметно при работе с Midnight Commander).
+            # If the characteristics of the current cell match the
+            # characteristics of the previous cell, combine them into a group.
             if bg != span_bg or fg != span_fg or i + 1 == h * w:
                 if len(span):
-                    # Заменить каждый пробел на неразрывный пробел
-                    # (non-breaking space).
+                    # Replace spaces with non-breaking space.
                     ch = span.replace(' ', '\xa0')
                     r += '<span class="f{} b{}">{}</span>'.format(
                         span_fg,

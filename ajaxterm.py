@@ -56,14 +56,7 @@ class TermSocketHandler(WebSocketHandler):
             if os.getuid() == 0:
                 cmd = ['/bin/login']
             else:
-                # В Python 3.x, в отличии от Python 2.x, для того чтобы строка
-                # попала в Терминал, необходимо завершить ее символом \n,
-                # который в данном случае эмулирует нажатие клавиши Enter.
-                # Однако, необходимость вводить таким образом логин при
-                # подключении к машине через ssh является всего лишь временной
-                # мерой. В недалеком будущем Терминал будет расширен опцией
-                # командной строки, которая позволит указать как логин, так и
-                # хост. К примеру, --ssh eugulixes@192.168.0.100.
+                # The prompt has to end with a newline character.
                 sys.stdout.write(socket.gethostname() + ' login: \n')
                 login = sys.stdin.readline().strip()
 

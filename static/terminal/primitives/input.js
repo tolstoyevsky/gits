@@ -46,12 +46,13 @@ export class Input extends Events {
             const sum  = aflg | cflg | sflg;
             let k = '';
 
-            /* TODO: добавить обработчики Ctrl-Alt-A..Z и Alt-A..Z. */
+            /* TODO: handle Ctrl-Alt-A..Z and Alt-A..Z. */
 
             if (cflg && e.keyCode >= 65 /* A */ && e.keyCode <= 90 /* Z */) {
                 /*
-                 * По номеру символа A..Z можно получить номер управляющего
-                 * символа, представленного комбинацией клавиш Ctrl-A..Z.
+                 * Using ASCII numeric representations of the letters A-Z,
+                 * figure out ASCII numeric representations of the control
+                 * characters Ctrl-A..Z
                  */
                 k = String.fromCharCode(e.keyCode - 64); // Ctrl-A..Z
             } else {
@@ -66,20 +67,18 @@ export class Input extends Events {
 
         const _keypress = e => {
             /*
-             * В Chrome и Firefox событие keypress возникает при нажатии на
-             * клавишу Enter несмотря на то, что она представляет непечатаемый
-             * символ. При этом в Chrome свойство e.charCode получает значение
-             * 13, а в Firefox – 0. Необходимо приблизить поведение Firefox к
-             * Chrome и другим браузерам.
+             * Chrome and Firefox fire the keypress event when the user presses
+             * the Enter key in spite of the fact it represents a non-printable
+             * character. Furthermore, in Chrome e.charCode gets 13 when in
+             * Firefox e.charCode gets 0. Make Firefox behave like
+             * Chrome and other browsers.
              */
             const char_code = (e.keyCode == 13) ? 13 : e.charCode;
 
             /*
-             * В Firefox, в отличии от Chrome и других браузеров, событие
-             * keypress возникает при нажатии клавиш, представляющих
-             * непечатаемые символы. Таким образом, их необходимо игнорировать,
-             * т. к. обработкой комбинаций клавиш и непечатаемых символов
-             * занимается keydown.
+             * Firefox fires the keypress event when the user presses
+             * non-printable characters. Ignore the characters since keydown
+             * handles them.
              */
             if (!e.altKey && !e.ctrlKey && char_code) {
                 let k = String.fromCharCode(char_code);

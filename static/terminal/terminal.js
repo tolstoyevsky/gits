@@ -15,10 +15,6 @@ export class Terminal {
         this.screen = new Screen($basis);
         this.display = new Display(this.screen.$node, row, col);
 
-        /*
-         * Подогнать размер экрана под разрешение дисплея, переданное в качестве
-         * параметров.
-         */
         this.display.bind('onready', function() {
             _fit_screen_size(row, col);
         });
@@ -27,8 +23,8 @@ export class Terminal {
         const _ws = new WebSocket('ws://' + location.host + '/termsocket');
 
         /*
-         * При переходе экрана в полноэкранный режим, необходимо рассчитать
-         * оптимальное разрешение дисплея.
+         * When entering full-screen mode, figure out an optimal display
+         * resolution.
          */
         this.screen.bind('onenterfullscreen', (() => {
             let row = this.display.getRow();
