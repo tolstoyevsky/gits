@@ -355,8 +355,11 @@ class Terminal:
         """
         self._zero((self._cur_x, self._cur_y), (self._cols, self._rows - 1))
 
-    def _cap_el(self, l=[0]):
+    def _cap_el(self, l=None):
         """Clears a line from the cursor position to the end of the line. """
+        if l is None:
+            l = [0]
+
         if l[0] == 0:
             self._zero((self._cur_x, self._cur_y), (self._cols, self._cur_y))
         elif l[0] == 1:
@@ -365,14 +368,18 @@ class Terminal:
         elif l[0] == 2:
             self._zero((0, self._cur_y), (self._cols, self._cur_y))
 
-    def _cap_el1(self, l=[0]):
+    def _cap_el1(self, l=None):
         """Clears a line from the beginning of the line to the current cursor
         position.
         """
-        self._cap_el([1])
+        if l is None:
+            l = [1]
+        self._cap_el(l)
 
-    def _cap_home(self, l=[1, 1]):
+    def _cap_home(self, l=None):
         """Moves the cursor to the home position. """
+        if l is None:
+            l = [1, 1]
         self._cur_x = min(self._cols, l[1]) - 1
         self._cur_y = min(self._rows, l[0]) - 1
         self._eol = False
@@ -408,25 +415,31 @@ class Terminal:
         """Scrolls the screen up moving its content down. """
         self._cursor_down()
 
-    def _cap_kb2(self, l=[1]):
+    def _cap_kb2(self, l=None):
         """Handles a Center key-press on keypad. """
+        if l is None:
+            l = [1]
         self._cur_x = min(self._cols, l[0]) - 1
 
-    def _cap_kcub1(self, l=[1]):
+    def _cap_kcub1(self, l=None):
         """Handles a Left Arrow key-press. """
+        if l is None:
+            l = [1]
         self._cur_x = max(0, self._cur_x - l[0])
         self._eol = False
 
-    def _cap_kcud1(self, l=[1]):
+    def _cap_kcud1(self, s=1):
         """Handles a Down Arrow key-press. """
         self._cap_cud(p1=1)
 
-    def _cap_kcuf1(self, l=[1]):
+    def _cap_kcuf1(self, s=''):
         """Handles a Right Arrow key-press. """
         self._cap_cuf(p1=1)
 
-    def _cap_kcuu1(self, l=[1]):
+    def _cap_kcuu1(self, l=None):
         """Handles a Up Arrow key-press. """
+        if l is None:
+            l = [1]
         self._cur_y = max(self._top_most, self._cur_y - l[0])
 
     def _cap_op(self, mo=None, p1=''):
