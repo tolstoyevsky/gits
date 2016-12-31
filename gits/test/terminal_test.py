@@ -18,7 +18,7 @@ import array
 import random
 import unittest
 
-from terminal import Terminal, MAGIC_NUMBER
+from gits.terminal import Terminal, MAGIC_NUMBER
 
 
 class TestEmulator(unittest.TestCase):

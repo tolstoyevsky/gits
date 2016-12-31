@@ -29,7 +29,7 @@ from tornado.ioloop import IOLoop
 from tornado.options import define, options
 from tornado.websocket import WebSocketHandler
 
-import terminal
+from gits.terminal import Terminal
 
 os.chdir(os.path.normpath(os.path.dirname(__file__)))
 
@@ -83,7 +83,7 @@ class TermSocketHandler(WebSocketHandler):
             TermSocketHandler.clients[fd] = {
                 'client': self,
                 'pid': pid,
-                'terminal': terminal.Terminal(rows, cols)
+                'terminal': Terminal(rows, cols)
             }
 
             return fd
@@ -128,8 +128,8 @@ class Application(tornado.web.Application):
             (r'/termsocket', TermSocketHandler),
         ]
         settings = dict(
-            template_path=os.path.join(os.path.dirname(__file__), "templates"),
-            static_path=os.path.join(os.path.dirname(__file__), "static"),
+            template_path=os.path.join(os.path.dirname(__file__), 'templates'),
+            static_path=os.path.join(os.path.dirname(__file__), 'static'),
         )
         tornado.web.Application.__init__(self, handlers, **settings)
 
