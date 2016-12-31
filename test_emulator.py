@@ -980,6 +980,7 @@ class TestEmulator(unittest.TestCase):
         rand_y = random.randint(1, term._bottom_most - 1)
         self._check_cap_il1((0, rand_y), ['s'] * term._right_most)
 
+    @unittest.skip('skip')
     def _check_cap_dl1(self, pos, s):
         """A helper method that checks `_cap_dl1` capability.
 
