@@ -246,14 +246,15 @@ class TestEmulator(unittest.TestCase):
         # Put the cursor to the right-most position - 1
         term._cur_x = term._cols - 2
 
-        # Put a character to move the cursor to the right-most position
+        # Put a character to move the cursor to the right-most position.
         term._echo('e')
 
-        # After putting another character we will reach the end of the line
+        # After putting another character we will reach the end of the line.
         term._echo('g')
         self.assertTrue(term._eol)
 
-        # After putting one more character the cursor will be moved to the next
+        # After putting one more character the cursor will be moved to the
+        # next.
         # line
         term._echo('g')
         self.assertEqual(1, term._cur_x)
@@ -300,7 +301,8 @@ class TestEmulator(unittest.TestCase):
         # Check that the line was moved correctly
         self._check_string(s, (x, y - 1), (x + len(s), y - 1))
 
-        # Check that the place, where the line used to be, is filled with zeros
+        # Check that the place, where the line used to be, is filled with
+        # zeros.
         want = array.array('L', [MAGIC_NUMBER] * term._cols)
         got = term._peek(pos, (term._right_most, y),
                          inclusively=True)
@@ -399,14 +401,14 @@ class TestEmulator(unittest.TestCase):
         end = 7
         zeros = array.array('L', [0] * (end - start))
 
-        # The last '0' will be on the 6th position
+        # The last '0' will be on the 6th position.
         term._screen[start:end] = zeros
 
-        # Get an area from the 3rd to the 6th character
+        # Get an area from the 3rd to the 6th character.
         got = term._peek((start, 0), (end, 0))
         self.assertEqual(zeros, got)
 
-        # Get an area from the 3rd to the 7th character
+        # Get an area from the 3rd to the 7th character.
         got = term._peek((start, 0), (end, 0), inclusively=True)
         zeros.append(MAGIC_NUMBER)
         self.assertEqual(zeros, got)
@@ -422,10 +424,10 @@ class TestEmulator(unittest.TestCase):
         end = 7
         zeros = array.array('L', [0] * (end - start))
 
-        # The last '0' will be on the 6th position
+        # The last '0' will be on the 6th position.
         term._poke((start, 0), zeros)
 
-        # Get an area from the 3rd to the 6th character
+        # Get an area from the 3rd to the 6th character.
         got = term._peek((start, 0), (end, 0))
         self.assertEqual(zeros, got)
 
@@ -437,24 +439,24 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         prompt = 'spam@ham:~$ '
-        self._put_string(prompt, (0, 0))  # put a prompt on the screen
+        self._put_string(prompt, (0, 0))  # put a prompt on the screen.
 
-        # Check that the prompt was put correctly
+        # Check that the prompt was put correctly.
         self._check_string(prompt, (0, 0), (len(prompt), 0))
 
         # Fill the rest of the screen with x
         length = term._cols * term._rows - len(prompt)
         self._put_string(['x'] * length, (len(prompt), 0))
 
-        # Clear the screen after the prompt till the end of the screen
+        # Clear the screen after the prompt till the end of the screen.
         term._cur_x = len(prompt)
         term._cur_y = 0
         term._cap_ed()
 
-        # Check that the prompt was not corrupted
+        # Check that the prompt was not corrupted.
         self._check_string(prompt, (0, 0), (len(prompt), 0))
 
-        # Check that the screen was cleared correctly
+        # Check that the screen was cleared correctly.
         want = array.array('L', [MAGIC_NUMBER] * length)
         got = term._peek((term._cur_x, 0),
                          (term._right_most, term._bottom_most),
@@ -584,59 +586,59 @@ class TestEmulator(unittest.TestCase):
         self._terminal._esc_ri('')
         self.assertEqual(rand_y - 1, self._terminal._cur_y)
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_set_colour_pair(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_set_colour(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_sgr0(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_op(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_noname(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_bold(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_dim(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_smul(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_blink(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_smso_rev(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_rmpch(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_smpch(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_rmul(self):
         pass
 
-    @unittest.skip("skip")
+    @unittest.skip('skip')
     def test_cap_rmso(self):
         pass
 
@@ -646,13 +648,13 @@ class TestEmulator(unittest.TestCase):
         """
         term = self._terminal
 
-        # Move the cursor to the right-most position
+        # Move the cursor to the right-most position.
         term._cap_cuf(p1=term._right_most)
         self.assertEqual(term._cur_x, term._right_most)
         self.assertFalse(term._eol)
 
         # Then move the cursor right by 1 position to check reaching the end of
-        # the line
+        # the line.
         term._cap_cuf(p1=1)
         self.assertTrue(term._eol)
 
@@ -676,23 +678,23 @@ class TestEmulator(unittest.TestCase):
         """
         term = self._terminal
 
-        # Put the cursor to the right-most position - 1
+        # Put the cursor to the right-most position - 1.
         term._cur_x = term._right_most - 1
 
-        # Put a character to move the cursor to the right-most position
+        # Put a character to move the cursor to the right-most position.
         term._echo('e')
 
-        # After putting another character we will reach the end of the line
+        # After putting another character we will reach the end of the line.
         term._echo('g')
         self.assertTrue(term._eol)
 
         cur_x_bck = term._cur_x
-        term._cap_sc()  # save the cursor's current position
+        term._cap_sc()  # save the cursor's current position.
 
-        # Put one more character to move the cursor to the next line
+        # Put one more character to move the cursor to the next line.
         term._echo('g')
 
-        term._cap_rc()  # restore a previously saved cursor's position
+        term._cap_rc()  # restore a previously saved cursor's position.
         self.assertEqual(cur_x_bck, term._cur_x)
         self.assertTrue(term._eol)
 
@@ -702,13 +704,13 @@ class TestEmulator(unittest.TestCase):
         """
         term = self._terminal
 
-        # Fill the first line with x
+        # Fill the first line with x.
         self._put_string(['x'] * self._cols, (0, 0))
 
         term._cur_x = term._cur_y = 0
 
         n = random.randint(0, term._right_most)
-        # Insert n blank characters at the beginning of the first line
+        # Insert n blank characters at the beginning of the first line.
         term._cap_ich(p1=n)
 
         blank_characters = ['\x00'] * n
@@ -913,8 +915,8 @@ class TestEmulator(unittest.TestCase):
         term._cap_rs1()
 
     def test_cap_el(self):
-        """The emulator should have the possibility to clear the screen from the
-        current cursor position to the end of line.
+        """The emulator should have the possibility to clear the screen from
+        the current cursor position to the end of line.
         """
 
         term = self._terminal
