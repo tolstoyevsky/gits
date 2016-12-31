@@ -50,11 +50,13 @@ class TestEmulator(unittest.TestCase):
         x1, y1 = left_border
         x2, y2 = right_border
 
+        term = self._terminal
+
         want = array.array('L', [])
         for c in s:
-            want.append(self._terminal._sgr | ord(c))
+            want.append(term._sgr | ord(c))
 
-        self.assertEqual(want, self._terminal._peek((x1, y1), (x2, y2)))
+        self.assertEqual(want, term._peek((x1, y1), (x2, y2)))
 
     def _check_screen_char(self, c, pos):
         """A helper method that checks if the screen has the character ``c``
@@ -351,33 +353,18 @@ class TestEmulator(unittest.TestCase):
                                  (random.randint(1, term._right_most - len(s)),
                                   random.randint(1, term._bottom_most)))
 
-    def _check_test_peek(self, a, lb, rb, inclusively=False):
+    def _check_test_peek(self, pos, s):
         """ A helper method that checks the `_peek` method.
 
-        The ``a`` argument is a test line/area that will be put on the screen.
-        The ``lb (left border)`` and ``rb (right border)`` arguments must be
-        tuples or lists of coordinates ``(x1, y1)`` and ``(x2, y2)``,
-        respectively.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string that will be put on the screen.
         """
 
+        x, y = pos
         term = self._terminal
 
-        x1, y1 = lb
-        x2, y2 = rb
-
-        start = self._cols * y1 + x1
-        end = self._cols * y2 + x2
-        
-        term._screen[start:end] = a
-
-        # Get the area from the start till the end.
-        got = term._peek(lb, rb, inclusively=inclusively)
-
-        if inclusively:
-            a.append(MAGIC_NUMBER)
-            self.assertEqual(a, got)
-        else:
-            self.assertEqual(a, got)
+        self._put_string(s, pos)
+        self._check_string(s, pos, (x + len(s), y))
 
         # Reset terminal completely to sane modes.
         term._cap_rs1()
@@ -391,17 +378,38 @@ class TestEmulator(unittest.TestCase):
         term = self._terminal
 
         # Peek the first line.
-        line = array.array('L', [0] * term._cols)
-        self._check_test_peek(line, (0, 0), (term._cols, 0))
+        self._check_test_peek((0, 0), ['s'] * term._right_most)
 
-        # Peek the line inclusively.
-        start = 3
-        end = 7
-        self._check_test_peek(array.array('L', [0] * (end - start)), 
-                              (start, 0), (end, 0), inclusively=True)
+        # Peek the random line.
+        rand_y = random.randint(1, term._bottom_most - 1)
+        self._check_test_peek((0, rand_y), ['s'] * term._right_most)
 
         # Peek the last line.
-        self._check_test_peek(line, (0, term._rows), (term._cols, term._rows))
+        self._check_test_peek((0, term._bottom_most), ['s'] * term._right_most)
+
+    def test_peek_inclusively(self):
+        """The terminal should have the possibility of capturing the area from
+        a left border starting at position x1, y1 to a right border starting at
+        position x2, y2 inclusively.
+        """
+
+        term = self._terminal
+
+        start = 3
+        end = 7
+        zeros = array.array('L', [0] * (end - start))
+
+        # The last '0' will be on the 6th position
+        term._screen[start:end] = zeros
+
+        # Get an area from the 3rd to the 6th character
+        got = term._peek((start, 0), (end, 0))
+        self.assertEqual(zeros, got)
+
+        # Get an area from the 3rd to the 7th character
+        got = term._peek((start, 0), (end, 0), inclusively=True)
+        zeros.append(MAGIC_NUMBER)
+        self.assertEqual(zeros, got)
 
     def test_poke(self):
         """The terminal should have the possibility of putting the specified
