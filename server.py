@@ -31,9 +31,11 @@ from tornado.websocket import WebSocketHandler
 
 from gits.terminal import Terminal
 
-os.chdir(os.path.normpath(os.path.dirname(__file__)))
-
 define('port', help='listen on a specific port', default=8888)
+define('static_path', help='the path to static resources',
+       default=os.path.join(os.getcwd(), 'node_modules/gits-client/static'))
+define('templates_path', help='the path to templates',
+       default=os.path.join(os.getcwd(), 'node_modules/gits-client/templates'))
 
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -128,8 +130,8 @@ class Application(tornado.web.Application):
             (r'/termsocket', TermSocketHandler),
         ]
         settings = dict(
-            template_path=os.path.join(os.path.dirname(__file__), 'templates'),
-            static_path=os.path.join(os.path.dirname(__file__), 'static'),
+            template_path=options.templates_path,
+            static_path=options.static_path,
         )
         tornado.web.Application.__init__(self, handlers, **settings)
 
