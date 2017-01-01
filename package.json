@@ -1,6 +1,6 @@
 {
   "name": "gits-client",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Gits is a web-based terminal emulator. Gits consists of two parts: a client and a server. Note that the package provides the client.",
   "main": "static/index.js",
   "scripts": {
