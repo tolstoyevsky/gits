@@ -6,6 +6,11 @@
   "scripts": {
     "start": "webpack --watch"
   },
+  "files": [
+    "static/bundles",
+    "templates",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Tolstoyevsky/gits.git"
