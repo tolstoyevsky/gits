@@ -16,6 +16,7 @@
 import array
 import html
 import re
+from os import path
 
 import yaml
 
@@ -53,7 +54,7 @@ class Terminal:
         self._buf = ''
         self._outbuf = ''
 
-        with open('linux_console.yml') as f:
+        with open(path.join(path.dirname(__file__), 'linux_console.yml')) as f:
             sequences = yaml.load(f.read())
 
         self.control_characters = sequences['control_characters']
