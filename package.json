@@ -8,13 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cusdeb/textual-mode.git"
+    "url": "https://github.com/Tolstoyevsky/gits.git"
   },
   "license": "Apache-2.0",
   "maintainers": [
     "Maxim Karpinskiy <karpinski20@gmail.com>"
   ],
-  "homepage": "https://bitbucket.org/cusdeb/textual-mode#readme",
+  "homepage": "https://github.com/Tolstoyevsky/gits",
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
