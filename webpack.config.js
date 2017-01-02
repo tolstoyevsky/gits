@@ -1,10 +1,11 @@
 const path = require('path');
+const webpack = require('webpack');
 const appModulesRoot = path.resolve(__dirname, 'static');
 const nodeModulesRoot = path.resolve(__dirname, 'node_modules');
 
-module.exports = {
+const config = {
     entry: {
-        main: './static/basic/index',
+        'main': './static/basic/index',
         'control-panel': './static/control-panel/index',
     },
 
@@ -56,5 +57,35 @@ module.exports = {
         extensions: ['.js'],
     },
 
-    devtool: 'source-map',
+    plugins: [],
 };
+
+if (process.env.NODE_ENV === 'production') {
+    config.plugins.push(
+        new webpack.optimize.UglifyJsPlugin({
+            minimize: true,
+            sourceMap: false,
+            output: {
+                comments: false
+            },
+            compress: {
+                warnings: false,
+                drop_console: true,
+                unsafe: true,
+                dead_code: true,
+                drop_debugger: true,
+                conditionals: true,
+                loops: true,
+                unused: true,
+                hoist_funs: true,
+                hoist_vars: true,
+                if_return: true,
+                join_vars: true,
+            },
+        })
+    );
+} else {
+    config.devtool = "#source-map";
+}
+
+module.exports = config;
