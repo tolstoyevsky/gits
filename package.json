@@ -1,20 +1,25 @@
 {
-  "name": "textual-mode",
-  "version": "1.0.0",
-  "description": "",
+  "name": "gits-client",
+  "version": "0.1.0",
+  "description": "Gits is a web-based terminal emulator. Gits consists of two parts: a client and a server. Note that the package provides the client.",
   "main": "static/index.js",
   "scripts": {
     "start": "webpack --watch"
   },
+  "files": [
+    "static/bundles",
+    "templates",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/cusdeb/textual-mode.git"
+    "url": "https://github.com/Tolstoyevsky/gits.git"
   },
   "license": "Apache-2.0",
   "maintainers": [
     "Maxim Karpinskiy <karpinski20@gmail.com>"
   ],
-  "homepage": "https://bitbucket.org/cusdeb/textual-mode#readme",
+  "homepage": "https://github.com/Tolstoyevsky/gits",
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
