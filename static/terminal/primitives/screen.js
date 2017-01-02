@@ -65,4 +65,19 @@ export class Screen extends Events {
         this.$node.style.width = width + 'px';
         this.$node.style.height = height + 'px';
     }
+
+    requestFullScreen() {
+        return ($node => {
+            return (
+                $node.requestFullscreen ||
+                $node.webkitRequestFullscreen ||
+                $node.mozRequestFullScreen ||
+                function() {
+                    console.warn(
+                        'browser does not support requestFullscreen API'
+                    );
+                }
+            ).call($node);
+        })(this.$node);
+    }
 };
