@@ -29,6 +29,7 @@
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
     "style-loader": "^0.13.1",
+    "tv-webpack-svg-loader": "^1.0.0-alpha.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.0-rc.2"
   }

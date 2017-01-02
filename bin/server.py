@@ -43,6 +43,11 @@ class IndexHandler(tornado.web.RequestHandler):
         self.render('index.htm')
 
 
+class ControlPanelHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('control-panel.htm')
+
+
 class TermSocketHandler(WebSocketHandler):
     clients = {}
 
@@ -128,6 +133,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r'/', IndexHandler),
             (r'/termsocket', TermSocketHandler),
+            (r'/control-panel', ControlPanelHandler),
         ]
         settings = dict(
             template_path=options.templates_path,

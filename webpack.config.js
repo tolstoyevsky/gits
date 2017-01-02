@@ -4,7 +4,8 @@ const nodeModulesRoot = path.resolve(__dirname, 'node_modules');
 
 module.exports = {
     entry: {
-        main: './static/index',
+        main: './static/basic/index',
+        'control-panel': './static/control-panel/index',
     },
 
     output: {
@@ -40,11 +41,13 @@ module.exports = {
             },
             {
                 // fonts
-                test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
-                use: [
-                    'url-loader?name=[name]-[hash].[ext]'
-                ],
+                test: /\.(eot|woff|woff2|ttf|png|jpg)$/,
+                use: ['url-loader'],
             },
+            {
+                test: /\.svg$/,
+                use: ['tv-webpack-svg-loader'],
+            }
         ]
     },
 
