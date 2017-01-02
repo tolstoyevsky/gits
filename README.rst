@@ -13,6 +13,11 @@ Documentation
 Documentation and links to additional resources are available at
 http://gits.readthedocs.io/en/latest/
 
+Authors
+-------
+
+See `AUTHORS <AUTHORS.rst>`_.
+
 Licensing
 ---------
 
