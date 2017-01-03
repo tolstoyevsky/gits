@@ -1,0 +1,2 @@
+Gits is written and maintained by Evgeny Golyshev, Maxim Karpinskiy and
+Dmitriy Shilin.
