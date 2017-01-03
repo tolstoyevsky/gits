@@ -492,7 +492,7 @@ class TestEmulator(unittest.TestCase):
 
         term._cap_cub1()
 
-        if cur_x == 0:
+        if cur_x <= 1:
             self.assertEqual(term._right_most, term._cur_x)
             
             if cur_y == 0:
@@ -514,11 +514,14 @@ class TestEmulator(unittest.TestCase):
         # Cursor at the left-most.
         self._check_cap_cub1((0, 1))
 
+        # Cursor at the first position.
+        self._check_cap_cub1((1, 0))
+
         # Cursor at the right-most position.
         self._check_cap_cub1((self._terminal._right_most, 0))
 
         # Set cursor's `x` position to random.
-        rand_x = random.randint(1, self._terminal._right_most - 1)
+        rand_x = random.randint(2, self._terminal._right_most - 1)
         self._check_cap_cub1((rand_x, 0))
 
     @unittest.skip('skip')
