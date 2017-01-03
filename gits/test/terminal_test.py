@@ -492,7 +492,7 @@ class TestEmulator(unittest.TestCase):
 
         term._cap_cub1()
 
-        if cur_x == 0:
+        if cur_x <= 1:
             self.assertEqual(term._right_most, term._cur_x)
             
             if cur_y == 0:
