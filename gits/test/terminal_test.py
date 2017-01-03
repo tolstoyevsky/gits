@@ -16,6 +16,7 @@
 
 import array
 import random
+import re
 import unittest
 
 from gits.terminal import Terminal, MAGIC_NUMBER
@@ -504,23 +505,20 @@ class TestEmulator(unittest.TestCase):
             self.assertEqual(cur_y, term._cur_y)
 
     def test_cap_cub1(self):
-        """The terminal should have the possibility to move cursor left by 1
-        position.
+        """The terminal should have the possibility to move the cursor left by
+        1 position.
         """
 
-        # Cursor at the left-most and top-most position.
+        # The cursor is set at the left-most and top-most position.
         self._check_cap_cub1((0, 0))
 
-        # Cursor at the left-most.
-        self._check_cap_cub1((0, 1))
-
-        # Cursor at the first position.
+        # The cursor is set at the first position.
         self._check_cap_cub1((1, 0))
 
-        # Cursor at the right-most position.
+        # The cursor is set at the right-most position.
         self._check_cap_cub1((self._terminal._right_most, 0))
 
-        # Set cursor's `x` position to random.
+        # The cursor is set at the random position.
         rand_x = random.randint(2, self._terminal._right_most - 1)
         self._check_cap_cub1((rand_x, 0))
 
@@ -1089,9 +1087,53 @@ class TestEmulator(unittest.TestCase):
     def test_cap_ech(self):
         pass
 
-    @unittest.skip('skip')
+    def _check_cap_cup(self, pos):
+        """A helper method that checks `_cap` method.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        """
+
+        x, y = pos
+        term = self._terminal
+
+        mo = re.search('(\d+) (\d+)', '{1} {0}'.format(x, y))
+        term._cap_cup(mo)
+
+        if x == 0:
+            self.assertEqual(x, term._cur_x)
+        else:
+            self.assertEqual(x - 1, term._cur_x)
+
+        if y == 0:
+            self.assertEqual(y, term._cur_y)
+        else:
+            self.assertEqual(y - 1, term._cur_y)
+
+        # Check reaching the end of the line.
+        if term._cur_x == term._right_most:
+            self.assertTrue(term._eol)
+        else:
+            self.assertFalse(term._eol)
+
+        # Restore terminal to the sane mode.
+        term._cap_rs1()
+
     def test_cap_cup(self):
-        pass
+        """The terminal should have the possibility to set vertical and
+        horizontal positions of the cursor.
+        """
+
+        term = self._terminal
+
+        # Cursor at the left-most position.
+        self._check_cap_cup((0, 0))
+
+        # Cursor at the random position.
+        rand_x = random.randint(1, term._right_most - 1)
+        rand_y = random.randint(1, term._bottom_most - 1)
+        self._check_cap_cup((rand_x, rand_y))
+
+        # Cursor at the right-most position.
+        self._check_cap_cup((term._cols, term._rows))
 
     @unittest.skip('skip')
     def test_exec_escape_sequence(self):

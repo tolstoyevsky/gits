@@ -297,12 +297,22 @@ class Terminal:
             self._cursor_right()
 
     def _cap_cup(self, mo):
-        """Move to row #1 col #2 """
-        p1 = int(mo.group(1))
-        p2 = int(mo.group(2))
-        self._cur_x = min(self._cols, p2) - 1
-        self._cur_y = min(self._rows, p1) - 1
-        self._eol = False
+        """Sets the vertical and horizontal positions specified by `mo` value.
+        The `mo` paramater has 1-based indexing, need to have 0-based indexing.
+        """
+
+        p1 = int(mo.group(1)) - 1
+        if p1 < 0:
+            p1 = 0
+        self._cur_y = min(self._bottom_most, p1)
+
+        p2 = int(mo.group(2)) - 1
+
+        if p2 < 0:
+            p2 = 0
+        self._cur_x = min(self._right_most, p2)
+
+        self._eol = True if self._cur_x == self._right_most else False
 
     def _cap_cvvis(self):
         """Make the cursor visible. See _cap_civis. """
