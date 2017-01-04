@@ -419,9 +419,12 @@ class Terminal:
 
     def _cap_kb2(self, l=None):
         """Handles a Center key-press on keypad. """
-        if l is None:
-            l = [1]
-        self._cur_x = min(self._cols, l[0]) - 1
+
+        # xterm and Linux console have the kb2 capability, but screen doesn't.
+        # Some terminal emulators even handle it in spite of the seeming
+        # uselessness of the capability.
+        # It's been decided to have a do-nothing handler for kb2.
+        pass
 
     def _cap_kcub1(self, l=None):
         """Handles a Left Arrow key-press. """

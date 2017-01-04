@@ -857,42 +857,6 @@ class TestEmulator(unittest.TestCase):
         rand_x = random.randint(1, term._right_most - 1)
         self._check_cap_kcub1((rand_x, 0), want_cur_x=rand_x - 1)
 
-    def _check_cap_kb2(self, pos):
-        """A helper method that checks `_cap_kb2` method.
-
-        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        """
-
-        term = self._terminal
-        term._cur_x, term._cur_y = pos
-        term._cap_kb2()
-        self.assertEqual(0, term._cur_x)
-
-        # TODO: rework after `cap_kb` fix.
-        # self.assertFalse(term._eol)
-
-        # Restore terminal to the sane mode.
-        term._cap_rs1()
-
-    def test_cap_kb2(self):
-        """The terminal should have the possibility to set cursor at the
-        beginning of the line.
-        """
-
-        term = self._terminal
-
-        # Terminal's `cur_x` is on the left-most position.
-        self._check_cap_kb2((0, 0))
-
-        # Terminal's `cur_x` is on the right-most position and end of the line
-        # was reached.
-        term._eol = True
-        self._check_cap_kb2((term._right_most, 0))
-
-        # Terminal's `cur_x` is on the random position.
-        rand_x = random.randint(1, term._right_most - 1)
-        self._check_cap_kb2((rand_x, 0))
-
     def _check_cap_home(self, pos):
         """A helper method that checks `cap_home` capability.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
