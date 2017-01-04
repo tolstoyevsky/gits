@@ -366,12 +366,14 @@ class Terminal:
         self._zero((self._cur_x, self._cur_y), (self._cols, self._rows - 1))
 
     def _cap_el(self, l=None):
-        """Clears a line from the cursor position to the end of the line. """
+        """Clears a line from the current cursor position to the end of the
+        line without moving the cursor. See _cap_el1.
+        """
         self._zero((self._cur_x, self._cur_y), (self._cols, self._cur_y))
 
     def _cap_el1(self, l=None):
-        """Clears a line from the beginning of the line to the current cursor
-        position.
+        """Clears a line from the beginning to the current cursor position,
+        inclusive. The cursor is not moved. See _cap_el.
         """
         self._zero((0, self._cur_y), (self._cur_x, self._cur_y),
                    inclusively=True)
