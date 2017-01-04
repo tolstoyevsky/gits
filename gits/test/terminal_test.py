@@ -1071,6 +1071,34 @@ class TestEmulator(unittest.TestCase):
         """The terminal should have the possibility to delete a character. """
         pass
 
+    def _check_cap_hpa(self, mo):
+        """A helper method that checks `hpa` capability. """
+
+        term = self._terminal
+
+        term._cap_hpa(mo)
+
+        x = int(mo.group(1))
+        self.assertEqual(x - 1, term._cur_x)
+
+        if x == self._terminal._cols:
+            self.assertTrue(self._terminal._eol)
+        else:
+            self.assertFalse(self._terminal._eol)
+
+    def test_cap_hpa(self):
+        """The terminal should have the possibility to set the horizontal
+        position to the specified value.
+        """
+
+        term = self._terminal
+
+        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(1)))
+        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(term._cols)))
+
+        rand_x = random.randint(2, term._cols - 1)
+        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(rand_x)))
+
     def _check_cap_vpa(self, mo=None):
         """A helper method that checks the `vpa` capability. """
 
