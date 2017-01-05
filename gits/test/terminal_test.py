@@ -1071,9 +1071,25 @@ class TestEmulator(unittest.TestCase):
         """The terminal should have the possibility to delete a character. """
         pass
 
-    @unittest.skip('skip')
+    def _check_cap_vpa(self, mo=None):
+        """A helper method that checks the `vpa` capability. """
+
+        self._terminal._cap_vpa(mo)
+        y = int(mo.group(1))
+        self.assertEqual(y - 1, self._terminal._cur_y)
+
     def test_cap_vpa(self):
-        pass
+        """The terminal should have the possibility to set the vertical
+        position of the cursor to the specified value.
+        """
+
+        term = self._terminal
+
+        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(1)))
+        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(term._rows)))
+
+        rand_y = random.randint(1, term._rows - 1)
+        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(rand_y)))
 
     @unittest.skip('skip')
     def test_cap_dch(self):
