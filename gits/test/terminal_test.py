@@ -930,8 +930,8 @@ class TestEmulator(unittest.TestCase):
         term._cap_rs1()
 
     def test_cap_el(self):
-        """The emulator should have the possibility to clear the screen from
-        the current cursor position to the end of line.
+        """The emulator should have the possibility to clear a line from the
+        current cursor position to the end of the line.
         """
 
         term = self._terminal
@@ -970,8 +970,8 @@ class TestEmulator(unittest.TestCase):
         term._cap_rs1()
         
     def test_cap_el1(self):
-        """The emulator should have the possibility to clear the screen from the
-        beginning of the line to current cursor position.
+        """The emulator should have the possibility to clear a line from the
+        beginning to the current cursor position.
         """
 
         term = self._terminal
