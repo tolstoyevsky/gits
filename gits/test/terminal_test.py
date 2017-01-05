@@ -582,24 +582,24 @@ class TestEmulator(unittest.TestCase):
         pass
 
     def test_cap_ri(self):
-        """The terminal should scroll down by 1 position when terminal's `top`
-        was chosen as maximum between terminal's `top` and terminal's `cur_y`.
-        """
-        
-        # Cursor at left-most position, `top` and `cur_y` equal 0.
-        s = ['a'] * self._terminal._right_most
+        """The terminal should have the possibility to scroll text down. """
+
+        term = self._terminal
+
+        # Fill the first line with x.
+        s = ['x'] * term._cols
         self._put_string(s, (0, 0))
-        self._terminal._cap_ri()
+        term._cap_ri()
         self._check_string(s, (0, 1), (len(s), 1))
 
-        # Reset the terminal to the sane mode.
-        self._terminal._cap_rs1()
+        # Reset the terminal to sane modes.
+        term._cap_rs1()
 
-        # Put `cur_y` at random position.
-        rand_y = random.randint(1, self._terminal._bottom_most)
-        self._terminal._cur_y = rand_y
-        self._terminal._cap_ri()
-        self.assertEqual(rand_y - 1, self._terminal._cur_y)
+        # Put the y position of the cursor at an arbitrary position.
+        rand_y = random.randint(1, term._bottom_most)
+        term._cur_y = rand_y
+        term._cap_ri()
+        self.assertEqual(rand_y - 1, term._cur_y)
 
     @unittest.skip('skip')
     def test_cap_set_colour_pair(self):
