@@ -1099,9 +1099,44 @@ class TestEmulator(unittest.TestCase):
     def test_cap_csr(self):
         pass
 
-    @unittest.skip('skip')
+    def _check_cap_ech(self, pos, s, mo=None):
+        """A helper method that checks the `ech` capability.
+
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
+        The ``s`` argument is a test string that will be put on the screen.
+        """
+
+        term = self._terminal
+        cur_x, cur_y = pos
+
+        self._put_string(s, pos)
+        term._cur_x, term._cur_y = pos
+
+        term._cap_ech(mo)
+
+        count = int(mo.group(1))
+        clear_area = array.array('L', [MAGIC_NUMBER] * count)
+        self.assertEqual(clear_area, term._peek(pos, (cur_x + count, cur_y)))
+
     def test_cap_ech(self):
-        pass
+        """The terminal should have the possibility to erase a specified
+        number of characters.
+        """
+
+        term = self._terminal
+
+        # Delete zero number of characters.
+        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+                            re.search('(\d+)', '{0}'.format(0)))
+
+        # Delete the whole line.
+        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+                            re.search('(\d+)', '{0}'.format(term._right_most)))
+
+        # Delete the random number of characters.
+        rand_x = random.randint(1, term._right_most - 1)
+        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+                            re.search('(\d+)', '{0}'.format(rand_x)))
 
     def _check_cap_cup(self, pos):
         """A helper method that checks `_cap` method.
