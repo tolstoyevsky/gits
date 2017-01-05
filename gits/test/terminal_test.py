@@ -414,6 +414,16 @@ class TestEmulator(unittest.TestCase):
         zeros.append(MAGIC_NUMBER)
         self.assertEqual(zeros, got)
 
+    def _check_poke(self, pos, s):
+        """A helper method that checks `_poke` method. """
+
+        term = self._terminal
+        x, y = pos
+
+        term._poke(pos, s)
+        got = term._peek((x, y), (x + len(s), y))
+        self.assertEqual(s, got)
+
     def test_poke(self):
         """The terminal should have the possibility of putting the specified
         string on the screen staring at the specified position.
@@ -421,16 +431,16 @@ class TestEmulator(unittest.TestCase):
 
         term = self._terminal
 
-        start = 3
-        end = 7
-        zeros = array.array('L', [0] * (end - start))
+        # Poke to the first line.
+        zeros = array.array('L', [0] * term._right_most)
+        self._check_test_poke((0, 0), zeros)
 
-        # The last '0' will be on the 6th position.
-        term._poke((start, 0), zeros)
+        # Poke to the random line.
+        rand_y = random.randint(1, term._bottom_most - 1)
+        # self._check_test_poke((0, rand_y), ['s'] * term._right_most)
 
-        # Get an area from the 3rd to the 6th character.
-        got = term._peek((start, 0), (end, 0))
-        self.assertEqual(zeros, got)
+        # Poke to the last line.
+        # self._check_test_poke((0, term._bottom_most), ['s'] * term._right_most)
 
     def test_cap_ed(self):
         """The terminal should have the possibility of clearing the screen from
