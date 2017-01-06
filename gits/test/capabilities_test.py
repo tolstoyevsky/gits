@@ -36,7 +36,7 @@ class TestCapabilities(Helper):
         self._check_cursor_down(rand_y)
 
         # The cursor is at the down-most position.
-        self._check_cursor_down(self._terminal._right_most, top=True)
+        self._check_cursor_down(self._terminal._bottom_most, top=True)
 
     def test_cursor_right(self):
         """The terminal should have the possibility to move the cursor right by
