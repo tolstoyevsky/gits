@@ -179,14 +179,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # Peek the first line.
-        self._check_test_peek(['s'] * term._right_most, (0, 0))
+        self._check_peek(['s'] * term._right_most, (0, 0))
 
         # Peek an arbitrary line.
         rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_test_peek(['s'] * term._right_most, (0, rand_y))
+        self._check_peek(['s'] * term._right_most, (0, rand_y))
 
         # Peek the last line.
-        self._check_test_peek(['s'] * term._right_most, (0, term._bottom_most))
+        self._check_peek(['s'] * term._right_most, (0, term._bottom_most))
 
     def test_peek_inclusively(self):
         """The terminal should have the possibility to capture the area of the

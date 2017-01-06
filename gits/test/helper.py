@@ -232,7 +232,7 @@ class Helper(unittest.TestCase):
         # Reset the terminal to sane modes.
         term._cap_rs1()
 
-    def _check_test_peek(self, s, pos):
+    def _check_peek(self, s, pos):
         """A helper that checks the `_peek` method.
 
         The ``s`` argument is a test string to be put on the screen.
