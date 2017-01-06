@@ -581,25 +581,49 @@ class TestEmulator(unittest.TestCase):
         # ATTN: need a decription.
         pass
 
-    def test_cap_ri(self):
-        """The terminal should scroll down by 1 position when terminal's `top`
-        was chosen as maximum between terminal's `top` and terminal's `cur_y`.
+    def _check_cap_ri(self, s, pos):
+        """A helper that checks the `_cap_ri` method.
+
+        The ``s`` argument is the string to be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
+        of the location where you want to place the string.
         """
-        
-        # Cursor at left-most position, `top` and `cur_y` equal 0.
-        s = ['a'] * self._terminal._right_most
-        self._put_string(s, (0, 0))
-        self._terminal._cap_ri()
-        self._check_string(s, (0, 1), (len(s), 1))
 
-        # Reset the terminal to the sane mode.
-        self._terminal._cap_rs1()
+        term = self._terminal
+        x, y = pos
 
-        # Put `cur_y` at random position.
-        rand_y = random.randint(1, self._terminal._bottom_most)
-        self._terminal._cur_y = rand_y
-        self._terminal._cap_ri()
-        self.assertEqual(rand_y - 1, self._terminal._cur_y)
+        self._put_string(s, pos)
+        term._cur_x, term._cur_y = pos
+
+        term._cap_ri()
+
+        if y == 0:
+            self.assertEqual(y, term._cur_y)
+            self._check_string(s, (x, y + 1), (x + len(s), y + 1))
+        elif y == 1:
+            self.assertEqual(y - 1, term._cur_y)
+            self._check_string(s, (x, y + 1), (x + len(s), y + 1))
+        else:
+            self.assertEqual(y - 1, term._cur_y)
+            self._check_string(s, (x, y), (x + len(s), y))
+
+        # Reset the terminal to sane modes.
+        term._cap_rs1()
+
+    def test_cap_ri(self):
+        """The terminal should have the possibility to scroll text down. """
+
+        term = self._terminal
+
+        # Put the text on the first line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 0))
+
+        # Put the text on the second line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 1))
+
+        # Put the text on an arbitrary line.
+        rand_y = random.randint(2, term._bottom_most)
+        self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
     @unittest.skip('skip')
     def test_cap_set_colour_pair(self):
