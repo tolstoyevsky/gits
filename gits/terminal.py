@@ -94,7 +94,8 @@ class Terminal:
     # Internal methods.
     #
     def _peek(self, left_border, right_border, inclusively=False):
-        """Captures and returns a rectangular region of the screen.
+        """Captures and returns a rectangular region of the screen between
+        ``left_border`` and ``right_border``.
 
         The ``left_border`` and ``right_border`` arguments must be tuples or
         lists of coordinates ``(x1, y1)`` and ``(x2, y2)``, respectively.
@@ -109,8 +110,8 @@ class Terminal:
         return self._screen[begin:end]
 
     def _poke(self, pos, s):
-        """Puts the specified string ``s`` on the screen staring at the
-        specified position ``pos``.
+        """Puts the specified slice ``s`` on the screen staring at the position
+        ``pos``.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``.
 
@@ -298,7 +299,7 @@ class Terminal:
 
     def _cap_cup(self, mo):
         """Sets the vertical and horizontal positions specified by `mo` value.
-        The `mo` paramater has 1-based indexing, need to have 0-based indexing.
+        The `mo` parameter has 1-based indexing, need to have 0-based indexing.
         """
 
         p1 = int(mo.group(1)) - 1
@@ -387,6 +388,7 @@ class Terminal:
         self._eol = False
 
     def _cap_ht(self):
+        """Tabs to the next 8-space hardware tab stop. """
         x = self._cur_x + 8
         q, r = divmod(x, 8)
         self._cur_x = (q * 8) % self._cols
@@ -442,12 +444,15 @@ class Terminal:
         self._cap_cuf(p1=1)
 
     def _cap_kcuu1(self, l=None):
-        """Handles a Up Arrow key-press. """
+        """Handles an Up Arrow key-press. """
         if l is None:
             l = [1]
         self._cur_y = max(self._top_most, self._cur_y - l[0])
 
     def _cap_op(self, mo=None, p1=''):
+        """Sets default color-pair to the original one. The name of the
+        capability stands for 'original pair'.
+        """
         self._cap_set_color_pair(p1=39, p2=49)
 
     def _cap_rc(self, s=''):
