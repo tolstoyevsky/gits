@@ -334,7 +334,6 @@ class Helper(unittest.TestCase):
         # Restore the terminal to sane modes.
         term._cap_rs1()
 
-    @unittest.skip('skip')
     def _check_cap_dl1(self, s, pos):
         """A helper that checks the `_cap_dl1` method.
 

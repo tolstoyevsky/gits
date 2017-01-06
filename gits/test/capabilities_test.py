@@ -315,6 +315,7 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to delete a character. """
         pass
 
+    @unittest.skip('skip')
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
 
