@@ -232,7 +232,7 @@ class Helper(unittest.TestCase):
         # Reset the terminal to sane modes.
         term._cap_rs1()
 
-    def _check_test_peek(self, pos, s):
+    def _check_test_peek(self, s, pos):
         """A helper that checks the `_peek` method.
 
         The ``s`` argument is a test string to be put on the screen.
@@ -249,7 +249,7 @@ class Helper(unittest.TestCase):
         # Reset the terminal to sane modes.
         term._cap_rs1()
 
-    def _check_poke(self, pos, s):
+    def _check_poke(self, s, pos):
         """A helper that checks the `_poke` method.
 
         The ``s`` argument is a test slice to be put on the screen.
@@ -335,7 +335,7 @@ class Helper(unittest.TestCase):
         term._cap_rs1()
 
     @unittest.skip('skip')
-    def _check_cap_dl1(self, pos, s):
+    def _check_cap_dl1(self, s, pos):
         """A helper that checks the `_cap_dl1` method.
 
         The ``s`` argument is a test string to be put on the screen.
@@ -367,7 +367,7 @@ class Helper(unittest.TestCase):
         # Restore the terminal to the sane modes.
         term._cap_rs1()
 
-    def _check_cap_ech(self, pos, s, mo=None):
+    def _check_cap_ech(self, s, pos, mo=None):
         """A helper that checks the `_cap_ech` method.
 
         The ``s`` argument is a test string to be put on the screen.
@@ -387,7 +387,7 @@ class Helper(unittest.TestCase):
         clear_area = array.array('L', [MAGIC_NUMBER] * count)
         self.assertEqual(clear_area, term._peek(pos, (cur_x + count, cur_y)))
 
-    def _check_cap_el(self, pos, s):
+    def _check_cap_el(self, s, pos):
         """A helper that checks the `_cap_el` method.
 
         The ``s`` argument is a test string to be put on the screen.
@@ -412,7 +412,7 @@ class Helper(unittest.TestCase):
         # Restore the terminal to the sane modes.
         term._cap_rs1()
 
-    def _check_cap_el1(self, pos, s):
+    def _check_cap_el1(self, s, pos):
         """A helper that checks the `_cap_el1` method.
 
         The ``s`` argument is a test string to be put on the screen.
@@ -469,7 +469,7 @@ class Helper(unittest.TestCase):
         else:
             self.assertFalse(self._terminal._eol)
 
-    def _check_cap_il1(self, pos, s):
+    def _check_cap_il1(self, s, pos):
         """A helper that checks the `_cap_il1` method.
 
         The ``s`` argument is a test string to be put on the screen.

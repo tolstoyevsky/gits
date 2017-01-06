@@ -179,14 +179,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # Peek the first line.
-        self._check_test_peek((0, 0), ['s'] * term._right_most)
+        self._check_test_peek(['s'] * term._right_most, (0, 0))
 
         # Peek an arbitrary line.
         rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_test_peek((0, rand_y), ['s'] * term._right_most)
+        self._check_test_peek(['s'] * term._right_most, (0, rand_y))
 
         # Peek the last line.
-        self._check_test_peek((0, term._bottom_most), ['s'] * term._right_most)
+        self._check_test_peek(['s'] * term._right_most, (0, term._bottom_most))
 
     def test_peek_inclusively(self):
         """The terminal should have the possibility to capture the area of the
@@ -221,14 +221,14 @@ class TestCapabilities(Helper):
 
         # Poke to the first line.
         zeros = array.array('L', [0] * term._right_most)
-        self._check_poke((0, 0), zeros)
+        self._check_poke(zeros, (0, 0))
 
         # Poke to the random line.
         rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_poke((0, rand_y), zeros)
+        self._check_poke(zeros, (0, rand_y))
 
         # Poke to the last line.
-        self._check_poke((0, term._bottom_most), zeros)
+        self._check_poke(zeros, (0, term._bottom_most))
 
     @unittest.skip('skip')
     def test_esc_da(self):
@@ -321,14 +321,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # The y position of the cursor is on the first line.
-        self._check_cap_dl1((0, 1), ['s'] * term._right_most)
+        self._check_cap_dl1(['s'] * term._right_most, (0, 1))
 
         # The y position of the cursor is on the last line.
-        self._check_cap_dl1((0, term._bottom_most), ['s'] * term._right_most)
+        self._check_cap_dl1(['s'] * term._right_most, (0, term._bottom_most))
 
         # The y position of the cursor is on an arbitrary line.
         rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_cap_dl1((0, rand_y), ['s'] * term._right_most)
+        self._check_cap_dl1(['s'] * term._right_most, (0, rand_y))
 
     def test_cap_ech(self):
         """The terminal should have the possibility to erase the specified
@@ -338,16 +338,16 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # Do not delete anything.
-        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+        self._check_cap_ech(['a'] * term._right_most, (0, 0),
                             re.search('(\d+)', '{0}'.format(0)))
 
         # Delete the whole line.
-        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+        self._check_cap_ech(['a'] * term._right_most, (0, 0),
                             re.search('(\d+)', '{0}'.format(term._right_most)))
 
         # Delete an arbitrary number of characters.
         rand_x = random.randint(1, term._right_most - 1)
-        self._check_cap_ech((0, 0), ['a'] * term._right_most,
+        self._check_cap_ech(['a'] * term._right_most, (0, 0),
                             re.search('(\d+)', '{0}'.format(rand_x)))
 
     def test_cap_ed(self):
@@ -390,14 +390,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
-        self._check_cap_el((0, 0), ['s'] * term._right_most)
+        self._check_cap_el(['s'] * term._right_most, (0, 0))
 
         # The x position of the cursor is at the right-most position.
-        self._check_cap_el((term._right_most, 0), ['s'] * term._right_most)
+        self._check_cap_el(['s'] * term._right_most, (term._right_most, 0))
 
         # The x position of the cursor is at an arbitrary position.
         rand_x = random.randint(1, term._right_most - 1)
-        self._check_cap_el((rand_x, 0), ['s'] * term._right_most)
+        self._check_cap_el(['s'] * term._right_most, (rand_x, 0))
 
     def test_cap_el1(self):
         """The terminal should have the possibility to clear a line from the
@@ -407,14 +407,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
-        self._check_cap_el1((0, 0), ['s'] * term._right_most)
+        self._check_cap_el1(['s'] * term._right_most, (0, 0))
 
         # The x position of the cursor is at the right-most position.
-        self._check_cap_el1((term._right_most, 0), ['s'] * term._right_most)
+        self._check_cap_el1(['s'] * term._right_most, (term._right_most, 0))
 
         # The x position of the cursor is at an arbitrary position.
         rand_x = random.randint(1, term._right_most - 1)
-        self._check_cap_el1((rand_x, 0), ['s'] * term._right_most)
+        self._check_cap_el1(['s'] * term._right_most, (rand_x, 0))
 
     def test_cap_home(self):
         """The terminal should have the possibility to move the cursor to the
@@ -482,14 +482,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # The y position of the cursor is on the first line.
-        self._check_cap_il1((0, 0), ['s'] * term._right_most)
+        self._check_cap_il1(['s'] * term._right_most, (0, 0))
 
         # The y position of the cursor is on the last line.
-        self._check_cap_il1((0, term._bottom_most), ['s'] * term._right_most)
+        self._check_cap_il1(['s'] * term._right_most, (0, term._bottom_most))
 
         # The y position of the cursor is on an arbitrary line.
         rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_cap_il1((0, rand_y), ['s'] * term._right_most)
+        self._check_cap_il1(['s'] * term._right_most, (0, rand_y))
 
     def test_cap_ind(self):
         """The terminal should have the possibility to move the cursor down by
