@@ -581,25 +581,49 @@ class TestEmulator(unittest.TestCase):
         # ATTN: need a decription.
         pass
 
+    def _check_cap_ri(self, s, pos):
+        """A helper that checks the `_cap_ri` method.
+
+        The ``s`` argument is the string to be put on the screen.
+        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
+        of the location where you want to place the string.
+        """
+
+        term = self._terminal
+        x, y = pos
+
+        self._put_string(s, pos)
+        term._cur_x, term._cur_y = pos
+
+        term._cap_ri()
+
+        if y == 0:
+            self.assertEqual(y, term._cur_y)
+            self._check_string(s, (x, y + 1), (x + len(s), y + 1))
+        elif y == 1:
+            self.assertEqual(y - 1, term._cur_y)
+            self._check_string(s, (x, y + 1), (x + len(s), y + 1))
+        else:
+            self.assertEqual(y - 1, term._cur_y)
+            self._check_string(s, (x, y), (x + len(s), y))
+
+        # Reset the terminal to sane modes.
+        term._cap_rs1()
+
     def test_cap_ri(self):
         """The terminal should have the possibility to scroll text down. """
 
         term = self._terminal
 
-        # Fill the first line with x.
-        s = ['x'] * term._cols
-        self._put_string(s, (0, 0))
-        term._cap_ri()
-        self._check_string(s, (0, 1), (len(s), 1))
+        # Put the text on the first line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 0))
 
-        # Reset the terminal to sane modes.
-        term._cap_rs1()
+        # Put the text on the second line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 1))
 
-        # Put the y position of the cursor at an arbitrary position.
-        rand_y = random.randint(1, term._bottom_most)
-        term._cur_y = rand_y
-        term._cap_ri()
-        self.assertEqual(rand_y - 1, term._cur_y)
+        # Put the text on an arbitrary line.
+        rand_y = random.randint(2, term._bottom_most)
+        self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
     @unittest.skip('skip')
     def test_cap_set_colour_pair(self):
