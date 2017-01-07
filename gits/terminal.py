@@ -326,7 +326,7 @@ class Terminal:
     def _cap_dl(self, n):
         """Deletes ``n`` number of lines. """
         if self._top_most <= self._cur_y <= self._bottom_most:
-            for i in range(n):
+            for _ in range(n):
                 self._scroll_up(self._cur_y + 1, self._bottom_most)
 
     def _cap_dl1(self):
@@ -376,7 +376,7 @@ class Terminal:
 
     def _cap_il(self, n):
         """Adds ``n`` number of new blank lines. """
-        for i in range(n):
+        for _ in range(n):
             if self._cur_y < self._bottom_most:
                 self._scroll_down(self._cur_y, self._bottom_most)
 
