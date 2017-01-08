@@ -303,27 +303,21 @@ class Helper(unittest.TestCase):
             self.assertEqual(cur_y, term._cur_y)
 
     def _check_cap_cup(self, pos):
-        """A helper that checks the `_cup` method.
+        """A helper that checks the `_cap_cup` method.
 
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        of the initial position of the cursor.
+        you want the cursor to be set to via `_cap_cup`.
         """
 
         x, y = pos
+
         term = self._terminal
 
-        mo = re.search('(\d+) (\d+)', '{1} {0}'.format(x, y))
-        term._cap_cup(mo)
+        term._cap_cup(y, x)
 
-        if x == 0:
-            self.assertEqual(x, term._cur_x)
-        else:
-            self.assertEqual(x - 1, term._cur_x)
-
-        if y == 0:
-            self.assertEqual(y, term._cur_y)
-        else:
-            self.assertEqual(y - 1, term._cur_y)
+        # The y and x values start from 1.
+        self.assertEqual(x - 1, term._cur_x)
+        self.assertEqual(y - 1, term._cur_y)
 
         # Check reaching the end of the line.
         if term._cur_x == term._right_most:
@@ -339,7 +333,7 @@ class Helper(unittest.TestCase):
 
         The ``s`` argument is a test string to be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        of the initial position of the cursor.
+        of the location where you want the string to be.
         """
 
         cur_x, cur_y = pos
@@ -366,12 +360,14 @@ class Helper(unittest.TestCase):
         # Restore the terminal to the sane modes.
         term._cap_rs1()
 
-    def _check_cap_ech(self, s, pos, mo=None):
+    def _check_cap_ech(self, s, pos, n):
         """A helper that checks the `_cap_ech` method.
 
         The ``s`` argument is a test string to be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        of the initial position of the cursor.
+        of the location where you want the string to be.
+        The ``n`` argument is a number of characters you want to be erased via
+        `_cap_ech`.
         """
 
         term = self._terminal
@@ -380,11 +376,10 @@ class Helper(unittest.TestCase):
         self._put_string(s, pos)
         term._cur_x, term._cur_y = pos
 
-        term._cap_ech(mo)
+        term._cap_ech(n)
 
-        count = int(mo.group(1))
-        clear_area = array.array('L', [MAGIC_NUMBER] * count)
-        self.assertEqual(clear_area, term._peek(pos, (cur_x + count, cur_y)))
+        clear_area = array.array('L', [MAGIC_NUMBER] * n)
+        self.assertEqual(clear_area, term._peek(pos, (cur_x + n, cur_y)))
 
     def _check_cap_el(self, s, pos):
         """A helper that checks the `_cap_el` method.
@@ -453,14 +448,17 @@ class Helper(unittest.TestCase):
         # Restore the terminal to the sane modes.
         term._cap_rs1()
 
-    def _check_cap_hpa(self, mo):
-        """A helper that checks the `_cap_hpa` method. """
+    def _check_cap_hpa(self, x):
+        """A helper that checks the `_cap_hpa` method.
+
+        The ``x`` argument is the horizontal position you want the cursor to be
+        set to.
+        """
 
         term = self._terminal
 
-        term._cap_hpa(mo)
+        term._cap_hpa(x)
 
-        x = int(mo.group(1))
         self.assertEqual(x - 1, term._cur_x)
 
         if x == self._terminal._cols:
@@ -473,7 +471,7 @@ class Helper(unittest.TestCase):
 
         The ``s`` argument is a test string to be put on the screen.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        of the initial position of the cursor.
+        of the location where you want the string to be.
         """
 
         cur_x, cur_y = pos
@@ -573,9 +571,12 @@ class Helper(unittest.TestCase):
         # Reset the terminal to sane modes.
         term._cap_rs1()
 
-    def _check_cap_vpa(self, mo=None):
-        """A helper that checks the `_cap_vpa` method. """
+    def _check_cap_vpa(self, y):
+        """A helper that checks the `_cap_vpa` method.
 
-        self._terminal._cap_vpa(mo)
-        y = int(mo.group(1))
+        The ``y`` argument is the vertical position you want the cursor to be
+        set to.
+        """
+
+        self._terminal._cap_vpa(y)
         self.assertEqual(y - 1, self._terminal._cur_y)

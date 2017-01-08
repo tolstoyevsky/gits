@@ -276,13 +276,13 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # Move the cursor to the right-most position.
-        term._cap_cuf(p1=term._right_most)
+        term._cap_cuf(term._right_most)
         self.assertEqual(term._cur_x, term._right_most)
         self.assertFalse(term._eol)
 
         # Then move the cursor right by 1 position to check reaching the end of
         # the line.
-        term._cap_cuf(p1=1)
+        term._cap_cuf(1)
         self.assertTrue(term._eol)
 
     def test_cap_cup(self):
@@ -293,7 +293,8 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # The cursor is at the left-most position.
-        self._check_cap_cup((0, 0))
+        # Note that the y and x values start from 1.
+        self._check_cap_cup((1, 1))
 
         # The cursor is at an arbitrary position.
         rand_x = random.randint(1, term._right_most - 1)
@@ -339,17 +340,14 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         # Do not delete anything.
-        self._check_cap_ech(['a'] * term._right_most, (0, 0),
-                            re.search('(\d+)', '{0}'.format(0)))
+        self._check_cap_ech(['a'] * term._right_most, (0, 0), 0)
 
         # Delete the whole line.
-        self._check_cap_ech(['a'] * term._right_most, (0, 0),
-                            re.search('(\d+)', '{0}'.format(term._right_most)))
+        self._check_cap_ech(['a'] * term._right_most, (0, 0), term._right_most)
 
         # Delete an arbitrary number of characters.
         rand_x = random.randint(1, term._right_most - 1)
-        self._check_cap_ech(['a'] * term._right_most, (0, 0),
-                            re.search('(\d+)', '{0}'.format(rand_x)))
+        self._check_cap_ech(['a'] * term._right_most, (0, 0), rand_x)
 
     def test_cap_ed(self):
         """The terminal should have the possibility to clear the screen from
@@ -444,11 +442,11 @@ class TestCapabilities(Helper):
 
         term = self._terminal
 
-        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(1)))
-        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(term._cols)))
+        self._check_cap_hpa(1)
+        self._check_cap_hpa(term._cols)
 
         rand_x = random.randint(2, term._cols - 1)
-        self._check_cap_hpa(re.search('(\d+)', '{0}'.format(rand_x)))
+        self._check_cap_hpa(rand_x)
 
     @unittest.skip('skip')
     def test_cap_ht(self):
@@ -470,7 +468,7 @@ class TestCapabilities(Helper):
 
         n = random.randint(0, term._right_most)
         # Insert n blank characters at the beginning of the first line.
-        term._cap_ich(p1=n)
+        term._cap_ich(n)
 
         blank_characters = ['\x00'] * n
         want = blank_characters + ['x'] * (self._cols - n)
@@ -640,11 +638,11 @@ class TestCapabilities(Helper):
 
         term = self._terminal
 
-        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(1)))
-        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(term._rows)))
+        self._check_cap_vpa(1)
+        self._check_cap_vpa(term._rows)
 
         rand_y = random.randint(1, term._rows - 1)
-        self._check_cap_vpa(re.search('(\d+)', '{0}'.format(rand_y)))
+        self._check_cap_vpa(rand_y)
 
     @unittest.skip('skip')
     def test_cap_set_color_pair(self):
