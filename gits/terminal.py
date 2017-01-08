@@ -546,6 +546,9 @@ class Terminal:
         """
 
         p = int(mo.group(1)) - 1
+        if p < 0:
+            p = 0
+
         self._cur_x = min(self._right_most, p)
         self._eol = True if self._cur_x == self._right_most else False
 
