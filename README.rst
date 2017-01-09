@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/tolstoyevsky/gits.svg?branch=master
+    :target: https://travis-ci.org/tolstoyevsky/gits
+.. image:: https://badge.fury.io/py/gits.svg
+    :target: https://badge.fury.io/py/gits
+.. image:: https://badge.fury.io/js/gits-client.svg
+    :target: https://badge.fury.io/js/gits-client
 Gits
 ====
 
