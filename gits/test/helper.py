@@ -33,7 +33,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want to place the string.
         """
-
         self._terminal._cur_x, self._terminal._cur_y = pos
         for character in s:
             self._terminal._echo(character)
@@ -45,7 +44,6 @@ class Helper(unittest.TestCase):
         The ``left_border`` and ``right_border`` arguments must be tuples or
         lists of coordinates ``(x1, y1)`` and ``(x2, y2)``, respectively.
         """
-
         x1, y1 = left_border
         x2, y2 = right_border
 
@@ -64,7 +62,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the character to be.
         """
-
         term = self._terminal
         want = term._sgr | ord(c)
         got = term._screen[pos]
@@ -76,7 +73,6 @@ class Helper(unittest.TestCase):
         The ``cur_x`` argument is the x position of the cursor.
         The ``eol`` argument enables checking reaching the end of a line.
         """
-
         self._terminal._cur_x = cur_x
         self._terminal._cursor_right()
 
@@ -94,7 +90,6 @@ class Helper(unittest.TestCase):
         The ``top`` argument enables checking that the y position doesn't
         change when the cursor is at the top-most position.
         """
-
         self._terminal._cur_y = cur_y
         self._terminal._cursor_down()
 
@@ -111,7 +106,6 @@ class Helper(unittest.TestCase):
         of the location where you want the character to be.
         The ``eol`` argument enables checking reaching the end of a line.
         """
-
         term = self._terminal
         term._eol = False
 
@@ -143,7 +137,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         term = self._terminal
         cur_x, cur_y = pos
 
@@ -164,7 +157,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         x, y = pos
         term = self._terminal
 
@@ -210,7 +202,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         x, y = pos
         term = self._terminal
 
@@ -239,7 +230,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         x, y = pos
         term = self._terminal
 
@@ -256,7 +246,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the slice to be.
         """
-
         term = self._terminal
         x, y = pos
 
@@ -270,7 +259,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the initial position of the cursor.
         """
-
         term = self._terminal
         term._cur_x, term._cur_y = pos
 
@@ -284,7 +272,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the initial position of the cursor.
         """
-
         term = self._terminal
         cur_x, cur_y = pos
         term._cur_x, term._cur_y = pos
@@ -308,7 +295,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         you want the cursor to be set to via `_cap_cup`.
         """
-
         x, y = pos
 
         term = self._terminal
@@ -335,7 +321,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         cur_x, cur_y = pos
 
         self._put_string(s, pos)
@@ -369,7 +354,6 @@ class Helper(unittest.TestCase):
         The ``n`` argument is a number of characters you want to be erased via
         `_cap_ech`.
         """
-
         term = self._terminal
         cur_x, cur_y = pos
 
@@ -388,7 +372,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         cur_x, cur_y = pos
 
         self._put_string(s, pos)
@@ -413,7 +396,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         cur_x, cur_y = pos
 
         self._put_string(s, pos)
@@ -436,7 +418,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the initial position of the cursor.
         """
-
         term = self._terminal
         term._cur_x, term._cur_y = pos
         term._cap_home()
@@ -454,7 +435,6 @@ class Helper(unittest.TestCase):
         The ``x`` argument is the horizontal position you want the cursor to be
         set to.
         """
-
         term = self._terminal
 
         term._cap_hpa(x)
@@ -473,7 +453,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         cur_x, cur_y = pos
 
         self._put_string(s, pos)
@@ -506,7 +485,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the initial position of the cursor.
         """
-
         self._terminal._cur_x, self._terminal._cur_y = pos
         self._terminal._cap_kcub1()
         self.assertEqual(want_cur_x, self._terminal._cur_x)
@@ -520,7 +498,6 @@ class Helper(unittest.TestCase):
         The ``want_cur_y`` argument is an expected y position of the cursor
         after calling the `cap_kcud1` method.
         """
-
         self._terminal._cur_x, self._terminal._cur_y = pos
         self._terminal._cap_kcud1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
@@ -535,7 +512,6 @@ class Helper(unittest.TestCase):
         The ``want_cur_y`` argument is an expected y position of the cursor
         after calling the `cap_kcud1` method.
         """
-
         self._terminal._cur_x, self._terminal._cur_y = pos
         self._terminal._cap_kcuu1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
@@ -549,7 +525,6 @@ class Helper(unittest.TestCase):
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the location where you want the string to be.
         """
-
         term = self._terminal
         x, y = pos
 
@@ -577,6 +552,5 @@ class Helper(unittest.TestCase):
         The ``y`` argument is the vertical position you want the cursor to be
         set to.
         """
-
         self._terminal._cap_vpa(y)
         self.assertEqual(y - 1, self._terminal._cur_y)

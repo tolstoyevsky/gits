@@ -27,7 +27,6 @@ class TestCapabilities(Helper):
     def test_cursor_down(self):
         """The terminal should have the possibility to move the cursor down by
         1 position."""
-
         # The cursor is at the top-most position.
         self._check_cursor_down(0)
 
@@ -42,7 +41,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move the cursor right by
         1 position.
         """
-
         # The cursor is at the left-most position.
         self._check_cursor_right(0)
 
@@ -57,7 +55,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to put the specified
         character on the screen and move the cursor right by 1 position.
         """
-
         term = self._terminal
 
         # Echo the character on the screen (left-most position).
@@ -77,7 +74,6 @@ class TestCapabilities(Helper):
         next line when the current position of the cursor is at the end of a
         line.
         """
-
         term = self._terminal
 
         # Put the cursor to the right-most position - 1
@@ -102,7 +98,6 @@ class TestCapabilities(Helper):
         left border starting at position x1, y1 to a right border starting at
         position x2, y2.
         """
-
         term = self._terminal
 
         # Clear the first line.
@@ -124,7 +119,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move an area by
         1 line up.
         """
-
         term = self._terminal
 
         # Scroll up the first line.
@@ -140,7 +134,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move an area by
         1 line down.
         """
-
         term = self._terminal
 
         # Scroll down the first line.
@@ -158,7 +151,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move an area by
         1 position right.
         """
-
         term = self._terminal
 
         # Scroll right the string (begin at left-most position).
@@ -175,7 +167,6 @@ class TestCapabilities(Helper):
         screen from a left border starting at position x1, y1 to a right border
         starting at position x2, y2.
         """
-
         term = self._terminal
 
         # Peek the first line.
@@ -193,7 +184,6 @@ class TestCapabilities(Helper):
         screen from a left border starting at position x1, y1 to a right border
         starting at position x2, y2 inclusive.
         """
-
         term = self._terminal
 
         start = 3
@@ -216,7 +206,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to put the specified slice
         on the screen staring at the specified position.
         """
-
         term = self._terminal
 
         # Poke to the first line.
@@ -239,7 +228,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move the cursor left by
         1 position.
         """
-
         # The cursor is set at the left-most and top-most position.
         self._check_cap_cub1((0, 0))
 
@@ -255,7 +243,6 @@ class TestCapabilities(Helper):
 
     def test_cap_cr(self):
         """The terminal should have the possibility to do carriage return. """
-
         # The cursor is at the left-most position.
         self._check_cap_cr((0, 0))
 
@@ -289,7 +276,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to set the vertical and
         horizontal positions of the cursor to the specified values.
         """
-
         term = self._terminal
 
         # The cursor is at the left-most position.
@@ -319,7 +305,6 @@ class TestCapabilities(Helper):
     @unittest.skip('skip')
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
-
         term = self._terminal
 
         # The y position of the cursor is on the first line.
@@ -336,7 +321,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to erase the specified
         number of characters.
         """
-
         term = self._terminal
 
         # Do not delete anything.
@@ -353,7 +337,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to clear the screen from
         the current cursor position to the end of the screen.
         """
-
         term = self._terminal
 
         prompt = 'spam@ham:~$ '
@@ -385,7 +368,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to clear a line from the
         current cursor position to the end of the line.
         """
-
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
@@ -402,7 +384,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to clear a line from the
         beginning to the current cursor position.
         """
-
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
@@ -419,7 +400,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move the cursor to the
         home position.
         """
-
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
@@ -439,7 +419,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to set the horizontal
         position to the specified value.
         """
-
         term = self._terminal
 
         self._check_cap_hpa(1)
@@ -477,7 +456,6 @@ class TestCapabilities(Helper):
     def test_cap_il1(self):
         """The terminal should have the possibility to add a new blank line.
         """
-
         term = self._terminal
 
         # The y position of the cursor is on the first line.
@@ -494,7 +472,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to move the cursor down by
         1 position.
         """
-
         # The cursor is at the left-most position.
         self._terminal._cap_ind()
         self.assertEqual(1, self._terminal._cur_y)
@@ -503,7 +480,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to handle a Left Arrow
         key-press.
         """
-
         term = self._terminal
 
         # The x position of the cursor is at the left-most position.
@@ -521,7 +497,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to handle a Down Arrow
         key-press.
         """
-
         term = self._terminal
 
         # The y position of the cursor is at the top-most position.
@@ -539,7 +514,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to handle an Up Arrow
         key-press.
         """
-
         term = self._terminal
 
         # The y position of the cursor is at the top-most position.
@@ -554,7 +528,6 @@ class TestCapabilities(Helper):
 
     def test_cap_ri(self):
         """The terminal should have the possibility to scroll text down. """
-
         term = self._terminal
 
         # Put the text on the first line.
@@ -597,7 +570,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to completely reset to sane
         modes.
         """
-
         # Do some useless work.
         self._terminal._echo('a')
         self._terminal._cursor_right()
@@ -614,7 +586,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to save the current cursor
         position.
         """
-
         term = self._terminal
         x = random.randint(0, term._right_most)
         y = random.randint(0, term._bottom_most)
@@ -626,7 +597,6 @@ class TestCapabilities(Helper):
 
     def test_cap_smso(self):
         """The terminal should have the possibility to enter Standout mode. """
-
         self._terminal._sgr = None
         self._terminal._cap_smso()
         self.assertEqual(0x70000000, self._terminal._sgr)
@@ -635,7 +605,6 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to set the vertical
         position of the cursor to the specified value.
         """
-
         term = self._terminal
 
         self._check_cap_vpa(1)
@@ -703,7 +672,6 @@ class TestCapabilities(Helper):
     @unittest.skip('skip')
     def test_exec_escape_sequence(self):
         pass
-
 
 if __name__ == '__main__':
     unittest.main()

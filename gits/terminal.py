@@ -20,7 +20,6 @@ from os import path
 
 import yaml
 
-
 MAGIC_NUMBER = 0x07000000
 
 
@@ -156,7 +155,6 @@ class Terminal:
         """Moves a piece of a row specified by coordinates ``x`` and ``y``
         right by 1 position.
         """
-
         self._poke((x + 1, y), self._peek((x, y), (self._cols, y)))
         self._zero((x, y), (x, y), inclusively=True)
 
@@ -390,7 +388,6 @@ class Terminal:
 
     def _cap_kb2(self):
         """Handles a Center key-press on keypad. """
-
         # xterm and Linux console have the kb2 capability, but screen doesn't.
         # Some terminal emulators even handle it in spite of the seeming
         # uselessness of the capability.
