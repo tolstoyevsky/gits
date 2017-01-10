@@ -15,6 +15,7 @@
 
 import array
 import html
+import logging
 import re
 from os import path
 
@@ -49,6 +50,8 @@ class Terminal:
         self._right_most = None
 
         self._sgr = None  # Select Graphic Rendition
+
+        self._logger = logging.getLogger('tornado.application')
 
         self._buf = ''
         self._outbuf = ''
@@ -191,6 +194,26 @@ class Terminal:
         pos = self._cur_y * self._cols + self._cur_x
         self._screen[pos] = self._sgr | ord(c)
         self._cursor_right()
+
+    def _exec_method(self, name, args=None):
+        """Tries to find the specified method and, in case the try succeeds,
+        executes it.
+
+        The ``name`` argument is a name of the target method. First,
+        `_exec_method` tries to find _cap_``name``, then _``name``.
+        The ``args`` argument must be a list of arguments to be passed to the
+        target method.
+        """
+        if args is None:
+            args = []
+
+        method = (getattr(self, '_cap_' + name, None) or
+                  getattr(self, '_' + name, None))
+        if method:
+            method(*args)
+        else:
+            self._logger.fatal('The _cap{name} and _{name} methods do not '
+                               'exist'.format(name=name))
 
     def _cap_set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
@@ -521,19 +544,17 @@ class Terminal:
         if len(e) > 32:
             self._buf = ''
         elif method_name:  # static sequences
-            method = getattr(self, '_cap_' + method_name)
-            method()
+            self._exec_method(method_name)
             self._buf = ''
         else:  # sequences with params
             for k, v in self.new_sci_seq_re_compiled:
                 mo = k.match(e)
                 if mo:
-                    method = getattr(self, '_cap_' + v)
                     args = []
                     for i in mo.groups():
                         args.append(int(i))
 
-                    method(*args)
+                    self._exec_method(v, args)
                     e = ''
                     self._buf = ''
 
