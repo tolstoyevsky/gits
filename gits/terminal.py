@@ -219,6 +219,15 @@ class Terminal:
         """Allows ignoring some escape and control sequences. """
         pass
 
+    def _default_rendition(self):
+        """Cancels the effect of any preceding occurrence of SGR in the data
+        stream regardless of the setting of the GRAPHIC RENDITION COMBINATION
+        MODE (GRCM). For details, see section 8.3.117, "SGR - SELECT GRAPHIC
+        RENDITION," in ECMA-048 at
+        http://www.ecma-international.org/publications/standards/Ecma-048.htm.
+        """
+        self._cap_set_color(0)
+
     def _cap_set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
             self._sgr = MAGIC_NUMBER
@@ -530,9 +539,6 @@ class Terminal:
         """
         self._cur_x = min(self._right_most, x - 1)
         self._eol = True if self._cur_x == self._right_most else False
-
-    def _cap_noname(self):
-        self._cap_set_color(0)
 
     def _exec_escape_sequence(self):
         e = self._buf
