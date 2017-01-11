@@ -83,8 +83,8 @@ class Terminal:
 
         d = {
             r'\[\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])':
-                self._cap_ignore,
-            r'\]([^\x07]+)\x07': self._cap_ignore,
+                self._ignore,
+            r'\]([^\x07]+)\x07': self._ignore,
         }
 
         for k, v in list(d.items()):
@@ -215,6 +215,10 @@ class Terminal:
             self._logger.fatal('The _cap{name} and _{name} methods do not '
                                'exist'.format(name=name))
 
+    def _ignore(self):
+        """Allows ignoring some escape and control sequences. """
+        pass
+
     def _cap_set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
             self._sgr = MAGIC_NUMBER
@@ -255,9 +259,6 @@ class Terminal:
             self._sgr = (self._sgr & 0x0fffffff) | (c << 28)
         elif colour == 49:
             self._sgr = MAGIC_NUMBER
-
-    def _cap_ignore(self, *s):
-        pass
 
     def _cap_blink(self):
         """Produces blinking text. """
@@ -567,8 +568,7 @@ class Terminal:
 
     def _exec_single_character_command(self):
         method_name = self.control_characters[self._buf]
-        method = getattr(self, '_cap_' + method_name)
-        method()
+        self._exec_method(method_name)
         self._buf = ''
 
     #
