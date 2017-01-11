@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='gits',
-      version='0.1',
+      version='0.2',
       description='Gits package',
       long_description=('Gits is a web-based terminal emulator. Gits consists '
                         'of two parts: a client and a server. Note that the '
