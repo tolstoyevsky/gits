@@ -390,8 +390,8 @@ class Terminal:
 
     def _cap_home(self):
         """Moves the cursor to the home position. """
-        self._cur_x = min(self._cols, 1) - 1
-        self._cur_y = min(self._rows, 1) - 1
+        self._cur_x = 0
+        self._cur_y = 0
         self._eol = False
 
     def _cap_ht(self):
