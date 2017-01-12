@@ -1,11 +1,18 @@
 from setuptools import setup
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except ImportError:
+    long_description = ('Gits is a web-based terminal emulator. Gits consists '
+                        'of two parts: a client and a server. Note that the '
+                        'package provides the server.')
+
+
 setup(name='gits',
       version='0.2',
       description='Gits package',
-      long_description=('Gits is a web-based terminal emulator. Gits consists '
-                        'of two parts: a client and a server. Note that the '
-                        'package provides the server.'),
+      long_description=long_description,
       url='https://github.com/Tolstoyevsky/gits.git',
       maintainer='Evgeny Golyshev',
       maintainer_email='Evgeny Golyshev <eugulixes@gmail.com>',
