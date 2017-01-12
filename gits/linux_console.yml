@@ -30,9 +30,7 @@ escape_sequences:
   '\E[4h': 'smir'
   '\E[4l': 'rmir'
 
-  # There's no such sequence, however ls sends it
-  '\E[0m': 'noname'
-
+  '\E[0m': 'default_rendition'
   '\E[1m': 'bold'
   '\E[2m': 'dim'
   '\E[4m': 'smul'
