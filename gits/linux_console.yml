@@ -35,7 +35,10 @@ escape_sequences:
   '\E[2m': 'dim'
   '\E[4m': 'smul'
   '\E[5m': 'blink'
-  '\E[7m': 'smso_rev'
+
+  # \E[7m is represented by both rev and smso
+
+  '\E[7m': 'smso'
   '\E[10m': 'rmpch'
   '\E[11m': 'smpch'
   '\E[24m': 'rmul'
