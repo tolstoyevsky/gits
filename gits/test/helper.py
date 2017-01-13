@@ -503,7 +503,10 @@ class Helper(unittest.TestCase):
         term._cap_kcub1()
 
         self.assertFalse(term._eol)
-        self.assertEqual(x - 1, term._cur_x)
+        if x == 0:
+            self.assertEqual(0, term._cur_x)
+        else:
+            self.assertEqual(x - 1, term._cur_x)
 
     @reset_after_executing
     def _check_cap_kcud1(self, pos, want_cur_y):

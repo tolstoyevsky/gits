@@ -492,6 +492,8 @@ class TestCapabilities(Helper):
         """
         term = self._terminal
 
+        self._check_cap_kcub1((0, 0))
+
         # The x position of the cursor is at the left-most position.
         self._check_cap_kcub1((1, 0))
 
