@@ -252,9 +252,19 @@ class TestCapabilities(Helper):
         # The cursor is at an arbitrary position.
         self._check_cap_cr((random.randint(1, self._terminal._right_most), 0))
 
-    @unittest.skip('skip')
     def test_cap_csr(self):
-        pass
+        """ The terminal should have the possibility to change the scrolling
+        region.
+        """
+        self._check_cap_csr((1, 1))
+        self._check_cap_csr((1, 2))
+        self._check_cap_csr((2, 1))
+
+        rand_top = random.randint(2, self._rows - 1)
+        rand_bottom = random.randint(2, self._rows - 1)
+        self._check_cap_csr((rand_top, rand_bottom))
+
+        self._check_cap_csr((self._rows, self._rows))
 
     def test_cap_cuf(self):
         """The terminal should have the possibility to move the cursor right by

@@ -295,8 +295,10 @@ class Terminal:
 
         The ``top`` and ``bottom`` values start from 1.
         """
-        self._top_most = min(self._rows - 1, top - 1)
-        self._bottom_most = min(self._rows - 1, bottom - 1)
+        self._top_most = min(self._bottom_most, top - 1)
+        self._bottom_most = min(self._bottom_most, bottom - 1)
+
+        # `_bottom_most` must be greater than or equal to `_top_most`.
         self._bottom_most = max(self._top_most, self._bottom_most)
 
     def _cap_cub1(self):

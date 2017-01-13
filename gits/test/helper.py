@@ -314,6 +314,25 @@ class Helper(unittest.TestCase):
         # Restore the terminal to sane modes.
         term._cap_rs1()
 
+    def _check_cap_csr(self, reg):
+        """ A helper that checks the `_cap_csr` method.
+
+        The ``reg`` argument must be a tuple or list of lines ``(top, bottom)``
+        you want the scrolling region to be set to via `_cap_csr`.
+        """
+        top, bottom = reg
+        term = self._terminal
+
+        term._cap_csr(top, bottom)
+
+        if top > bottom:
+            self.assertEqual(top - 1, term._bottom_most)
+        else:
+            self.assertEqual(bottom - 1, term._bottom_most)
+        self.assertEqual(top - 1, term._top_most)
+
+        term._cap_rs1()
+
     def _check_cap_dl1(self, s, pos):
         """A helper that checks the `_cap_dl1` method.
 
