@@ -20,6 +20,16 @@ import unittest
 from gits.terminal import Terminal, MAGIC_NUMBER
 
 
+def reset_after_executing(func):
+    """Resets the terminal to sane modes after executing a decorated helper.
+    """
+    def wrapper(self, *args, **kwargs):
+        func(self, *args, **kwargs)
+        self._terminal._cap_rs1()
+
+    return wrapper
+
+
 class Helper(unittest.TestCase):
     def setUp(self):
         self._rows = 24
@@ -195,6 +205,7 @@ class Helper(unittest.TestCase):
         # Restore the initial position of the screen.
         term._zero((0, 0), (term._right_most, term._bottom_most))
 
+    @reset_after_executing
     def _check_scroll_up(self, s, pos):
         """A helper that checks the `_scroll_up` method.
 
@@ -220,9 +231,7 @@ class Helper(unittest.TestCase):
                          inclusively=True)
         self.assertEqual(want, got)
 
-        # Reset the terminal to sane modes.
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_peek(self, s, pos):
         """A helper that checks the `_peek` method.
 
@@ -235,9 +244,6 @@ class Helper(unittest.TestCase):
 
         self._put_string(s, pos)
         self._check_string(s, pos, (x + len(s), y))
-
-        # Reset the terminal to sane modes.
-        term._cap_rs1()
 
     def _check_poke(self, s, pos):
         """A helper that checks the `_poke` method.
@@ -289,6 +295,7 @@ class Helper(unittest.TestCase):
             self.assertEqual(cur_x - 1, term._cur_x)
             self.assertEqual(cur_y, term._cur_y)
 
+    @reset_after_executing
     def _check_cap_cup(self, pos):
         """A helper that checks the `_cap_cup` method.
 
@@ -311,9 +318,7 @@ class Helper(unittest.TestCase):
         else:
             self.assertFalse(term._eol)
 
-        # Restore the terminal to sane modes.
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_csr(self, reg):
         """ A helper that checks the `_cap_csr` method.
 
@@ -331,8 +336,7 @@ class Helper(unittest.TestCase):
             self.assertEqual(bottom - 1, term._bottom_most)
         self.assertEqual(top - 1, term._top_most)
 
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_dl1(self, s, pos):
         """A helper that checks the `_cap_dl1` method.
 
@@ -361,9 +365,6 @@ class Helper(unittest.TestCase):
             got = term._peek((0, cur_y), (term._right_most, cur_y))
             self.assertEqual(want, got)
 
-        # Restore the terminal to the sane modes.
-        term._cap_rs1()
-
     def _check_cap_ech(self, s, pos, n):
         """A helper that checks the `_cap_ech` method.
 
@@ -384,6 +385,7 @@ class Helper(unittest.TestCase):
         clear_area = array.array('L', [MAGIC_NUMBER] * n)
         self.assertEqual(clear_area, term._peek(pos, (cur_x + n, cur_y)))
 
+    @reset_after_executing
     def _check_cap_el(self, s, pos):
         """A helper that checks the `_cap_el` method.
 
@@ -405,9 +407,7 @@ class Helper(unittest.TestCase):
         got = term._peek(pos, (term._right_most, cur_y))
         self.assertEqual(want, got)
 
-        # Restore the terminal to the sane modes.
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_el1(self, s, pos):
         """A helper that checks the `_cap_el1` method.
 
@@ -428,9 +428,7 @@ class Helper(unittest.TestCase):
         got = term._peek((0, cur_y), (cur_x, cur_y))
         self.assertEqual(want, got)
 
-        # Restore the terminal to the sane modes.
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_home(self, pos):
         """A helper that checks the `_cap_home` method.
 
@@ -444,9 +442,6 @@ class Helper(unittest.TestCase):
         self.assertEqual(0, term._cur_x)
         self.assertEqual(0, term._cur_y)
         self.assertFalse(term._eol)
-
-        # Restore the terminal to the sane modes.
-        term._cap_rs1()
 
     def _check_cap_hpa(self, x):
         """A helper that checks the `_cap_hpa` method.
@@ -465,6 +460,7 @@ class Helper(unittest.TestCase):
         else:
             self.assertFalse(self._terminal._eol)
 
+    @reset_after_executing
     def _check_cap_il1(self, s, pos):
         """A helper that checks the `_cap_il1` method.
 
@@ -493,9 +489,7 @@ class Helper(unittest.TestCase):
             got = term._peek((0, cur_y), (term._right_most, cur_y))
             self.assertEqual(want, got)
 
-        # Restore the terminal to the sane modes.
-        term._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_kcub1(self, pos, want_cur_x):
         """A helper that checks the `_cap_kcub1` method.
 
@@ -507,8 +501,8 @@ class Helper(unittest.TestCase):
         self._terminal._cur_x, self._terminal._cur_y = pos
         self._terminal._cap_kcub1()
         self.assertEqual(want_cur_x, self._terminal._cur_x)
-        self._terminal._cap_rs1()
 
+    @reset_after_executing
     def _check_cap_kcud1(self, pos, want_cur_y):
         """A helper that checks the `_cap_kcud1` method.
 
@@ -521,8 +515,7 @@ class Helper(unittest.TestCase):
         self._terminal._cap_kcud1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
 
-        self._terminal._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_kcuu1(self, pos, want_cur_y):
         """A helper that checks the `_cap_kcuu1` method.
 
@@ -535,8 +528,7 @@ class Helper(unittest.TestCase):
         self._terminal._cap_kcuu1()
         self.assertEqual(want_cur_y, self._terminal._cur_y)
 
-        self._terminal._cap_rs1()
-
+    @reset_after_executing
     def _check_cap_ri(self, s, pos):
         """A helper that checks the `_cap_ri` method.
 
@@ -561,9 +553,6 @@ class Helper(unittest.TestCase):
         else:
             self.assertEqual(y - 1, term._cur_y)
             self._check_string(s, (x, y), (x + len(s), y))
-
-        # Reset the terminal to sane modes.
-        term._cap_rs1()
 
     def _check_cap_vpa(self, y):
         """A helper that checks the `_cap_vpa` method.
