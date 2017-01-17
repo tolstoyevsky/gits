@@ -458,6 +458,10 @@ class Terminal:
         self._cur_y = self._cur_y_bak
         self._eol = True if self._cur_x == self._right_most else False
 
+    def _cap_rev(self):
+        """Enables Reverse Video mode. """
+        self._cap_set_color(3)
+
     def _cap_ri(self):
         """Scrolls text down. See _cap_ind. """
         self._cur_y = max(self._top_most, self._cur_y - 1)
@@ -514,9 +518,6 @@ class Terminal:
         definition for the term. Standout mode is whatever special highlighting
         the terminal can do, as defined in the terminal's database entry.
         """
-        self._sgr = 0x70000000
-
-    def _cap_smso_rev(self):
         self._cap_set_color(7)
 
     def _cap_smul(self):
