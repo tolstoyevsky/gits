@@ -13,7 +13,7 @@ Documentation and links to additional resources are available at http://gits.rea
 Authors
 -------
 
-See [AUTHORS](AUTHORS.md).
+See [AUTHORS](https://github.com/tolstoyevsky/gits/blob/master/AUTHORS.md).
 
 Licensing
 ---------
