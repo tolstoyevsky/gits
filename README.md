@@ -13,7 +13,7 @@ Documentation and links to additional resources are available at http://gits.rea
 Authors
 -------
 
-See [AUTHORS](AUTHORS.rst).
+See [AUTHORS](AUTHORS.md).
 
 Licensing
 ---------
