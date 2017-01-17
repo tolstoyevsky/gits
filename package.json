@@ -13,13 +13,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Tolstoyevsky/gits.git"
+    "url": "https://github.com/tolstoyevsky/gits.git"
   },
   "license": "Apache-2.0",
   "maintainers": [
     "Maxim Karpinskiy <karpinski20@gmail.com>"
   ],
-  "homepage": "https://github.com/Tolstoyevsky/gits",
+  "homepage": "https://github.com/tolstoyevsky/gits",
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-loader": "^6.2.10",
