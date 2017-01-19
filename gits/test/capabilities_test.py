@@ -536,22 +536,9 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to set default color-pair
         to the original one.
         """
+        self._terminal._sgr = None
         self._terminal._cap_op()
         self.assertEqual(MAGIC_NUMBER, self._terminal._sgr)
-
-    def test_cap_ri(self):
-        """The terminal should have the possibility to scroll text down. """
-        term = self._terminal
-
-        # Put the text on the first line.
-        self._check_cap_ri(['x'] * term._right_most, (0, 0))
-
-        # Put the text on the second line.
-        self._check_cap_ri(['x'] * term._right_most, (0, 1))
-
-        # Put the text on an arbitrary line.
-        rand_y = random.randint(2, term._bottom_most)
-        self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
     def test_cap_rc(self):
         """The terminal should have the possibility to restore the cursor to
@@ -642,10 +629,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_sgr0(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_op(self):
         pass
 
     @unittest.skip('skip')
