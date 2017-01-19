@@ -490,17 +490,23 @@ class Helper(unittest.TestCase):
             self.assertEqual(want, got)
 
     @reset_after_executing
-    def _check_cap_kcub1(self, pos, want_cur_x):
+    def _check_cap_kcub1(self, pos):
         """A helper that checks the `_cap_kcub1` method.
 
-        The ``want_cur_x`` argument is an expected x position of the cursor
-        after calling the `cap_kcub1` method.
         The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
         of the initial position of the cursor.
         """
-        self._terminal._cur_x, self._terminal._cur_y = pos
-        self._terminal._cap_kcub1()
-        self.assertEqual(want_cur_x, self._terminal._cur_x)
+        term = self._terminal
+        x, _ = pos
+        term._cur_x, term._cur_y = pos
+
+        term._cap_kcub1()
+
+        self.assertFalse(term._eol)
+        if x == 0:
+            self.assertEqual(0, term._cur_x)
+        else:
+            self.assertEqual(x - 1, term._cur_x)
 
     @reset_after_executing
     def _check_cap_kcud1(self, pos, want_cur_y):
