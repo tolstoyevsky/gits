@@ -493,14 +493,9 @@ class TestCapabilities(Helper):
         term = self._terminal
 
         self._check_cap_kcub1((0, 0))
-
-        # The x position of the cursor is at the left-most position.
         self._check_cap_kcub1((1, 0))
-
-        # The x position of the cursor is at the right-most position.
         self._check_cap_kcub1((term._right_most, 0))
 
-        # The x position of the cursor is at an arbitrary position.
         rand_x = random.randint(2, term._right_most - 1)
         self._check_cap_kcub1((rand_x, 0))
 
