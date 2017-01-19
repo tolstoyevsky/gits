@@ -300,12 +300,21 @@ class TestCapabilities(Helper):
         # The cursor is at the right-most position.
         self._check_cap_cup((term._cols, term._rows))
 
-    @unittest.skip('skip')
     def test_cap_dch(self):
         """The terminal should have the possibility to delete the specified
         number of characters.
         """
-        pass
+        term = self._terminal
+
+        greeting = 'Hello, World!'
+        self._put_string(greeting, (0, 0))
+        self._check_string(greeting, (0, 0), (len(greeting), 0))
+
+        term._cur_x, term._cur_y = 0, 0
+
+        n = 7
+        term._cap_dch(n)  # remove 'Hello, '
+        self._check_string(greeting[n:], (0, 0), (len(greeting[n:]), 0))
 
     @unittest.skip('skip')
     def test_cap_dch1(self):
