@@ -612,6 +612,7 @@ class TestCapabilities(Helper):
     def test_cap_sgr0(self):
         """The terminal should have the possibility to turn off all atributes.
         """
+        self._terminal._sgr = None
         self._terminal._cap_sgr0()
         self.assertEqual(MAGIC_NUMBER, self._terminal._sgr)
 
