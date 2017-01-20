@@ -343,10 +343,10 @@ class Terminal:
 
     def _cap_dch(self, n):
         """Deletes ``n`` number of characters. """
-        w, cx, cy = self._cols, self._cur_x, self._cur_y
-        end = self._peek((cx, cy), (w, cy))
+        cur_x, cur_y = self._cur_x, self._cur_y
+        end = self._peek((cur_x, cur_y), (self._cols, cur_y))
         self._cap_el()
-        self._poke((cx, cy), end[n:])
+        self._poke((cur_x, cur_y), end[n:])
 
     def _cap_dch1(self):
         """Deletes a character. """
