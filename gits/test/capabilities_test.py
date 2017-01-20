@@ -532,20 +532,6 @@ class TestCapabilities(Helper):
         rand_y = random.randint(1, term._bottom_most - 1)
         self._check_cap_kcuu1((0, rand_y), rand_y - 1)
 
-    def test_cap_ri(self):
-        """The terminal should have the possibility to scroll text down. """
-        term = self._terminal
-
-        # Put the text on the first line.
-        self._check_cap_ri(['x'] * term._right_most, (0, 0))
-
-        # Put the text on the second line.
-        self._check_cap_ri(['x'] * term._right_most, (0, 1))
-
-        # Put the text on an arbitrary line.
-        rand_y = random.randint(2, term._bottom_most)
-        self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
-
     def test_cap_rc(self):
         """The terminal should have the possibility to restore the cursor to
         the last saved position.
@@ -571,6 +557,20 @@ class TestCapabilities(Helper):
         term._cap_rc()  # restore a previously saved cursor position.
         self.assertEqual(cur_x_bck, term._cur_x)
         self.assertTrue(term._eol)
+
+    def test_cap_ri(self):
+        """The terminal should have the possibility to scroll text down. """
+        term = self._terminal
+
+        # Put the text on the first line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 0))
+
+        # Put the text on the second line.
+        self._check_cap_ri(['x'] * term._right_most, (0, 1))
+
+        # Put the text on an arbitrary line.
+        rand_y = random.randint(2, term._bottom_most)
+        self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
     def test_cap_rs1(self):
         """The terminal should have the possibility to completely reset to sane
