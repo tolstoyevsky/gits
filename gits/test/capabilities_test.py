@@ -609,6 +609,13 @@ class TestCapabilities(Helper):
         self.assertEqual(x, term._cur_x_bak)
         self.assertEqual(y, term._cur_y_bak)
 
+    def test_cap_sgr0(self):
+        """The terminal should have the possibility to turn off all atributes.
+        """
+        self._terminal._sgr = None
+        self._terminal._cap_sgr0()
+        self.assertEqual(MAGIC_NUMBER, self._terminal._sgr)
+
     def test_cap_smso(self):
         """The terminal should have the possibility to enter Standout mode. """
         self._terminal._sgr = None
@@ -626,10 +633,6 @@ class TestCapabilities(Helper):
 
         rand_y = random.randint(1, term._rows - 1)
         self._check_cap_vpa(rand_y)
-
-    @unittest.skip('skip')
-    def test_cap_sgr0(self):
-        pass
 
     @unittest.skip('skip')
     def test_cap_bold(self):
