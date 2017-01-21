@@ -219,6 +219,12 @@ class TestCapabilities(Helper):
         # Poke to the last line.
         self._check_poke(zeros, (0, term._bottom_most))
 
+    def test_cap_bold(self):
+        """The terminal should have the possibility to produce bold text. """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_bold()
+        self.assertEqual(0x01 | 0x08000000, self._terminal._sgr)
+
     @unittest.skip('skip')
     def test_esc_da(self):
         # TODO: add a docstring.
@@ -633,10 +639,6 @@ class TestCapabilities(Helper):
 
         rand_y = random.randint(1, term._rows - 1)
         self._check_cap_vpa(rand_y)
-
-    @unittest.skip('skip')
-    def test_cap_bold(self):
-        pass
 
     @unittest.skip('skip')
     def test_cap_dim(self):
