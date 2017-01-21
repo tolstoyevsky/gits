@@ -620,23 +620,11 @@ class TestCapabilities(Helper):
         self._check_cap_vpa(rand_y)
 
     @unittest.skip('skip')
-    def test_cap_set_color_pair(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_set_color(self):
-        pass
-
-    @unittest.skip('skip')
     def test_cap_sgr0(self):
         pass
 
     @unittest.skip('skip')
     def test_cap_op(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_noname(self):
         pass
 
     @unittest.skip('skip')
@@ -656,10 +644,6 @@ class TestCapabilities(Helper):
         pass
 
     @unittest.skip('skip')
-    def test_cap_smso_rev(self):
-        pass
-
-    @unittest.skip('skip')
     def test_cap_rmpch(self):
         pass
 
@@ -673,10 +657,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_rmso(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_exec_escape_sequence(self):
         pass
 
 if __name__ == '__main__':
