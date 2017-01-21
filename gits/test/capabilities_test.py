@@ -622,6 +622,13 @@ class TestCapabilities(Helper):
         self._terminal._cap_smso()
         self.assertEqual(0x70000000, self._terminal._sgr)
 
+    def test_cap_smul(self):
+        """The terminal should have the possibility to enter Underscore mode.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_smul()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     def test_cap_vpa(self):
         """The terminal should have the possibility to set the vertical
         position of the cursor to the specified value.
@@ -640,10 +647,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_dim(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_smul(self):
         pass
 
     @unittest.skip('skip')
