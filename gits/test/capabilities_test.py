@@ -580,6 +580,14 @@ class TestCapabilities(Helper):
         rand_y = random.randint(2, term._bottom_most)
         self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
+    def test_cap_rmpch(self):
+        """The terminal should have the possibility to exit PC character
+        display mode.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_rmpch()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     def test_cap_rs1(self):
         """The terminal should have the possibility to completely reset to sane
         modes.
@@ -616,6 +624,14 @@ class TestCapabilities(Helper):
         self._terminal._cap_sgr0()
         self.assertEqual(MAGIC_NUMBER, self._terminal._sgr)
 
+    def test_cap_smpch(self):
+        """The terminal should have the possibility to enter PC character
+        display mode.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_smpch()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     def test_cap_smso(self):
         """The terminal should have the possibility to enter Standout mode. """
         self._terminal._sgr = None
@@ -648,14 +664,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_blink(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_rmpch(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_smpch(self):
         pass
 
     @unittest.skip('skip')
