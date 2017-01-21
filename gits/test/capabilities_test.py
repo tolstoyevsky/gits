@@ -312,6 +312,13 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to delete a character. """
         pass
 
+    def test_cap_dim(self):
+        """The terminal should have the possibility to enter Half-bright mode.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_dim()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     @unittest.skip('skip')
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
@@ -636,10 +643,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_bold(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_dim(self):
         pass
 
     @unittest.skip('skip')
