@@ -219,6 +219,13 @@ class TestCapabilities(Helper):
         # Poke to the last line.
         self._check_poke(zeros, (0, term._bottom_most))
 
+    def test_cap_blink(self):
+        """The terminal should have the possibility to produce blinking text.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_blink()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     @unittest.skip('skip')
     def test_esc_da(self):
         # TODO: add a docstring.
@@ -644,10 +651,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_smul(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_blink(self):
         pass
 
     @unittest.skip('skip')
