@@ -532,6 +532,14 @@ class TestCapabilities(Helper):
         rand_y = random.randint(1, term._bottom_most - 1)
         self._check_cap_kcuu1((0, rand_y), rand_y - 1)
 
+    def test_cap_op(self):
+        """The terminal should have the possibility to set default color-pair
+        to the original one.
+        """
+        self._terminal._sgr = None
+        self._terminal._cap_op()
+        self.assertEqual(MAGIC_NUMBER, self._terminal._sgr)
+
     def test_cap_rc(self):
         """The terminal should have the possibility to restore the cursor to
         the last saved position.
@@ -621,10 +629,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_sgr0(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_op(self):
         pass
 
     @unittest.skip('skip')
