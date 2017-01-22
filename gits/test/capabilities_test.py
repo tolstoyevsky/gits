@@ -308,6 +308,8 @@ class TestCapabilities(Helper):
 
         self._check_cap_dch(greeting, 7)  # remove 'Hello, '
 
+        self._check_cap_dch(greeting, 0)
+
     @unittest.skip('skip')
     def test_cap_dch1(self):
         """The terminal should have the possibility to delete a character. """
