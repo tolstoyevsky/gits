@@ -323,20 +323,49 @@ class TestCapabilities(Helper):
         want = s[:term._cur_x] + s[term._cur_x + 1:]
         self._check_string(want, (0, 0), (len(want), 0))
 
-    @unittest.skip('skip')
+    def test_cap_dl(self):
+        """The terminal should have the possibility to delete ``n`` number of
+        lines.
+        """
+        term = self._terminal
+        self._put_string(['f'] * term._right_most, (0, 0))
+        self._put_string(['s'] * term._right_most, (0, 1))
+        self._put_string(['t'] * term._right_most, (0, 2))
+        term._cap_dl(2)
+        self._check_string(['f'] * term._right_most, (0, 0),
+                                                     (term._right_most, 0))
+
+        term._cap_rs1()
+
+        self._put_string(['f'] * term._right_most, (0, 0))
+        self._put_string(['s'] * term._right_most, (0, 1))
+        term._cap_dl(2)
+
+        want = array.array('L', [MAGIC_NUMBER] * term._right_most)
+        got = term._peek((0, 0), (term._right_most, 0))
+        self.assertEqual(want, got)
+
+        term._cap_rs1()
+
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
         term = self._terminal
 
-        # The y position of the cursor is on the first line.
-        self._check_cap_dl1(['s'] * term._right_most, (0, 1))
+        # Delete a first line.
+        self._put_string(['f'] * term._right_most, (0, 0))
+        self._put_string(['s'] * term._right_most, (0, 1))
+        term._cap_dl1()
+        self._check_string(['f'] * term._right_most, (0, 0),
+                                                     (term._right_most, 0))
+        term._cap_rs1()
 
-        # The y position of the cursor is on the last line.
-        self._check_cap_dl1(['s'] * term._right_most, (0, term._bottom_most))
+        self._put_string(['f'] * term._right_most, (0, 0))
+        term._cap_dl1()
+        want = array.array('L', [MAGIC_NUMBER] * term._right_most)
+        got = term._peek((0, 0), (term._right_most, 0))
+        self.assertEqual(want, got)
 
-        # The y position of the cursor is on an arbitrary line.
-        rand_y = random.randint(1, term._bottom_most - 1)
-        self._check_cap_dl1(['s'] * term._right_most, (0, rand_y))
+        term._cap_rs1()
 
     def test_cap_ech(self):
         """The terminal should have the possibility to erase the specified
