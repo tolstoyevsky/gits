@@ -304,17 +304,9 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to delete the specified
         number of characters.
         """
-        term = self._terminal
-
         greeting = 'Hello, World!'
-        self._put_string(greeting, (0, 0))
-        self._check_string(greeting, (0, 0), (len(greeting), 0))
 
-        term._cur_x, term._cur_y = 0, 0
-
-        n = 7
-        term._cap_dch(n)  # remove 'Hello, '
-        self._check_string(greeting[n:], (0, 0), (len(greeting[n:]), 0))
+        self._check_cap_dch(greeting, 7)  # remove 'Hello, '
 
     @unittest.skip('skip')
     def test_cap_dch1(self):
