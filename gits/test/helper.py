@@ -365,6 +365,23 @@ class Helper(unittest.TestCase):
             got = term._peek((0, cur_y), (term._right_most, cur_y))
             self.assertEqual(want, got)
 
+    def _check_cap_dch(self, s, n):
+        """A helper that checks the `_cap_dch` method.
+
+        The ``s`` argument is a test string to be put on the screen.
+        The ``n`` argument is a number of characters to be deleted from the
+        string.
+        """
+        term = self._terminal
+
+        self._put_string(s, (0, 0))
+        self._check_string(s, (0, 0), (len(s), 0))
+
+        term._cur_x, term._cur_y = 0, 0
+
+        term._cap_dch(n)
+        self._check_string(s[n:], (0, 0), (len(s[n:]), 0))
+
     def _check_cap_ech(self, s, pos, n):
         """A helper that checks the `_cap_ech` method.
 
