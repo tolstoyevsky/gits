@@ -133,7 +133,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r'/', IndexHandler),
             (r'/termsocket', TermSocketHandler),
-            (r'/control-panel', ControlPanelHandler),
+            (r'/experimental', ControlPanelHandler),
         ]
         settings = dict(
             template_path=options.templates_path,
