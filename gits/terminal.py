@@ -61,7 +61,6 @@ class Terminal:
 
         self.control_characters = sequences['control_characters']
 
-        self.esc_re = []
         self.new_sci_seq = {}
         for k, v in sequences['escape_sequences'].items():
             self.new_sci_seq[k.replace('\\E', '\x1b')] = v
@@ -71,24 +70,12 @@ class Terminal:
             self.new_sci_seq_re[k.replace('\\E', '\x1b')] = v
 
         self.new_sci_seq_re_compiled = []
-        self.csi_seq = {
-            '`': (self._cap_kb2, [1]),
-        }
         for k, v in list(self.new_sci_seq_re.items()):
             res = k.replace('[', '\['). \
                 replace('%d', '([0-9]+)')
             self.new_sci_seq_re_compiled.append(
                 (re.compile(res), v)
             )
-
-        d = {
-            r'\[\??([0-9;]*)([@ABCDEFGHJKLMPXacdefghlmnqrstu`])':
-                self._ignore,
-            r'\]([^\x07]+)\x07': self._ignore,
-        }
-
-        for k, v in list(d.items()):
-            self.esc_re.append((re.compile('\x1b' + k), v))
 
         self._cap_rs1()
 
@@ -504,6 +491,21 @@ class Terminal:
         self._cur_x_bak = self._cur_x
         self._cur_y_bak = self._cur_y
 
+    def _cap_sgr(self, p1=0, p2=0, p3=0, p4=0, p5=0, p6=0, p7=0, p8=0, p9=0):
+        """Allows setting arbitrary combinations of modes taking nine
+        arguments. The nine arguments are, in order:
+        * standout
+        * underline
+        * reverse
+        * blink
+        * dim
+        * bold
+        * blank
+        * protect
+        * alternate character set
+        """
+        pass
+
     def _cap_sgr0(self):
         self._cap_set_color_pair(0, 10)
 
@@ -546,9 +548,6 @@ class Terminal:
     def _exec_escape_sequence(self):
         e = self._buf
 
-        if e == '\x1b[?2004l':
-            pass
-
         method_name = self.new_sci_seq.get(self._buf, None)
 
         if len(e) > 32:
@@ -567,13 +566,6 @@ class Terminal:
                     self._exec_method(v, args)
                     e = ''
                     self._buf = ''
-
-            for sequence, method in self.esc_re:
-                mo = sequence.match(e)
-                if mo:
-                    method()
-                    self._buf = ''
-                    break
 
     def _exec_single_character_command(self):
         method_name = self.control_characters[self._buf]
