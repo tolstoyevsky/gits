@@ -305,10 +305,23 @@ class TestCapabilities(Helper):
         number of characters.
         """
         greeting = 'Hello, World!'
+        term = self._terminal
 
         self._check_cap_dch(greeting, 7)  # remove 'Hello, '
 
         self._check_cap_dch(greeting, 0)
+
+        # Remove a character.
+
+        s = self._get_random_string(term._cols)
+        self._put_string(s, (0, 0))
+        self._check_string(s, (0, 0), (len(s), 0))
+
+        term._cur_x = random.randint(0, term._right_most)
+        term._cap_dch(1)
+
+        want = s[:term._cur_x] + s[term._cur_x + 1:]
+        self._check_string(want, (0, 0), (len(want), 0))
 
     @unittest.skip('skip')
     def test_cap_dch1(self):
