@@ -14,7 +14,9 @@
 # under the License.
 
 import array
+import random
 import re
+import string
 import unittest
 
 from gits.terminal import Terminal, MAGIC_NUMBER
@@ -46,6 +48,14 @@ class Helper(unittest.TestCase):
         self._terminal._cur_x, self._terminal._cur_y = pos
         for character in s:
             self._terminal._echo(character)
+
+    def _get_random_string(self, n):
+        """Generates a random string.
+
+        The ``n`` argument is the length of the target string.
+        """
+        chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
+        return ''.join(random.SystemRandom().choice(chars) for _ in range(n))
 
     def _check_string(self, s, left_border, right_border):
         """A helper that checks if the screen has the string ``s`` between
