@@ -324,11 +324,6 @@ class TestCapabilities(Helper):
         self._check_string(want, (0, 0), (len(want), 0))
 
     @unittest.skip('skip')
-    def test_cap_dch1(self):
-        """The terminal should have the possibility to delete a character. """
-        pass
-
-    @unittest.skip('skip')
     def test_cap_dl1(self):
         """The terminal should have the possibility to delete a line. """
         term = self._terminal
