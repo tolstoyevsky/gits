@@ -347,33 +347,33 @@ class Helper(unittest.TestCase):
         self.assertEqual(top - 1, term._top_most)
 
     @reset_after_executing
-    def _check_cap_dl1(self, s, pos):
-        """A helper that checks the `_cap_dl1` method.
+    def _check_cap_dl(self, n, lines_positions):
+        """A helper that checks the `_cap_dl` method.
 
-        The ``s`` argument is a test string to be put on the screen.
-        The ``pos`` argument must be a tuple or list of coordinates ``(x, y)``
-        of the location where you want the string to be.
+        The ``n`` argument is a number of lines to be deleted from the screen.
+        The ``lines_positions`` argument must be a list of tuples
+        ``(line, pos)``, where ``line`` is a test string to be put on the
+        screen, ``pos`` is a tuple or list of coordinates ``(x, y)`` of the
+        location where you want the string to be.
         """
-        cur_x, cur_y = pos
-
-        self._put_string(s, pos)
-
         term = self._terminal
-        term._cur_x, term._cur_y = pos
 
-        term._cap_dl1()
+        for line, pos in lines_positions:
+            self._put_string(line, pos)
 
-        self.assertEqual(cur_x, term._cur_x)
+        self._terminal._cap_dl(n)
 
-        if cur_y == 0:
-            self._check_string(s, pos, (cur_x + len(s), cur_y))
-        else:
-            self._check_string(s, (cur_x, cur_y - 1),
-                               (cur_x + len(s), cur_y - 1))
-
+        if len(lines_positions) == n:
+            line_pos = lines_positions[0]
+            x, y = line_pos[1]
             want = array.array('L', [MAGIC_NUMBER] * term._right_most)
-            got = term._peek((0, cur_y), (term._right_most, cur_y))
+            got = term._peek((x, y), (term._right_most, y))
             self.assertEqual(want, got)
+        else:
+            line_pos = lines_positions[len(lines_positions) - n - 1]
+            x, y = line_pos[1]
+            line = line_pos[0]
+            self._check_string(line, (x, y), (term._right_most, y))
 
     def _check_cap_dch(self, s, n):
         """A helper that checks the `_cap_dch` method.
