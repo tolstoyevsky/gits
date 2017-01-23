@@ -347,25 +347,37 @@ class TestCapabilities(Helper):
 
         term._cap_rs1()
 
-    def test_cap_dl1(self):
-        """The terminal should have the possibility to delete a line. """
+    def test_cap_dl(self):
+        """The terminal should have the possibility to delete ``n`` number of
+        lines.
+        """
         term = self._terminal
+        self._check_cap_dl(0, [
+            (['f'] * term._right_most, (0, 0)),
+        ])
 
-        # Delete a first line.
-        self._put_string(['f'] * term._right_most, (0, 0))
-        self._put_string(['s'] * term._right_most, (0, 1))
-        term._cap_dl1()
-        self._check_string(['f'] * term._right_most, (0, 0),
-                                                     (term._right_most, 0))
-        term._cap_rs1()
+        self._check_cap_dl(1, [
+            (['f'] * term._right_most, (0, 0)),
+        ])
 
-        self._put_string(['f'] * term._right_most, (0, 0))
-        term._cap_dl1()
-        want = array.array('L', [MAGIC_NUMBER] * term._right_most)
-        got = term._peek((0, 0), (term._right_most, 0))
-        self.assertEqual(want, got)
+        self._check_cap_dl(2, [
+            (['f'] * term._right_most, (0, 0)),
+            (['s'] * term._right_most, (0, 1)),
+        ])
 
-        term._cap_rs1()
+        self._check_cap_dl(2, [
+            (['f'] * term._right_most, (0, 0)),
+            (['s'] * term._right_most, (0, 1)),
+            (['k'] * term._right_most, (0, 2)),
+        ])
+
+        lines_cnt = random.randint(2, term._bottom_most - 1)
+        test_lines = []
+        for i in range(lines_cnt):
+            test_lines.append((['a'] * term._right_most, (0, i)))
+
+        del_cnt = random.randint(0, lines_cnt)
+        self._check_cap_dl(del_cnt, test_lines)
 
     def test_cap_ech(self):
         """The terminal should have the possibility to erase the specified
