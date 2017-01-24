@@ -21,10 +21,7 @@ control_characters:
 escape_sequences:
   '\E7': 'sc'
   '\E8': 'rc'
-
-  # rs1 consists of \x1bc\x1b]R. The second part is ignored so far.
-  '\Ec': 'rs1'
-
+  '\Ec\E]R': 'rs1'
   '\EH': 'ignore'
   '\EM': 'ri'
   '\E[4h': 'smir'
@@ -35,6 +32,13 @@ escape_sequences:
   '\E[2m': 'dim'
   '\E[4m': 'smul'
   '\E[5m': 'blink'
+  '\E[?7h': 'ignore'
+  '\E[?25h\E[?0c': 'ignore'
+  '\E[?25l\E[?1c': 'ignore'
+  '\E[?1000h': 'ignore'
+  '\E[?1000l': 'ignore'
+  '\E[?2004h': 'ignore'
+  '\E[?2004l': 'ignore'
 
   # \E[7m is represented by both rev and smso
 
@@ -59,7 +63,6 @@ escape_sequences:
   '\E[L': 'il1'
   '\E[M': 'dl1'
   '\E[P': 'dch1'
-  '\E]R': 'ignore'
 
   # Shell sequence to be run before the command output (Mac OS X-specific)
   '\E]133;A': 'ignore'
@@ -68,13 +71,19 @@ escape_sequences:
   # Shell sequence to be run before the command output (Mac OS X-specific)
   '\E]133;C;': 'ignore'
 
-  # '\x1b[?25l': civis
-
 escape_sequences_re:
   '\E[%d@': 'ich'
   '\E[%dd': 'vpa'
   '\E[%d;%dm': 'set_color_pair'
   '\E[%dm': 'set_color'
+  '\E[%d;%dm': 'sgr'
+  '\E[%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%d;%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%d;%d;%d;%d;%dm': 'sgr'
+  '\E[%d;%d;%d;%d;%d;%d;%d;%d;%dm': 'sgr'
   '\E[%dB': 'cud'
   '\E[%dC': 'cuf'
   '\E[%dG': 'hpa'
