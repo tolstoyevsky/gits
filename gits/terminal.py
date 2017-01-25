@@ -61,20 +61,18 @@ class Terminal:
 
         self.control_characters = sequences['control_characters']
 
-        self.new_sci_seq = {}
+        self._escape_sequences = {}
         for k, v in sequences['escape_sequences'].items():
-            self.new_sci_seq[k.replace('\\E', '\x1b')] = v
+            self._escape_sequences[k.replace('\\E', '\x1b')] = v
 
-        self.new_sci_seq_re = {}
+        self._escape_sequences_re = []
         for k, v in sequences['escape_sequences_re'].items():
-            self.new_sci_seq_re[k.replace('\\E', '\x1b')] = v
+            sequence = k.replace('\\E', '\x1b'). \
+                         replace('[', '\['). \
+                         replace('%d', '([0-9]+)')
 
-        self.new_sci_seq_re_compiled = []
-        for k, v in list(self.new_sci_seq_re.items()):
-            res = k.replace('[', '\['). \
-                replace('%d', '([0-9]+)')
-            self.new_sci_seq_re_compiled.append(
-                (re.compile(res), v)
+            self._escape_sequences_re.append(
+                (re.compile(sequence), v)
             )
 
         self._cap_rs1()
@@ -548,7 +546,7 @@ class Terminal:
     def _exec_escape_sequence(self):
         e = self._buf
 
-        method_name = self.new_sci_seq.get(self._buf, None)
+        method_name = self._escape_sequences.get(self._buf, None)
 
         if len(e) > 32:
             self._buf = ''
@@ -556,7 +554,7 @@ class Terminal:
             self._exec_method(method_name)
             self._buf = ''
         else:  # sequences with params
-            for k, v in self.new_sci_seq_re_compiled:
+            for k, v in self._escape_sequences_re:
                 mo = k.match(e)
                 if mo:
                     args = []
