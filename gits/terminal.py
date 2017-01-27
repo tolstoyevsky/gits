@@ -342,13 +342,12 @@ class Terminal:
         self._cap_set_color(2)
 
     def _cap_dl(self, n):
-        """Deletes ``n`` number of lines. """
+        """Deletes ``n`` number of lines in their entirety, with the lines
+        below moving up to fill the gap that is left.
+        """
         if self._top_most <= self._cur_y <= self._bottom_most:
-            self._cur_x = 0
             for _ in range(n):
-                self._cap_dch(self._right_most)
                 self._scroll_up(self._cur_y + 1, self._bottom_most)
-                self._cur_y -= 1
 
     def _cap_dl1(self):
         """Deletes a line. """
