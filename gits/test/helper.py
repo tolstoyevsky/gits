@@ -347,33 +347,44 @@ class Helper(unittest.TestCase):
         self.assertEqual(top - 1, term._top_most)
 
     @reset_after_executing
-    def _check_cap_dl(self, n, lines_positions):
+    def _check_cap_dl(self, n, lines):
         """A helper that checks the `_cap_dl` method.
 
         The ``n`` argument is a number of lines to be deleted from the screen.
-        The ``lines_positions`` argument must be a list of tuples
-        ``(line, pos)``, where ``line`` is a test string to be put on the
-        screen, ``pos`` is a tuple or list of coordinates ``(x, y)`` of the
-        location where you want the string to be.
+        The ``lines`` argument must be a list of tuples ``(line, pos)``, where
+        ``line`` is a test string to be put on the screen, ``pos`` is a tuple
+        or list of coordinates ``(x, y)`` of the location where you want the
+        string to be.
         """
         term = self._terminal
 
-        for line, pos in lines_positions:
+        for line, pos in lines:
             self._put_string(line, pos)
+            term._eol = False
 
-        self._terminal._cap_dl(n)
+        # We have to put the cursor on the line that is going to be deleted.
+        # In this particular case, the home capability does what we really
+        # want, but it doesn't mean that the capabilities are always used
+        # together. Moreover, it's quite difficult to find a program which
+        # uses dl. As far as we know, vi, nano, top, htop and mc don't use it.
+        term._cap_home()
 
-        if len(lines_positions) == n:
-            line_pos = lines_positions[0]
-            x, y = line_pos[1]
-            want = array.array('L', [MAGIC_NUMBER] * term._right_most)
-            got = term._peek((x, y), (term._right_most, y))
+        term._cap_dl(n)
+
+        if len(lines) == n:
+            line = lines[0]
+            x, y = line[1]
+            s = line[0]
+
+            want = array.array('L', [MAGIC_NUMBER] * len(s))
+            got = term._peek((x, y), (len(s), y))
             self.assertEqual(want, got)
         else:
-            line_pos = lines_positions[len(lines_positions) - n - 1]
-            x, y = line_pos[1]
-            line = line_pos[0]
-            self._check_string(line, (x, y), (term._right_most, y))
+            lines = lines[n:len(lines)-1]
+            for i, line in enumerate(lines):
+                x, _ = line[1]
+                s = line[0]
+                self._check_string(s, (x, i), (len(s), i))
 
     def _check_cap_dch(self, s, n):
         """A helper that checks the `_cap_dch` method.
