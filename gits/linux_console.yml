@@ -24,6 +24,7 @@ escape_sequences:
   '\Ec\E]R': 'rs1'
   '\EH': 'ignore'
   '\EM': 'ri'
+  '\E]R': 'ignore'
   '\E[4h': 'smir'
   '\E[4l': 'rmir'
 
@@ -74,9 +75,8 @@ escape_sequences:
 escape_sequences_re:
   '\E[%d@': 'ich'
   '\E[%dd': 'vpa'
-  '\E[%d;%dm': 'set_color_pair'
   '\E[%dm': 'set_color'
-  '\E[%d;%dm': 'sgr'
+  '\E[%d;%dm': 'set_color_pair'
   '\E[%d;%d;%dm': 'sgr'
   '\E[%d;%d;%d;%dm': 'sgr'
   '\E[%d;%d;%d;%d;%dm': 'sgr'
