@@ -1,3 +1,5 @@
+![](doc/images/logo.png)
+
 [![build](https://travis-ci.org/tolstoyevsky/gits.svg?branch=master)](https://travis-ci.org/tolstoyevsky/gits) [![pypi](https://badge.fury.io/py/gits.svg)](https://badge.fury.io/py/gits) [![npm](https://badge.fury.io/js/gits-client.svg)](https://badge.fury.io/js/gits-client)
 
 Gits
@@ -19,3 +21,5 @@ Licensing
 ---------
 
 Gits is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
+
+Gits logo created by [botanicahouse](https://www.instagram.com/botanicahouse/) and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
