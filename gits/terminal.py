@@ -21,7 +21,28 @@ from os import path
 
 import yaml
 
-MAGIC_NUMBER = 0x07000000
+MAGIC_NUMBER = 0x10000000000
+# +------------------+--------------------------------------------------------+
+# | character (0-31) | 4-byte value represents a character in UTF-8 encoding. |
+# +------------------+--------------------------------------------------------+
+# | emphasis and     | 1-byte value represents 8 emphasis and modes. Each of  |
+# | modes (32-39)    | them is represented by 1 bit.                          |
+# |                  | 32) underline                                          |
+# |                  | 33) reverse                                            |
+# |                  | 34) blink                                              |
+# |                  | 35) dim                                                |
+# |                  | 36) bold                                               |
+# |                  | 37) blank                                              |
+# |                  | 38) protect                                            |
+# |                  | 39) alternate character set                            |
+# +------------------+--------------------------------------------------------+
+# | colors (40-46)   | 7-bit value represents both background and foreground  |
+# |                  | color. To get them divide the value by 16 via divmod.  |
+# |                  | The result will be a tuple (bg, fg).                   |
+# +------------------+--------------------------------------------------------+
+
+# The colors section of MAGIC_NUMBER stores 7, i.e. (0, 7) or black and white.
+BLACK_AND_WHITE = MAGIC_NUMBER * 7
 
 
 class Terminal:
@@ -50,6 +71,12 @@ class Terminal:
         self._right_most = None
 
         self._sgr = None  # Select Graphic Rendition
+
+        # Gits supports two color schemes: normal and bright. Each color scheme
+        # consists of 8 colors for a background and text. The terminal doesn't
+        # allow users to switch between them so far.
+        # The bright color scheme is used by default.
+        self._normal_mode = False
 
         self._logger = logging.getLogger('tornado.application')
 
@@ -120,7 +147,7 @@ class Terminal:
         begin = self._cols * y1 + x1
         end = self._cols * y2 + x2 + (1 if inclusively else 0)
         length = end - begin  # the length of the area which have to be cleared
-        self._screen[begin:end] = array.array('L', [MAGIC_NUMBER] * length)
+        self._screen[begin:end] = array.array('Q', [BLACK_AND_WHITE] * length)
         return length
 
     def _scroll_up(self, y1, y2):
@@ -215,44 +242,50 @@ class Terminal:
 
     def _cap_set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
-            self._sgr = MAGIC_NUMBER
+            self._sgr = BLACK_AND_WHITE
         elif p1 == 39 and p2 == 49:  # op
-            self._sgr = MAGIC_NUMBER
+            self._sgr = BLACK_AND_WHITE
         else:
             self._cap_set_color(p1)
             self._cap_set_color(p2)
 
-    def _cap_set_color(self, colour):
-        if colour == 0:
-            self._sgr = MAGIC_NUMBER
-        elif colour == 1:  # bold
-            self._sgr = (self._sgr | 0x08000000)
-        elif colour == 2:  # dim
+    def _cap_set_color(self, color):
+        if color == 0:
+            self._sgr = BLACK_AND_WHITE
+        elif color == 1:  # bold
             pass
-        elif colour == 4:  # smul
+        elif color == 2:  # dim
             pass
-        elif colour == 5:  # blink
+        elif color == 4:  # smul
             pass
-        elif colour == 7:  # smso or rev
-            self._sgr = 0x70000000
-        elif colour == 10:  # rmpch
+        elif color == 5:  # blink
             pass
-        elif colour == 11:  # smpch
+        elif color == 7:  # smso or rev
             pass
-        elif colour == 24:  # rmul
+        elif color == 10:  # rmpch
             pass
-        elif colour == 27:  # rmso
-            self._sgr = MAGIC_NUMBER
-        elif 30 <= colour <= 37:  # setaf
-            c = colour - 30
-            self._sgr = (self._sgr & 0xf8ffffff) | (c << 24)
-        elif colour == 39:
-            self._sgr = MAGIC_NUMBER
-        elif 40 <= colour <= 47:  # setab
-            c = colour - 40
-            self._sgr = (self._sgr & 0x0fffffff) | (c << 28)
-        elif colour == 49:
-            self._sgr = MAGIC_NUMBER
+        elif color == 11:  # smpch
+            pass
+        elif color == 24:  # rmul
+            pass
+        elif color == 27:  # rmso
+            pass
+        elif 30 <= color <= 37:  # setaf
+            color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
+            bg, _ = divmod(color_bits, 16)
+            new_color_bits = bg * 16 + (color - 30)
+            self._sgr &= ~(color_bits << 40)  # clear color bits
+            self._sgr |= new_color_bits << 40  # update bg and fg colors
+        elif color == 39:
+            self._sgr = BLACK_AND_WHITE
+        elif 40 <= color <= 47:  # setab
+            color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
+            _, fg = divmod(color_bits, 16)
+            new_color_bits = (color - 40) * 16 + fg
+            self._sgr &= ~(color_bits << 40)  # clear color bits
+            self._sgr |= new_color_bits << 40  # update bg and fg colors
+        elif color == 49:
+            self._sgr = BLACK_AND_WHITE
 
     def _cap_blink(self):
         """Produces blinking text. """
@@ -474,8 +507,8 @@ class Terminal:
     def _cap_rs1(self):
         """Resets terminal completely to sane modes. """
         cells_number = self._cols * self._rows
-        self._screen = array.array('L', [MAGIC_NUMBER] * cells_number)
-        self._sgr = MAGIC_NUMBER
+        self._screen = array.array('Q', [BLACK_AND_WHITE] * cells_number)
+        self._sgr = BLACK_AND_WHITE
         self._cur_x_bak = self._cur_x = 0
         self._cur_y_bak = self._cur_y = 0
         self._eol = False
@@ -596,17 +629,11 @@ class Terminal:
         span = ''  # ready-to-output character
         span_bg, span_fg = -1, -1
         for i in range(h * w):
-            q, c = divmod(self._screen[i], 256 * 256 * 256)
+            q, c = divmod(self._screen[i], MAGIC_NUMBER)
             bg, fg = divmod(q, 16)
 
-            # Gits supports two color schemes: normal and bright. Each color
-            # scheme consists of 8 colors for a background and text. The
-            # terminal doesn't allow users to switch between them so far.
-            # Gits uses the normal color scheme by default.
-            #
-            # Suppose we have a bright green color (10). Using bitwise AND, we
-            # can get a normal green color (2).
-            bg &= 0x7
+            if not self._normal_mode and fg != 7:
+                fg += 8
 
             if i == self._cur_y * w + self._cur_x:
                 bg, fg = 1, 7
