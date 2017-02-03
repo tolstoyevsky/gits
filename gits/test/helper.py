@@ -15,11 +15,10 @@
 
 import array
 import random
-import re
 import string
 import unittest
 
-from gits.terminal import Terminal, MAGIC_NUMBER
+from gits.terminal import Terminal, BLACK_AND_WHITE
 
 
 def reset_after_executing(func):
@@ -69,7 +68,7 @@ class Helper(unittest.TestCase):
 
         term = self._terminal
 
-        want = array.array('L', [])
+        want = array.array('Q', [])
         for c in s:
             want.append(term._sgr | ord(c))
 
@@ -167,7 +166,7 @@ class Helper(unittest.TestCase):
 
         self.assertEqual(len(s), clear_len)
 
-        clear_area = array.array('L', [MAGIC_NUMBER] * len(s))
+        clear_area = array.array('Q', [BLACK_AND_WHITE] * len(s))
         self.assertEqual(clear_area, term._peek(pos, (cur_x + len(s), cur_y)))
 
     def _check_scroll_down(self, s, pos):
@@ -188,7 +187,7 @@ class Helper(unittest.TestCase):
 
         self._check_string(s, (x, y + 1), (x + len(s), y + 1))
 
-        want = array.array('L', [MAGIC_NUMBER] * term._right_most)
+        want = array.array('Q', [BLACK_AND_WHITE] * term._right_most)
         got = term._peek(pos, (term._right_most, y))
         self.assertEqual(want, got)
 
@@ -236,9 +235,8 @@ class Helper(unittest.TestCase):
 
         # Check that the place, where the line used to be, is filled with
         # zeros.
-        want = array.array('L', [MAGIC_NUMBER] * term._cols)
-        got = term._peek(pos, (term._right_most, y),
-                         inclusively=True)
+        want = array.array('Q', [BLACK_AND_WHITE] * term._cols)
+        got = term._peek(pos, (term._right_most, y), inclusively=True)
         self.assertEqual(want, got)
 
     @reset_after_executing
@@ -250,7 +248,6 @@ class Helper(unittest.TestCase):
         of the location where you want the string to be.
         """
         x, y = pos
-        term = self._terminal
 
         self._put_string(s, pos)
         self._check_string(s, pos, (x + len(s), y))
@@ -376,7 +373,7 @@ class Helper(unittest.TestCase):
             x, y = line[1]
             s = line[0]
 
-            want = array.array('L', [MAGIC_NUMBER] * len(s))
+            want = array.array('Q', [BLACK_AND_WHITE] * len(s))
             got = term._peek((x, y), (len(s), y))
             self.assertEqual(want, got)
         else:
@@ -420,7 +417,7 @@ class Helper(unittest.TestCase):
 
         term._cap_ech(n)
 
-        clear_area = array.array('L', [MAGIC_NUMBER] * n)
+        clear_area = array.array('Q', [BLACK_AND_WHITE] * n)
         self.assertEqual(clear_area, term._peek(pos, (cur_x + n, cur_y)))
 
     @reset_after_executing
@@ -441,7 +438,7 @@ class Helper(unittest.TestCase):
 
         term._cap_el()
 
-        want = array.array('L', [MAGIC_NUMBER] * (term._right_most - cur_x))
+        want = array.array('Q', [BLACK_AND_WHITE] * (term._right_most - cur_x))
         got = term._peek(pos, (term._right_most, cur_y))
         self.assertEqual(want, got)
 
@@ -462,7 +459,7 @@ class Helper(unittest.TestCase):
 
         term._cap_el1()
 
-        want = array.array('L', [MAGIC_NUMBER] * cur_x)
+        want = array.array('Q', [BLACK_AND_WHITE] * cur_x)
         got = term._peek((0, cur_y), (cur_x, cur_y))
         self.assertEqual(want, got)
 
@@ -523,7 +520,7 @@ class Helper(unittest.TestCase):
             self._check_string(s, (cur_x, cur_y + 1),
                                (cur_x + len(s), cur_y + 1))
 
-            want = array.array('L', [MAGIC_NUMBER] * term._right_most)
+            want = array.array('Q', [BLACK_AND_WHITE] * term._right_most)
             got = term._peek((0, cur_y), (term._right_most, cur_y))
             self.assertEqual(want, got)
 
