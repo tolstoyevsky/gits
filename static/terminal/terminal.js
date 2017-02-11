@@ -27,8 +27,11 @@ export class Terminal {
          * resolution.
          */
         this.screen.bind('onenterfullscreen', (() => {
-            let row = this.display.getRow();
-            let col = this.display.getCol();
+            const cell = this.display.getCellSize();
+            const indent = this.screen.getIndent()
+            const row = (window.screen.height - indent * 2) / cell.height
+            const col = (window.screen.width - indent * 2) / cell.width;
+
             this.display.setResolution(Math.floor(row), Math.floor(col));
         }));
 
