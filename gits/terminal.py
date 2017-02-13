@@ -45,6 +45,7 @@ MAGIC_NUMBER = 0x10000000000
 BLACK_AND_WHITE = MAGIC_NUMBER * 7
 
 UNDERLINE_BIT = 32
+BLINK_BIT = 34
 BOLD_BIT = 36
 
 
@@ -284,7 +285,7 @@ class Terminal:
         elif color == 4:  # smul, start underscore mode
             self._sgr ^= 1 << UNDERLINE_BIT
         elif color == 5:  # blink
-            pass
+            self._sgr ^= 1 << BLINK_BIT
         elif color == 7:  # smso or rev
             pass
         elif color == 10:  # rmpch
@@ -656,6 +657,9 @@ class Terminal:
 
             if self._screen[i] & (1 << UNDERLINE_BIT):
                 current_classes.append('underline')
+
+            if self._screen[i] & (1 << BLINK_BIT):
+                current_classes.append('blink')
 
             if self._screen[i] & (1 << BOLD_BIT):
                 current_classes.append('bold')
