@@ -240,6 +240,22 @@ class Terminal:
         """
         self._cap_set_color(0)
 
+    def _set_bg_color(self, color):
+        """Sets background color. """
+        color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
+        _, fg = divmod(color_bits, 16)
+        new_color_bits = color * 16 + fg
+        self._sgr &= ~(color_bits << 40)  # clear color bits
+        self._sgr |= new_color_bits << 40  # update bg and fg colors
+
+    def _set_fg_color(self, color):
+        """Sets foreground color. """
+        color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
+        bg, _ = divmod(color_bits, 16)
+        new_color_bits = bg * 16 + color
+        self._sgr &= ~(color_bits << 40)  # clear color bits
+        self._sgr |= new_color_bits << 40  # update bg and fg colors
+
     def _cap_set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
             self._sgr = BLACK_AND_WHITE
@@ -271,19 +287,11 @@ class Terminal:
         elif color == 27:  # rmso
             pass
         elif 30 <= color <= 37:  # setaf
-            color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
-            bg, _ = divmod(color_bits, 16)
-            new_color_bits = bg * 16 + (color - 30)
-            self._sgr &= ~(color_bits << 40)  # clear color bits
-            self._sgr |= new_color_bits << 40  # update bg and fg colors
+            self._set_fg_color(color - 30)
         elif color == 39:
             self._sgr = BLACK_AND_WHITE
         elif 40 <= color <= 47:  # setab
-            color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
-            _, fg = divmod(color_bits, 16)
-            new_color_bits = (color - 40) * 16 + fg
-            self._sgr &= ~(color_bits << 40)  # clear color bits
-            self._sgr |= new_color_bits << 40  # update bg and fg colors
+            self._set_bg_color(color - 40)
         elif color == 49:
             self._sgr = BLACK_AND_WHITE
 
