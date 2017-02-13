@@ -39,7 +39,14 @@
             &.b7  { background-color: @background-color7; }
 
             &.underline { text-decoration: underline; }
+            &.blink { animation: blink-animation 1s steps(5, start) infinite; }
             &.bold { font-family: 'SourceCodePro Bold'; }
+
+            @keyframes blink-animation {
+                to {
+                    visibility: hidden;
+                }
+            }
         }
     }
 
