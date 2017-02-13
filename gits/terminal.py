@@ -252,6 +252,11 @@ class Terminal:
         """Sets foreground color. """
         color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
         bg, _ = divmod(color_bits, 16)
+
+        # Switch to the bright color scheme if necessary.
+        if not self._normal_mode:
+            color += 8
+
         new_color_bits = bg * 16 + color
         self._sgr &= ~(color_bits << 40)  # clear color bits
         self._sgr |= new_color_bits << 40  # update bg and fg colors
@@ -639,9 +644,6 @@ class Terminal:
         for i in range(h * w):
             q, c = divmod(self._screen[i], MAGIC_NUMBER)
             bg, fg = divmod(q, 16)
-
-            if not self._normal_mode and fg != 7:
-                fg += 8
 
             if i == self._cur_y * w + self._cur_x:
                 bg, fg = 1, 7
