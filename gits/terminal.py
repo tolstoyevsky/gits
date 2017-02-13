@@ -44,6 +44,8 @@ MAGIC_NUMBER = 0x10000000000
 # The colors section of MAGIC_NUMBER stores 7, i.e. (0, 7) or black and white.
 BLACK_AND_WHITE = MAGIC_NUMBER * 7
 
+BOLD_BIT = 36
+
 
 class Terminal:
     def __init__(self, rows=24, cols=80):
@@ -274,7 +276,8 @@ class Terminal:
         if color == 0:
             self._sgr = BLACK_AND_WHITE
         elif color == 1:  # bold
-            pass
+            self._sgr ^= 1 << BOLD_BIT
+            self._cap_set_color(37)  # bold also means extra bright
         elif color == 2:  # dim
             pass
         elif color == 4:  # smul
@@ -640,27 +643,32 @@ class Terminal:
         r = ''
 
         span = ''  # ready-to-output character
-        span_bg, span_fg = -1, -1
+        span_classes = []
         for i in range(h * w):
             q, c = divmod(self._screen[i], MAGIC_NUMBER)
             bg, fg = divmod(q, 16)
 
+            current_classes = [
+                'b{}'.format(bg),
+                'f{}'.format(fg)
+            ]
+
+            if self._screen[i] & (1 << BOLD_BIT):
+                current_classes.append('bold')
+
             if i == self._cur_y * w + self._cur_x:
-                bg, fg = 1, 7
+                current_classes[0], current_classes[1] = 'b1', 'f7'
 
             # If the characteristics of the current cell match the
             # characteristics of the previous cell, combine them into a group.
-            if bg != span_bg or fg != span_fg or i + 1 == h * w:
+            if span_classes != current_classes or i + 1 == h * w:
                 if len(span):
+                    classes = ' '.join(span_classes)
                     # Replace spaces with non-breaking space.
-                    ch = span.replace(' ', '\xa0')
-                    r += '<span class="f{} b{}">{}</span>'.format(
-                        span_fg,
-                        span_bg,
-                        html.escape(ch)
-                    )
+                    ch = html.escape(span.replace(' ', '\xa0'))
+                    r += '<span class="{}">{}</span>'.format(classes, ch)
                 span = ''
-                span_bg, span_fg = bg, fg
+                span_classes = current_classes[:]
 
             if c == 0:
                 span += ' '
