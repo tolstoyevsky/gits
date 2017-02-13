@@ -44,6 +44,7 @@ MAGIC_NUMBER = 0x10000000000
 # The colors section of MAGIC_NUMBER stores 7, i.e. (0, 7) or black and white.
 BLACK_AND_WHITE = MAGIC_NUMBER * 7
 
+UNDERLINE_BIT = 32
 BOLD_BIT = 36
 
 
@@ -280,8 +281,8 @@ class Terminal:
             self._cap_set_color(37)  # bold also means extra bright
         elif color == 2:  # dim
             pass
-        elif color == 4:  # smul
-            pass
+        elif color == 4:  # smul, start underscore mode
+            self._sgr ^= 1 << UNDERLINE_BIT
         elif color == 5:  # blink
             pass
         elif color == 7:  # smso or rev
@@ -290,8 +291,8 @@ class Terminal:
             pass
         elif color == 11:  # smpch
             pass
-        elif color == 24:  # rmul
-            pass
+        elif color == 24:  # rmul, end underscore mode
+            self._sgr &= ~(1 << UNDERLINE_BIT)
         elif color == 27:  # rmso
             pass
         elif 30 <= color <= 37:  # setaf
@@ -652,6 +653,9 @@ class Terminal:
                 'b{}'.format(bg),
                 'f{}'.format(fg)
             ]
+
+            if self._screen[i] & (1 << UNDERLINE_BIT):
+                current_classes.append('underline')
 
             if self._screen[i] & (1 << BOLD_BIT):
                 current_classes.append('bold')
