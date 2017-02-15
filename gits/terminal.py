@@ -235,6 +235,14 @@ class Terminal:
         """Allows ignoring some escape and control sequences. """
         pass
 
+    def _set_bit(self, bit):
+        """Sets the specified `_sgr` bit. """
+        self._sgr |= 1 << bit
+
+    def _clean_bit(self, bit):
+        """Cleans the specified `_sgr` bit. """
+        self._sgr &= ~(1 << bit)
+
     def _default_rendition(self):
         """Cancels the effect of any preceding occurrence of SGR in the data
         stream regardless of the setting of the GRAPHIC RENDITION COMBINATION
@@ -278,14 +286,14 @@ class Terminal:
         if color == 0:
             self._sgr = BLACK_AND_WHITE
         elif color == 1:  # bold
-            self._sgr ^= 1 << BOLD_BIT
+            self._set_bit(BOLD_BIT)
             self._cap_set_color(37)  # bold also means extra bright
         elif color == 2:  # dim
             pass
         elif color == 4:  # smul, start underscore mode
-            self._sgr ^= 1 << UNDERLINE_BIT
+            self._set_bit(UNDERLINE_BIT)
         elif color == 5:  # blink
-            self._sgr ^= 1 << BLINK_BIT
+            self._set_bit(BLINK_BIT)
         elif color == 7:  # smso or rev
             pass
         elif color == 10:  # rmpch
@@ -293,7 +301,7 @@ class Terminal:
         elif color == 11:  # smpch
             pass
         elif color == 24:  # rmul, end underscore mode
-            self._sgr &= ~(1 << UNDERLINE_BIT)
+            self._clean_bit(UNDERLINE_BIT)
         elif color == 27:  # rmso
             pass
         elif 30 <= color <= 37:  # setaf
