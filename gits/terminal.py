@@ -640,13 +640,13 @@ class Terminal:
                 self._echo(i)
 
     def dumphtml(self):
-        h = self._rows
-        w = self._cols
+        rows = self._rows
+        cols = self._cols
         r = ''
 
-        span = ''  # ready-to-output character
+        span = ''  # ready-to-output characters
         span_classes = []
-        for i in range(h * w):
+        for i in range(rows * cols):
             q, c = divmod(self._screen[i], MAGIC_NUMBER)
             bg, fg = divmod(q, 16)
 
@@ -664,15 +664,15 @@ class Terminal:
             if self._screen[i] & (1 << BOLD_BIT):
                 current_classes.append('bold')
 
-            if i == self._cur_y * w + self._cur_x:
+            if i == self._cur_y * cols + self._cur_x:
                 current_classes[0], current_classes[1] = 'b1', 'f7'
 
             # If the characteristics of the current cell match the
             # characteristics of the previous cell, combine them into a group.
-            if span_classes != current_classes or i + 1 == h * w:
+            if span_classes != current_classes or i + 1 == rows * cols:
                 if len(span):
                     classes = ' '.join(span_classes)
-                    # Replace spaces with non-breaking space.
+                    # Replace spaces with non-breaking spaces.
                     ch = html.escape(span.replace(' ', '\xa0'))
                     r += '<span class="{}">{}</span>'.format(classes, ch)
                 span = ''
@@ -683,7 +683,7 @@ class Terminal:
 
             span += chr(c & 0xFFFF)
 
-            if not (i + 1) % w:
+            if not (i + 1) % cols:
                 span += '\n'
 
         return r
