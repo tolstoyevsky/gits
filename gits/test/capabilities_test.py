@@ -649,7 +649,7 @@ class TestCapabilities(Helper):
         self.assertEqual(y, term._cur_y_bak)
 
     def test_cap_sgr0(self):
-        """The terminal should have the possibility to turn off all atributes.
+        """The terminal should have the possibility to turn off all attributes.
         """
         self._terminal._sgr = None
         self._terminal._cap_sgr0()
