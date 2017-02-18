@@ -279,31 +279,33 @@ class Terminal:
         elif p1 == 39 and p2 == 49:  # op
             self._sgr = BLACK_AND_WHITE
         else:
-            self._cap_set_color(p1)
+            self._set_attribute(p1)
             self._cap_set_color(p2)
+
+    def _set_attribute(self, p1):
+        """Sets attribute parameters of SGR. """
+        if p1 == 1:
+            self._cap_bold()
+        elif p1 == 2:
+            self._cap_dim()
+        elif p1 == 4:
+            self._cap_smul()
+        elif p1 == 5:
+            self._cap_blink()
+        elif p1 == 7:
+            self._cap_rev()
+        elif p1 == 10:
+            self._cap_rmpch()
+        elif p1 == 11:
+            self._cap_smpch()
+        elif p1 == 24:
+            self._cap_rmul()
+        elif p1 == 27:
+            self._cap_rmso()
 
     def _cap_set_color(self, color):
         if color == 0:
             self._sgr = BLACK_AND_WHITE
-        elif color == 1:  # bold
-            self._set_bit(BOLD_BIT)
-            self._cap_set_color(37)  # bold also means extra bright
-        elif color == 2:  # dim
-            pass
-        elif color == 4:  # smul, start underscore mode
-            self._set_bit(UNDERLINE_BIT)
-        elif color == 5:  # blink
-            self._set_bit(BLINK_BIT)
-        elif color == 7:  # smso or rev
-            pass
-        elif color == 10:  # rmpch
-            pass
-        elif color == 11:  # smpch
-            pass
-        elif color == 24:  # rmul, end underscore mode
-            self._clean_bit(UNDERLINE_BIT)
-        elif color == 27:  # rmso
-            pass
         elif 30 <= color <= 37:  # setaf
             self._set_fg_color(color - 30)
         elif color == 39:
@@ -315,11 +317,12 @@ class Terminal:
 
     def _cap_blink(self):
         """Produces blinking text. """
-        self._cap_set_color(5)
+        self._set_bit(BLINK_BIT)
 
     def _cap_bold(self):
         """Produces bold text. """
-        self._cap_set_color(1)
+        self._set_bit(BOLD_BIT)
+        self._cap_set_color(37)  # bold also means extra bright
 
     def _cap_civis(self):
         """Makes the cursor invisible. See _cap_cvvis. """
@@ -398,7 +401,7 @@ class Terminal:
 
     def _cap_dim(self):
         """Enters Half-bright mode. """
-        self._cap_set_color(2)
+        pass
 
     def _cap_dl(self, n):
         """Deletes ``n`` number of lines in their entirety, with the lines
@@ -506,7 +509,7 @@ class Terminal:
 
     def _cap_rev(self):
         """Enables Reverse Video mode. """
-        self._cap_set_color(3)
+        pass
 
     def _cap_ri(self):
         """Scrolls text down. See _cap_ind. """
@@ -520,15 +523,15 @@ class Terminal:
 
     def _cap_rmpch(self):
         """Exits PC character display mode. See _cap_smpch. """
-        self._cap_set_color(10)
+        pass
 
     def _cap_rmso(self):
         """Exits Standout mode. See _cap_smso. """
-        self._cap_set_color(27)
+        pass
 
     def _cap_rmul(self):
         """Exits Underscore mode. See _cap_smul. """
-        self._cap_set_color(24)
+        self._clean_bit(UNDERLINE_BIT)
 
     def _cap_rs1(self):
         """Resets terminal completely to sane modes. """
@@ -583,7 +586,7 @@ class Terminal:
 
     def _cap_smul(self):
         """Enters Underscore mode. See _cap_rmul. """
-        self._cap_set_color(4)
+        self._set_bit(UNDERLINE_BIT)
 
     def _cap_smpch(self):
         """Enters PC character display mode. See _cap_rmpch. """
