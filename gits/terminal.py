@@ -530,7 +530,7 @@ class Terminal:
         pass
 
     def _cap_rmul(self):
-        """Exits Underscore mode. See _cap_smul. """
+        """Exits Underline mode. See _cap_smul. """
         self._clean_bit(UNDERLINE_BIT)
 
     def _cap_rs1(self):
@@ -585,7 +585,7 @@ class Terminal:
         self._cap_set_color(7)
 
     def _cap_smul(self):
-        """Enters Underscore mode. See _cap_rmul. """
+        """Enters Underline mode. See _cap_rmul. """
         self._set_bit(UNDERLINE_BIT)
 
     def _cap_smpch(self):
