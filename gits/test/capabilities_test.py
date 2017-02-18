@@ -18,7 +18,7 @@ import array
 import random
 import unittest
 
-from gits.terminal import BLACK_AND_WHITE
+from gits.terminal import BLACK_AND_WHITE, UNDERLINE_BIT, BLINK_BIT, BOLD_BIT
 from gits.test.helper import Helper
 
 
@@ -222,6 +222,19 @@ class TestCapabilities(Helper):
     def test_esc_da(self):
         # TODO: add a docstring.
         pass
+
+    def test_cap_blink(self):
+        """The terminal should have the possibility to produce blinking text.
+        """
+        term = self._terminal
+        term._cap_blink()
+        self.assertTrue(term._sgr & (1 << BLINK_BIT))
+
+    def test_cap_bold(self):
+        """The terminal should have the possibility to produce bold text. """
+        term = self._terminal
+        term._cap_bold()
+        self.assertTrue(term._sgr & (1 << BOLD_BIT))
 
     def test_cap_cub1(self):
         """The terminal should have the possibility to move the cursor left by
@@ -659,6 +672,16 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to enter Standout mode. """
         pass
 
+    def test_cap_smul_rmul(self):
+        """The terminal should have the possibility to enter and exit
+        Underline mode.
+        """
+        term = self._terminal
+        term._cap_smul()
+        self.assertTrue(term._sgr & (1 << UNDERLINE_BIT))
+        term._cap_rmul()
+        self.assertFalse(term._sgr & (1 << UNDERLINE_BIT))
+
     def test_cap_vpa(self):
         """The terminal should have the possibility to set the vertical
         position of the cursor to the specified value.
@@ -672,19 +695,7 @@ class TestCapabilities(Helper):
         self._check_cap_vpa(rand_y)
 
     @unittest.skip('skip')
-    def test_cap_bold(self):
-        pass
-
-    @unittest.skip('skip')
     def test_cap_dim(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_smul(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_blink(self):
         pass
 
     @unittest.skip('skip')
@@ -693,10 +704,6 @@ class TestCapabilities(Helper):
 
     @unittest.skip('skip')
     def test_cap_smpch(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_rmul(self):
         pass
 
     @unittest.skip('skip')
