@@ -265,8 +265,9 @@ class Terminal:
         color_bits, _ = divmod(self._sgr, MAGIC_NUMBER)
         bg, _ = divmod(color_bits, 16)
 
-        # Switch to the bright color scheme if necessary.
-        if not self._normal_mode:
+        # bold also means extra bright, so if the corresponding bit is set, we
+        # have to switch to the bright color scheme.
+        if self._sgr & (1 << BOLD_BIT):
             color += 8
 
         new_color_bits = bg * 16 + color
@@ -322,7 +323,6 @@ class Terminal:
     def _cap_bold(self):
         """Produces bold text. """
         self._set_bit(BOLD_BIT)
-        self._cap_set_color(37)  # bold also means extra bright
 
     def _cap_civis(self):
         """Makes the cursor invisible. See _cap_cvvis. """
