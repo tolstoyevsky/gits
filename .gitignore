@@ -1,5 +1,6 @@
 .idea
 *.pyc
+*.swo
 *.swp
 *tags
 build
