@@ -402,8 +402,15 @@ class Terminal:
         pass
 
     def _cap_dl(self, n):
-        """Deletes ``n`` number of lines in their entirety, with the lines
-        below moving up to fill the gap that is left.
+        """Deletes ``n`` number of lines.
+
+        On the one hand, the specification says that the dl capability should
+        delete ``n`` number of lines, on the other hand, in the reality, dl
+        just scrolls up ``n`` number of lines. Notice, that dl should work
+        together with another capability that will put the cursor on the
+        line that is going to be deleted. For example, in tests dl works
+        together with the home capability, but it doesn't mean that the
+        capabilities are always used together.
         """
         if self._top_most <= self._cur_y <= self._bottom_most:
             for _ in range(n):
