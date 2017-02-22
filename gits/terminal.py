@@ -323,6 +323,7 @@ class Terminal:
     def _cap_bold(self):
         """Produces bold text. """
         self._set_bit(BOLD_BIT)
+        self._cap_set_color(37)
 
     def _cap_civis(self):
         """Makes the cursor invisible. See _cap_cvvis. """
