@@ -18,7 +18,13 @@ import array
 import random
 import unittest
 
-from gits.terminal import BLACK_AND_WHITE, UNDERLINE_BIT, BLINK_BIT, BOLD_BIT
+from gits.terminal import (
+    BLACK_AND_WHITE,
+    UNDERLINE_BIT,
+    REVERSE_BIT,
+    BLINK_BIT,
+    BOLD_BIT,
+)
 from gits.test.helper import Helper
 
 
@@ -612,6 +618,11 @@ class TestCapabilities(Helper):
         term._cap_rc()  # restore a previously saved cursor position.
         self.assertEqual(cur_x_bck, term._cur_x)
         self.assertTrue(term._eol)
+
+    def test_cap_rev(self):
+        term = self._terminal
+        term._cap_rev()
+        self.assertTrue(term._is_bit_set(REVERSE_BIT, term._sgr))
 
     def test_cap_ri(self):
         """The terminal should have the possibility to scroll text down. """
