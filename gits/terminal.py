@@ -381,10 +381,6 @@ class Terminal:
         """Makes the cursor visible. See _cap_civis. """
         self._cur_visible = True
 
-    # TODO: rework later
-    def _esc_da(self):
-        self._outbuf = "\x1b[?6c"  # u8
-
     def _cap_dch(self, n):
         """Deletes ``n`` number of characters. """
         cur_x, cur_y = self._cur_x, self._cur_y

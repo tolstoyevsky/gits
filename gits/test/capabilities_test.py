@@ -218,11 +218,6 @@ class TestCapabilities(Helper):
         # Poke to the last line.
         self._check_poke(zeros, (0, term._bottom_most))
 
-    @unittest.skip('skip')
-    def test_esc_da(self):
-        # TODO: add a docstring.
-        pass
-
     def test_cap_blink(self):
         """The terminal should have the possibility to produce blinking text.
         """
