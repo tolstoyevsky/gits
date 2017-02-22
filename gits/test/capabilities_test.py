@@ -223,13 +223,13 @@ class TestCapabilities(Helper):
         """
         term = self._terminal
         term._cap_blink()
-        self.assertTrue(term._sgr & (1 << BLINK_BIT))
+        self.assertTrue(term._is_bit_set(BLINK_BIT, term._sgr))
 
     def test_cap_bold(self):
         """The terminal should have the possibility to produce bold text. """
         term = self._terminal
         term._cap_bold()
-        self.assertTrue(term._sgr & (1 << BOLD_BIT))
+        self.assertTrue(term._is_bit_set(BOLD_BIT, term._sgr))
 
     def test_cap_cub1(self):
         """The terminal should have the possibility to move the cursor left by
@@ -673,9 +673,9 @@ class TestCapabilities(Helper):
         """
         term = self._terminal
         term._cap_smul()
-        self.assertTrue(term._sgr & (1 << UNDERLINE_BIT))
+        self.assertTrue(term._is_bit_set(UNDERLINE_BIT, term._sgr))
         term._cap_rmul()
-        self.assertFalse(term._sgr & (1 << UNDERLINE_BIT))
+        self.assertFalse(term._is_bit_set(UNDERLINE_BIT, term._sgr))
 
     def test_cap_vpa(self):
         """The terminal should have the possibility to set the vertical

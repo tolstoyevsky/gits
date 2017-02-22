@@ -241,6 +241,10 @@ class Terminal:
         """Sets the specified `_sgr` bit. """
         self._sgr |= 1 << bit
 
+    def _is_bit_set(self, bit, value):
+        """Checks if the specified bit is set in the specified value. """
+        return bool(value & (1 << bit))
+
     def _clean_bit(self, bit):
         """Cleans the specified `_sgr` bit. """
         self._sgr &= ~(1 << bit)
@@ -663,17 +667,17 @@ class Terminal:
                 'f{}'.format(fg)
             ]
 
-            if cell & (1 << UNDERLINE_BIT):
+            if self._is_bit_set(UNDERLINE_BIT, cell):
                 current_classes.append('underline')
 
-            if cell & (1 << REVERSE_BIT):
+            if self._is_bit_set(REVERSE_BIT, cell):
                 current_classes[0] = 'b{}'.format(fg)
                 current_classes[1] = 'f{}'.format(bg)
 
-            if cell & (1 << BLINK_BIT):
+            if self._is_bit_set(BLINK_BIT, cell):
                 current_classes.append('blink')
 
-            if cell & (1 << BOLD_BIT):
+            if self._is_bit_set(BOLD_BIT, cell):
                 current_classes.append('bold')
 
             if i == self._cur_y * cols + self._cur_x and self._cur_visible:
