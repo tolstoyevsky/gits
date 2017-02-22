@@ -654,7 +654,8 @@ class Terminal:
         span = ''  # ready-to-output characters
         span_classes = []
         for i in range(rows * cols):
-            q, c = divmod(self._screen[i], MAGIC_NUMBER)
+            cell = self._screen[i]
+            q, c = divmod(cell, MAGIC_NUMBER)
             bg, fg = divmod(q, 16)
 
             current_classes = [
@@ -662,17 +663,17 @@ class Terminal:
                 'f{}'.format(fg)
             ]
 
-            if self._screen[i] & (1 << UNDERLINE_BIT):
+            if cell & (1 << UNDERLINE_BIT):
                 current_classes.append('underline')
 
-            if self._screen[i] & (1 << REVERSE_BIT):
+            if cell & (1 << REVERSE_BIT):
                 current_classes[0] = 'b{}'.format(fg)
                 current_classes[1] = 'f{}'.format(bg)
 
-            if self._screen[i] & (1 << BLINK_BIT):
+            if cell & (1 << BLINK_BIT):
                 current_classes.append('blink')
 
-            if self._screen[i] & (1 << BOLD_BIT):
+            if cell & (1 << BOLD_BIT):
                 current_classes.append('bold')
 
             if i == self._cur_y * cols + self._cur_x and self._cur_visible:
