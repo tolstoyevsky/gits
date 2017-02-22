@@ -45,6 +45,7 @@ MAGIC_NUMBER = 0x10000000000
 BLACK_AND_WHITE = MAGIC_NUMBER * 7
 
 UNDERLINE_BIT = 32
+REVERSE_BIT = 33
 BLINK_BIT = 34
 BOLD_BIT = 36
 
@@ -502,7 +503,7 @@ class Terminal:
 
     def _cap_rev(self):
         """Enables Reverse Video mode. """
-        pass
+        self._set_bit(REVERSE_BIT)
 
     def _cap_ri(self):
         """Scrolls text down. See _cap_ind. """
@@ -644,6 +645,8 @@ class Terminal:
                 self._echo(i)
 
     def dumphtml(self):
+        self._clean_bit(REVERSE_BIT)
+
         rows = self._rows
         cols = self._cols
         r = ''
@@ -661,6 +664,10 @@ class Terminal:
 
             if self._screen[i] & (1 << UNDERLINE_BIT):
                 current_classes.append('underline')
+
+            if self._screen[i] & (1 << REVERSE_BIT):
+                current_classes[0] = 'b{}'.format(fg)
+                current_classes[1] = 'f{}'.format(bg)
 
             if self._screen[i] & (1 << BLINK_BIT):
                 current_classes.append('blink')
