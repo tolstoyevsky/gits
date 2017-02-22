@@ -55,6 +55,7 @@ class Terminal:
         self._rows = rows
         self._cur_y = None
         self._cur_x = None
+        self._cur_visible = True
 
         # The following two fields are used only for implementation of
         # storing (sc) and restoring (rc) the current cursor position.
@@ -327,7 +328,7 @@ class Terminal:
 
     def _cap_civis(self):
         """Makes the cursor invisible. See _cap_cvvis. """
-        pass
+        self._cur_visible = False
 
     def _cap_cr(self):
         """Does carriage return. """
@@ -377,8 +378,8 @@ class Terminal:
         self._eol = True if self._cur_x == self._right_most else False
 
     def _cap_cvvis(self):
-        """Make the cursor visible. See _cap_civis. """
-        pass
+        """Makes the cursor visible. See _cap_civis. """
+        self._cur_visible = True
 
     # TODO: rework later
     def _esc_da(self):
@@ -671,8 +672,8 @@ class Terminal:
             if self._screen[i] & (1 << BOLD_BIT):
                 current_classes.append('bold')
 
-            if i == self._cur_y * cols + self._cur_x:
-                current_classes[0], current_classes[1] = 'b1', 'f7'
+            if i == self._cur_y * cols + self._cur_x and self._cur_visible:
+                current_classes[0], current_classes[1] = 'b1', 'f7'  # cursor
 
             # If the characteristics of the current cell match the
             # characteristics of the previous cell, combine them into a group.

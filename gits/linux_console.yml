@@ -36,8 +36,8 @@ escape_sequences:
   '\E[?7h': 'ignore'
   '\E[?25h\E[?0c': 'ignore'
   '\E[?25l\E[?1c': 'ignore'
-  '\E[?1000h': 'ignore'
-  '\E[?1000l': 'ignore'
+  '\E[?1000h': 'civis'
+  '\E[?1000l': 'cvvis'
   '\E[?2004h': 'ignore'
   '\E[?2004l': 'ignore'
 
