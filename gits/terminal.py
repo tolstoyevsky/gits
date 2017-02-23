@@ -377,10 +377,8 @@ class Terminal:
 
         The ``y`` and ``x`` values start from 1.
         """
-        self._cur_y = min(self._bottom_most, y - 1)
-        self._cur_x = min(self._right_most, x - 1)
-
-        self._eol = False
+        self._cap_vpa(y)
+        self._cap_hpa(x)
 
     def _cap_cvvis(self):
         """Makes the cursor visible. See _cap_civis. """
@@ -610,7 +608,7 @@ class Terminal:
         The ``x`` value starts from 1.
         """
         self._cur_x = min(self._right_most, x - 1)
-        self._eol = True if self._cur_x == self._right_most else False
+        self._eol = False  # it's necessary to reset _eol after preceding echo
 
     def _exec_escape_sequence(self):
         e = self._buf
