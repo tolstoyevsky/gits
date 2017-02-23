@@ -355,11 +355,6 @@ class Terminal:
         """
         self._cur_x = max(0, self._cur_x - 1)
 
-        if self._cur_x == self._left_most:
-            self._cur_x = self._right_most
-            self._cur_y = max(0, self._cur_y - 1)
-            self._eol = True
-
     def _cap_cud(self, n):
         """Moves the cursor down ``n`` number of lines. """
         self._cur_y = min(self._bottom_most, self._cur_y + n)

@@ -291,13 +291,8 @@ class Helper(unittest.TestCase):
 
         term._cap_cub1()
 
-        if cur_x <= 1:
-            self.assertEqual(term._right_most, term._cur_x)
-
-            if cur_y == 0:
-                self.assertEqual(0, term._cur_y)
-            else:
-                self.assertEqual(cur_y - 1, term._cur_y)
+        if cur_x == 0:
+            self.assertEqual(term._left_most, term._cur_x)
         else:
             self.assertEqual(cur_x - 1, term._cur_x)
             self.assertEqual(cur_y, term._cur_y)
