@@ -313,12 +313,7 @@ class Helper(unittest.TestCase):
         # The y and x values start from 1.
         self.assertEqual(x - 1, term._cur_x)
         self.assertEqual(y - 1, term._cur_y)
-
-        # Check reaching the end of the line.
-        if term._cur_x == term._right_most:
-            self.assertTrue(term._eol)
-        else:
-            self.assertFalse(term._eol)
+        self.assertFalse(term._eol)
 
     @reset_after_executing
     def _check_cap_csr(self, reg):
@@ -485,11 +480,7 @@ class Helper(unittest.TestCase):
         term._cap_hpa(x)
 
         self.assertEqual(x - 1, term._cur_x)
-
-        if x == self._terminal._cols:
-            self.assertTrue(self._terminal._eol)
-        else:
-            self.assertFalse(self._terminal._eol)
+        self.assertFalse(term._eol)
 
     @reset_after_executing
     def _check_cap_il1(self, s, pos):
