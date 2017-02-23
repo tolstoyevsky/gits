@@ -373,7 +373,7 @@ class Terminal:
 
     def _cap_cup(self, y, x):
         """Sets the vertical and horizontal positions of the cursor to ``y``
-        and ``x``, respectively.
+        and ``x``, respectively. See _cap_vpa and _cap_hpa.
 
         The ``y`` and ``x`` values start from 1.
         """
