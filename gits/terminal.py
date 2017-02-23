@@ -380,7 +380,7 @@ class Terminal:
         self._cur_y = min(self._bottom_most, y - 1)
         self._cur_x = min(self._right_most, x - 1)
 
-        self._eol = True if self._cur_x == self._right_most else False
+        self._eol = False
 
     def _cap_cvvis(self):
         """Makes the cursor visible. See _cap_civis. """
