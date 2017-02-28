@@ -627,6 +627,13 @@ class TestCapabilities(Helper):
         rand_y = random.randint(2, term._bottom_most)
         self._check_cap_ri(['x'] * term._right_most, (0, rand_y))
 
+    def test_cap_rmul(self):
+        """The terminal should have the possibility to exit Underscore mode.
+        """
+        self._terminal._sgr = 0x01
+        self._terminal._cap_rmul()
+        self.assertEqual(0x01, self._terminal._sgr)
+
     def test_cap_rs1(self):
         """The terminal should have the possibility to completely reset to sane
         modes.
