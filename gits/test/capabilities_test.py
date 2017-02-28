@@ -317,12 +317,14 @@ class TestCapabilities(Helper):
         """The terminal should have the possibility to delete the specified
         number of characters.
         """
-        greeting = 'Hello, World!'
         term = self._terminal
 
+        greeting = 'Hello, World!'
         self._check_cap_dch(greeting, 7)  # remove 'Hello, '
 
         self._check_cap_dch(greeting, 0)
+        self._check_cap_dch(['a'] * term._right_most, term._right_most)
+        self._check_cap_dch(['b'] * term._cols, term._cols)
 
         # Remove a character.
 
