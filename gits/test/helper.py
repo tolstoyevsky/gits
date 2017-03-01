@@ -378,6 +378,7 @@ class Helper(unittest.TestCase):
                 s = line[0]
                 self._check_string(s, (x, i), (len(s), i))
 
+    @reset_after_executing
     def _check_cap_dch(self, s, n):
         """A helper that checks the `_cap_dch` method.
 
