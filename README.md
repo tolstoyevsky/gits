@@ -22,4 +22,4 @@ Licensing
 
 Gits is available under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html).
 
-Gits logo created by [botanicahouse](https://www.instagram.com/botanicahouse/) and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+Gits logo is created by [botanicahouse](https://www.instagram.com/botanicahouse/) and licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
