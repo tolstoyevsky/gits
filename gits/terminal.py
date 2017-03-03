@@ -230,7 +230,7 @@ class Terminal:
         if method:
             method(*args)
         else:
-            self._logger.fatal('The _cap{name} and _{name} methods do not '
+            self._logger.fatal('The _cap_{name} and _{name} methods do not '
                                'exist'.format(name=name))
 
     def _ignore(self):
