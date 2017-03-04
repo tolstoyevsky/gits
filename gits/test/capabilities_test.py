@@ -411,7 +411,7 @@ class TestCapabilities(Helper):
 
         # The x position of the cursor is at the right-most position and
         # the end of the line was reached.
-        term._eol = True
+        self._put_string(['t'] * term._right_most, (0, 0))
         self._check_cap_home((term._right_most, term._bottom_most))
 
         rand_x = random.randint(1, term._right_most - 1)
