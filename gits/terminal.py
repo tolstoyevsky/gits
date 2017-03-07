@@ -451,7 +451,7 @@ class Terminal:
     def _cap_ht(self):
         """Tabs to the next 8-space hardware tab stop. """
         x = self._cur_x + 8
-        q, r = divmod(x, 8)
+        q, _ = divmod(x, 8)
         self._cur_x = (q * 8) % self._cols
 
     def _cap_ich(self, n):

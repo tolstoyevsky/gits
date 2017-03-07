@@ -128,7 +128,7 @@ class Helper(unittest.TestCase):
         term = self._terminal
         term._eol = False
 
-        cur_x, cur_y = term._cur_x, term._cur_y = pos
+        cur_x, _ = term._cur_x, term._cur_y = pos
 
         term._echo(c)
 
