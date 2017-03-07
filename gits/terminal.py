@@ -280,14 +280,9 @@ class Terminal:
         self._sgr &= ~(color_bits << 40)  # clear color bits
         self._sgr |= new_color_bits << 40  # update bg and fg colors
 
-    def _cap_set_color_pair(self, p1, p2):
-        if p1 == 0 and p2 == 10:  # sgr0
-            self._sgr = BLACK_AND_WHITE
-        elif p1 == 39 and p2 == 49:  # op
-            self._sgr = BLACK_AND_WHITE
-        else:
-            self._set_attribute(p1)
-            self._cap_set_color(p2)
+    def _set_black_and_white(self):
+        """Sets black(background) and white(foreground) color pair. """
+        self._sgr = BLACK_AND_WHITE
 
     def _set_attribute(self, p1):
         """Sets attribute parameters of SGR. """
@@ -502,7 +497,7 @@ class Terminal:
         """Sets default color-pair to the original one. The name of the
         capability stands for 'original pair'.
         """
-        self._cap_set_color_pair(39, 49)
+        self._set_black_and_white()
 
     def _cap_rc(self):
         """Restores the cursor to the last saved position. See _cap_sc. """
@@ -572,7 +567,7 @@ class Terminal:
         pass
 
     def _cap_sgr0(self):
-        self._cap_set_color_pair(0, 10)
+        self._set_black_and_white()
 
     def _cap_smir(self):
         """Enters Insert mode. See _cap_rmir. """
