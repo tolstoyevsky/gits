@@ -256,7 +256,7 @@ class Terminal:
         RENDITION," in ECMA-048 at
         http://www.ecma-international.org/publications/standards/Ecma-048.htm.
         """
-        self._cap_set_color(0)
+        self._set_color(0)
 
     def _set_bg_color(self, color):
         """Sets the background color. """
@@ -280,14 +280,14 @@ class Terminal:
         self._sgr &= ~(color_bits << 40)  # clear color bits
         self._sgr |= new_color_bits << 40  # update bg and fg colors
 
-    def _cap_set_color_pair(self, p1, p2):
+    def _set_color_pair(self, p1, p2):
         if p1 == 0 and p2 == 10:  # sgr0
             self._sgr = BLACK_AND_WHITE
         elif p1 == 39 and p2 == 49:  # op
             self._sgr = BLACK_AND_WHITE
         else:
             self._set_attribute(p1)
-            self._cap_set_color(p2)
+            self._set_color(p2)
 
     def _set_attribute(self, p1):
         """Sets attribute parameters of SGR. """
@@ -310,7 +310,7 @@ class Terminal:
         elif p1 == 27:
             self._cap_rmso()
 
-    def _cap_set_color(self, color):
+    def _set_color(self, color):
         if color == 0:
             self._sgr = BLACK_AND_WHITE
         elif 30 <= color <= 37:  # setaf
@@ -329,7 +329,7 @@ class Terminal:
     def _cap_bold(self):
         """Produces bold text. """
         self._set_bit(BOLD_BIT)
-        self._cap_set_color(37)
+        self._set_color(37)
 
     def _cap_civis(self):
         """Makes the cursor invisible. See _cap_cvvis. """
@@ -502,7 +502,7 @@ class Terminal:
         """Sets default color-pair to the original one. The name of the
         capability stands for 'original pair'.
         """
-        self._cap_set_color_pair(39, 49)
+        self._set_color_pair(39, 49)
 
     def _cap_rc(self):
         """Restores the cursor to the last saved position. See _cap_sc. """
@@ -572,7 +572,7 @@ class Terminal:
         pass
 
     def _cap_sgr0(self):
-        self._cap_set_color_pair(0, 10)
+        self._set_color_pair(0, 10)
 
     def _cap_smir(self):
         """Enters Insert mode. See _cap_rmir. """
@@ -585,7 +585,7 @@ class Terminal:
         definition for the term. Standout mode is whatever special highlighting
         the terminal can do, as defined in the terminal's database entry.
         """
-        self._cap_set_color(7)
+        self._set_color(7)
 
     def _cap_smul(self):
         """Enters Underline mode. See _cap_rmul. """
@@ -593,7 +593,7 @@ class Terminal:
 
     def _cap_smpch(self):
         """Enters PC character display mode. See _cap_rmpch. """
-        self._cap_set_color(11)
+        self._set_color(11)
 
     def _cap_vpa(self, y):
         """Sets the vertical position of the cursor to ``y``. See _cap_hpa.
