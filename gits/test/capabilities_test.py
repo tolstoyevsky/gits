@@ -430,12 +430,44 @@ class TestCapabilities(Helper):
         rand_x = random.randint(2, term._cols - 1)
         self._check_cap_hpa(rand_x)
 
-    @unittest.skip('skip')
     def test_cap_ht(self):
         """The terminal should have the possibility to tab to the next 8-space
         hardware tab stop.
         """
-        pass
+        term = self._terminal
+        tab = 8
+
+        # echo -e "\tHello"
+        s = 'Hello'
+        term._cap_ht()
+        self._put_string(s, (term._cur_x, 0))
+        # There must be 8 spaces at the beginning of the line.
+        want = ('\x00' * tab) + s
+        self._check_string(want, (0, 0), (len(s) + tab, 0))
+        term._cap_rs1()
+
+        # echo -e "Hello,\tWorld!"
+        part1, part2 = 'Hello,', 'World!'
+        self._put_string(part1, (0, 0))
+        term._cap_ht()
+        self._put_string(part2, (term._cur_x, 0))
+        spaces = tab - len(part1)
+        # There must be 2 spaces between 'Hello,' and 'World!' because 'Hello,'
+        # consists of 6 characters (tab - 6 = 2).
+        self.assertEqual(2, spaces)
+        want = part1 + ('\x00' * spaces) + part2
+        self._check_string(want, (0, 0), (len(want), 0))
+        term._cap_rs1()
+
+        # echo -e "Buzzword\tcontains 8 letters"
+        part1, part2 = 'Buzzword', 'contains 8 letters'
+        self._put_string(part1, (0, 0))
+        term._cap_ht()
+        self._put_string(part2, (term._cur_x, 0))
+        # There must be 8 spaces between 'Buzzword' and 'contains 8 letters'
+        # because 'Buzzword' consists of 8 characters.
+        want = part1 + ('\x00' * tab) + part2
+        self._check_string(want, (0, 0), (len(want), 0))
 
     def test_cap_ich(self):
         """The terminal should have the possibility to insert the specified
