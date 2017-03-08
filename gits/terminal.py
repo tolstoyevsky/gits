@@ -572,6 +572,7 @@ class Terminal:
         pass
 
     def _cap_sgr0(self):
+        """Resets all attributes to the default values. """
         self._set_color_pair(0, 10)
 
     def _cap_smir(self):
@@ -611,6 +612,11 @@ class Terminal:
         self._eol = False  # it's necessary to reset _eol after preceding echo
 
     def _exec_escape_sequence(self):
+        """Matches either static escape sequences (such as \E[1m and \E[0;10m)
+        or escape sequences with parameters (such as \E[%d@ and \E[%d;%dr) to
+        one of the capabilities from the files, containing the matching rules
+        (escape sequence to capability). Then the capabilities are executed.
+        """
         e = self._buf
 
         method_name = self._escape_sequences.get(self._buf, None)
@@ -633,6 +639,9 @@ class Terminal:
                     self._buf = ''
 
     def _exec_single_character_command(self):
+        """Executes control sequences like 10 (LF, line feed) or 13 (CR,
+        carriage return).
+        """
         method_name = self.control_characters[self._buf]
         self._exec_method(method_name)
         self._buf = ''
@@ -654,6 +663,9 @@ class Terminal:
                 self._echo(i)
 
     def dumphtml(self):
+        """Transforms the internal representation of the screen into the HTML
+        representation.
+        """
         self._clean_bit(REVERSE_BIT)
 
         rows = self._rows
