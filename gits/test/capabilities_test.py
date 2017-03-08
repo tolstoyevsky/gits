@@ -619,21 +619,5 @@ class TestCapabilities(Helper):
         rand_y = random.randint(1, term._rows - 1)
         self._check_cap_vpa(rand_y)
 
-    @unittest.skip('skip')
-    def test_cap_dim(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_rmpch(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_smpch(self):
-        pass
-
-    @unittest.skip('skip')
-    def test_cap_rmso(self):
-        pass
-
 if __name__ == '__main__':
     unittest.main()
