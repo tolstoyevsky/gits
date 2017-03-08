@@ -586,7 +586,7 @@ class Terminal:
         definition for the term. Standout mode is whatever special highlighting
         the terminal can do, as defined in the terminal's database entry.
         """
-        self._set_color(7)
+        pass
 
     def _cap_smul(self):
         """Enters Underline mode. See _cap_rmul. """
@@ -594,7 +594,7 @@ class Terminal:
 
     def _cap_smpch(self):
         """Enters PC character display mode. See _cap_rmpch. """
-        self._set_color(11)
+        pass
 
     def _cap_vpa(self, y):
         """Sets the vertical position of the cursor to ``y``. See _cap_hpa.
