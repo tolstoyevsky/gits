@@ -646,23 +646,7 @@ class Terminal:
         self._exec_method(method_name)
         self._buf = ''
 
-    #
-    # User visible methods.
-    #
-    def write(self, s):
-        for i in s.decode('utf8', errors='replace'):
-            if ord(i) in self.control_characters:
-                self._buf = ord(i)
-                self._exec_single_character_command()
-            elif i == '\x1b':
-                self._buf += i
-            elif len(self._buf):
-                self._buf += i
-                self._exec_escape_sequence()
-            else:
-                self._echo(i)
-
-    def dumphtml(self):
+    def _build_html(self):
         """Transforms the internal representation of the screen into the HTML
         representation.
         """
@@ -720,3 +704,26 @@ class Terminal:
                 span += '\n'
 
         return r
+
+    #
+    # User visible methods.
+    #
+    def generate_html(self, buf):
+        """Determines the terminal commands. Then the commands are executed.
+        Then the html, representing the state of the terminal after the
+        commands executing, is generated. Commands are either the control
+        characters or the escape sequences, describing in on of the
+        configuration files. """
+        for i in buf.decode('utf8', errors='replace'):
+            if ord(i) in self.control_characters:
+                self._buf = ord(i)
+                self._exec_single_character_command()
+            elif i == '\x1b':
+                self._buf += i
+            elif len(self._buf):
+                self._buf += i
+                self._exec_escape_sequence()
+            else:
+                self._echo(i)
+
+        return self._build_html()
