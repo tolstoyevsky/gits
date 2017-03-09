@@ -110,9 +110,9 @@ class TermSocketHandler(WebSocketHandler):
     def open(self):
         def callback(*args, **kwargs):
             buf = os.read(self._fd, 65536)
-            TermSocketHandler.clients[self._fd]['terminal'].write(buf)
-            dump = TermSocketHandler.clients[self._fd]['terminal'].dumphtml()
-            TermSocketHandler.clients[self._fd]['client'].write_message(dump)
+            client = TermSocketHandler.clients[self._fd]
+            html = client['terminal'].generate_html(buf)
+            client['client'].write_message(html)
 
         self._fd = self._create()
         self._io_loop.add_handler(self._fd, callback, self._io_loop.READ)
