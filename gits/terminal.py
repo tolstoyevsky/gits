@@ -709,11 +709,12 @@ class Terminal:
     # User visible methods.
     #
     def generate_html(self, buf):
-        """Determines the terminal commands. Then the commands are executed.
-        Then the html, representing the state of the terminal after the
-        commands executing, is generated. Commands are either the control
-        characters or the escape sequences, describing in on of the
-        configuration files. """
+        """Splits the ``buf`` byte buffer taken from a terminal-oriented
+        program into output, escape and control sequences. The output prints on
+        the screen as is. The escape and control sequences are executed,
+        affecting the output. Finally, the routine generates the HTML document
+        which is ready to be printed in a user's browser.
+        """
         for i in buf.decode('utf8', errors='replace'):
             if ord(i) in self.control_characters:
                 self._buf = ord(i)
