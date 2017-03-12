@@ -639,7 +639,7 @@ class Terminal:
         """Executes control sequences like 10 (LF, line feed) or 13 (CR,
         carriage return).
         """
-        method_name = self.control_characters[self._buf]
+        method_name = self.control_characters[ord(self._buf)]
         self._exec_method(method_name)
         self._buf = ''
 
@@ -716,7 +716,7 @@ class Terminal:
         """
         for i in buf.decode('utf8', errors='replace'):
             if ord(i) in self.control_characters:
-                self._buf = ord(i)
+                self._buf = i
                 self._exec_single_character_command()
             elif i == '\x1b':
                 self._buf += i
