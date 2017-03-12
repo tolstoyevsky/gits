@@ -10,7 +10,7 @@ except ImportError:
 
 
 setup(name='gits',
-      version='0.3',
+      version='0.4',
       description='Gits package',
       long_description=long_description,
       url='https://github.com/tolstoyevsky/gits.git',
