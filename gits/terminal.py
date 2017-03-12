@@ -617,25 +617,22 @@ class Terminal:
         one of the capabilities from the files, containing the matching rules
         (escape sequence to capability). Then the capabilities are executed.
         """
-        e = self._buf
-
         method_name = self._escape_sequences.get(self._buf, None)
 
-        if len(e) > 32:
+        if len(self._buf) > 32:
             self._buf = ''
         elif method_name:  # static sequences
             self._exec_method(method_name)
             self._buf = ''
         else:  # sequences with params
-            for k, v in self._escape_sequences_re:
-                mo = k.match(e)
+            for sequence, capability in self._escape_sequences_re:
+                mo = sequence.match(self._buf)
                 if mo:
                     args = []
                     for i in mo.groups():
                         args.append(int(i))
 
-                    self._exec_method(v, args)
-                    e = ''
+                    self._exec_method(capability, args)
                     self._buf = ''
 
     def _exec_single_character_command(self):
