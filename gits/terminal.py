@@ -709,11 +709,13 @@ class Terminal:
     # User visible methods.
     #
     def generate_html(self, buf):
-        """Splits the ``buf`` byte buffer taken from a terminal-oriented
-        program into output, escape and control sequences. The output prints on
-        the screen as is. The escape and control sequences are executed,
-        affecting the output. Finally, the routine generates the HTML document
-        which is ready to be printed in a user's browser.
+        """Splits ``buf`` into output, escape and control sequences. The output
+        prints on the screen as is. The escape and control sequences are
+        executed, affecting the output. Finally, the routine generates the HTML
+        document which is ready to be printed in a user's browser.
+
+        The ``buf`` argument is a byte buffer taken from a terminal-oriented
+        program.
         """
         for i in buf.decode('utf8', errors='replace'):
             if ord(i) in self.control_characters:
