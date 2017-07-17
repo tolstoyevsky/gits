@@ -86,6 +86,10 @@ used through the ``--static-path`` and ``--templates-path`` parameters.
 
 Gits uses
 
+* `SSH <https://en.wikipedia.org/wiki/Secure_Shell>`_ to remotely login into a 
+  system. You need to ensure, that ssh daemon is running, before you'll start
+  a gits server.
+
 * `Tornado <http://tornadoweb.org>`_ to create a WebSocket server and multiplex
   input/output in a platform-independent way
 * `PyYAML <http://pyyaml.org>`_ to store escape and control sequences in a YAML
