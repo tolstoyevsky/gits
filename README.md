@@ -7,6 +7,11 @@ Gits
 
 Gits is a web-based terminal emulator. The project is based on completely reworked source code of [Ajaxterm](https://github.com/antonylesuisse/qweb/tree/master/ajaxterm). It understands only Linux console escape and control sequences so far. The main goal of the project is to be used in [OpenStack](https://openstack.org) one day.
 
+Gits in action
+-------------
+
+![](http://g.recordit.co/OfyakFzxH7.gif)
+
 Documentation
 -------------
 
